@@ -1,0 +1,7 @@
+{
+  "host": "",
+  "user": "root",
+  "password": "2719",
+  "port": 3306,
+  "database": "db_notas"
+}
