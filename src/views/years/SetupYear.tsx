@@ -6,6 +6,7 @@ import { Typography } from "@mui/material";
 import { ArrowForwardIosTwoTone } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -18,10 +19,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const SetupYear = ({ idPedioro }) => {
+  const [periodos, setPeriodos] = useState({});
+  const navigate = useNavigate();
   const getPeriodos = async (filter: any) => {
     // @ts-ignore
     const data = await window.API.getPeriodos(filter);
     console.log(data);
+    setPeriodos({ data: data[0], itemsCount: data[1] });
     return { data: data[0], itemsCount: data[1] };
   };
 
@@ -38,6 +42,8 @@ const SetupYear = ({ idPedioro }) => {
     // @ts-ignore
     const data = await window.API.insertPeriodo(periodo);
     if (data) {
+      idPedioro += 1;
+      getData();
       Swal.fire({
         title: "Periodo creado",
         icon: "success",
@@ -76,6 +82,7 @@ const SetupYear = ({ idPedioro }) => {
 
   const insertAnio = async (anio: any) => {
     anio.periodoId = idPedioro;
+    anio.anio = anio.anio.toUpperCase();
     // @ts-ignore
     const data = await window.API.createAnio(anio);
     if (data) {
@@ -125,7 +132,7 @@ const SetupYear = ({ idPedioro }) => {
       },
 
       rowClick: function (args: any) {
-        console.log(args);
+        navigate("/anio/" + args.item.id);
       },
       fields: [
         {
@@ -134,7 +141,14 @@ const SetupYear = ({ idPedioro }) => {
           align: "center",
           type: "text",
         },
-        { type: "control", width: 10 },
+        {
+          name: "id",
+          title: "ids",
+          align: "center",
+          type: "text",
+          visible: false,
+        },
+        { type: "control", width: 10, editButton: false },
       ],
     });
     // @ts-ignore
@@ -160,11 +174,24 @@ const SetupYear = ({ idPedioro }) => {
       pageNavigatorNextText: "...",
       pageNavigatorPrevText: "...",
       invalidMessage: "Por favor ingreser un valor valido",
-      rowClick: function (args: any) {
-        console.log(args);
+      rowClick: async function (args: any) {
+        idPedioro = args.item.id;
+        const anios = await getAnios(args.item.id);
+        console.log("anios", anios);
+        // @ts-ignore
+        $("#jsGrid").jsGrid("loadData", anios);
+        // @ts-ignore
       },
       controller: {
-        loadData: (filter: any) => {
+        loadData: async (filter: any) => {
+          try {
+            // @ts-ignore
+            $("#jsGrid").jsGrid("loadData", periodos);
+            // @ts-ignore
+            $("#jsGrid").jsGrid("refresh");
+          } catch (error) {
+            console.log(error);
+          }
           return getPeriodos(filter);
         },
         insertItem: async function (item: any) {
@@ -205,6 +232,13 @@ const SetupYear = ({ idPedioro }) => {
           align: "center",
           type: "text",
           validate: "required",
+        },
+        {
+          name: "id",
+          title: "ids",
+          align: "center",
+          type: "text",
+          visible: false,
         },
         {
           name: "estado",

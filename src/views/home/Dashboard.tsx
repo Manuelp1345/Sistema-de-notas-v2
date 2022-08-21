@@ -23,6 +23,7 @@ import Home from "./Home";
 import { House } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import SetupYear from "../years/SetupYear";
+import Year from "../years/Year";
 
 const drawerWidth = 240;
 
@@ -108,7 +109,12 @@ export default function Dashboard({ element }: { element: string }) {
     const data = await window.API.getPeriodos(filter);
     console.log(data);
     console.log(data[0][0]);
-    setPeriodo(data[0][0]);
+    data[0].find((item) => {
+      console.log(item);
+      if (item.estado) {
+        setPeriodo({ periodo: item.periodo, id: item.id });
+      }
+    });
   };
 
   const handleDrawerClose = () => {
@@ -123,8 +129,10 @@ export default function Dashboard({ element }: { element: string }) {
 
   React.useEffect(() => {
     setBgColor();
-    getPeriodos(1);
-  }, []);
+    if (periodo.id === 0) {
+      getPeriodos(1);
+    }
+  }, [navigate]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -214,6 +222,7 @@ export default function Dashboard({ element }: { element: string }) {
       </Drawer>
       {element === "home" && <Home />}
       {element === "anos" && <SetupYear idPedioro={periodo.id} />}
+      {element === "Year" && <Year />}
     </Box>
   );
 }

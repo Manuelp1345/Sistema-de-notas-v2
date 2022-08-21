@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, Notification } from "electron";
 import electronIsDev from "electron-is-dev";
-import { createConnection } from "typeorm";
+import { DataSource } from "typeorm";
 import fs from "fs";
 import * as path from "path";
 import { ConnectionDB } from "./config/database";
@@ -8,6 +8,7 @@ import { User } from "./config/entitys/user";
 import crypto from "crypto";
 import { Periodo } from "./config/entitys/periodo";
 import { Anio } from "./config/entitys/anios";
+import "reflect-metadata";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -75,8 +76,12 @@ app.on("window-all-closed", () => {
 ipcMain.handle("VALIDATE_CREDENTIALS", async () => {
   try {
     const connect = await ConnectionDB();
-    if (connect.isConnected) {
-      connect.close();
+
+    console.log(
+      "File:electron.ts VALIDATE_CREDENTIALS connect",
+      connect.isInitialized
+    );
+    if (connect.isInitialized) {
       return true;
     }
   } catch (error) {
@@ -86,7 +91,7 @@ ipcMain.handle("VALIDATE_CREDENTIALS", async () => {
 
 ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
   try {
-    const connection = await createConnection({
+    const connection = await new DataSource({
       type: "mysql",
       host: credentials.host,
       port: credentials.port,
@@ -94,7 +99,8 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
       password: credentials.pass,
       database: "",
     });
-    if (connection.isConnected) {
+    await connection.initialize();
+    if (connection.isInitialized) {
       await connection.query("CREATE DATABASE IF NOT EXISTS db_notas");
       const credentialsDB = {
         host: credentials.host,
@@ -128,7 +134,6 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
 
 ipcMain.handle("CREATE_USER_DB", async (event, user) => {
   //@ts-ignore
-  const connect = await ConnectionDB();
   const userDB = new User();
   userDB.nombre = user.nombre;
   userDB.apellido = user.apellido;
@@ -149,39 +154,27 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();
-    connect.close();
+
     return true;
   } catch (error) {
     console.log(error);
     //@ts-ignore
-
     new Notification({
       title: "Error",
       body: "No se pudo crear el usuario",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();
-    connect.close();
-
     return false;
   }
 });
 
 ipcMain.handle("LOGIN", async (event, user) => {
-  const connect = await ConnectionDB();
-  console.log(connect.isConnected);
-  let userDB;
-  try {
-    userDB = await connect.getRepository("User");
-  } catch (error) {
-    console.log(error);
-  }
-  const userJson = await userDB.findOne({
+  const userJson = await User.findOne({
     where: {
       correo: user.email,
     },
   });
-  connect.close();
 
   if (userJson) {
     if (
@@ -200,7 +193,6 @@ ipcMain.handle("LOGIN", async (event, user) => {
     icon: path.join(__dirname, "./img/logo.png"),
     //@ts-ignore
   }).show();
-  connect.close();
   return false;
 });
 
@@ -212,29 +204,31 @@ ipcMain.handle("GET_PERIODO", async (e, { pageIndex = 1, pageSize = 0 }) => {
     periodoDB = await connect.getRepository("periodo");
   } catch (error) {
     console.log(error);
+
+    //@ts-ignore
+    throw new Error(error);
   }
-  const periodoJson = await periodoDB.findAndCount({
-    order: {
-      id: "DESC",
-    },
-    skip: skip,
-    take: 3,
-  });
-  connect.close();
+
+  let periodoJson;
+  try {
+    periodoJson = await periodoDB.findAndCount({
+      order: {
+        id: "DESC",
+      },
+      skip: skip,
+      take: 3,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
   return periodoJson;
 });
 
 ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
-  const connect = await ConnectionDB();
-  let periodoDB;
-  try {
-    periodoDB = await connect.getRepository("periodo");
-  } catch (error) {
-    console.log(error);
-  }
-  const periodoJson = await periodoDB.findOne({
+  const periodoJson = await Periodo.findOne({
     where: {
-      estado: 1,
+      estado: true,
     },
   });
   if (periodoJson) {
@@ -243,14 +237,14 @@ ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
     console.log(periodoJson);
 
     try {
-      await periodoDB.save(periodoJson);
+      await Periodo.save(periodoJson);
     } catch (error) {
       console.log(error);
     }
   }
   try {
     console.log("first");
-    await periodoDB.save(periodo);
+    await Periodo.save(periodo);
     //@ts-ignore
     new Notification({
       title: "Notificacion",
@@ -258,7 +252,6 @@ ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();
-    connect.close();
     return true;
   } catch (error) {
     console.log(error);
@@ -270,63 +263,75 @@ ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();
-    connect.close();
     return false;
   }
 });
 
 ipcMain.handle("GET_AÑOS", async (eve, id) => {
-  const connect = await ConnectionDB();
   let años;
   console.log(id);
   try {
     años = await Anio.find({
       relations: ["periodo"],
       where: {
-        periodo: id,
+        periodo: {
+          id: id,
+        },
       },
     });
     console.log(años);
-    connect.close();
     return años;
   } catch (error) {
     console.log("2", error);
   }
 });
 
-ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
-  const connect = await ConnectionDB();
-  const periodo = await Periodo.findOne({
-    where: {
-      estado: 1,
-    },
-  });
-  const anio = new Anio();
-  anio.anio = anioFron.anio;
-  anio.periodo = periodo as Periodo;
-
+ipcMain.handle("GET_AÑO", async (eve, id) => {
+  let año;
+  console.log("Periodo ID", id);
   try {
-    await anio.save();
-    //@ts-ignore
-    new Notification({
-      title: "Notificacion",
-      body: "Año creado correctamente",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    connect.close();
-    return true;
+    año = await Anio.findOne({
+      relations: ["periodo"],
+      where: {
+        id: id,
+      },
+    });
+    console.log(año);
+    return año;
   } catch (error) {
-    console.log(error);
-    //@ts-ignore
-
-    new Notification({
-      title: "Error",
-      body: "No se pudo crear el año",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    connect.close();
-    return false;
+    console.log("2", error);
   }
-});
+}),
+  ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
+    const periodo = await Periodo.findOne({
+      where: {
+        estado: true,
+      },
+    });
+    const anio = new Anio();
+    anio.anio = anioFron.anio;
+    anio.periodo = periodo as Periodo;
+
+    try {
+      await anio.save();
+      //@ts-ignore
+      new Notification({
+        title: "Notificacion",
+        body: "Año creado correctamente",
+        icon: path.join(__dirname, "./img/logo.png"),
+        //@ts-ignore
+      }).show();
+      return true;
+    } catch (error) {
+      console.log(error);
+      //@ts-ignore
+
+      new Notification({
+        title: "Error",
+        body: "No se pudo crear el año",
+        icon: path.join(__dirname, "./img/logo.png"),
+        //@ts-ignore
+      }).show();
+      return false;
+    }
+  });
