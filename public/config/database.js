@@ -8,95 +8,56 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConnectionDB = void 0;
-var electron_1 = require("electron");
-var typeorm_1 = require("typeorm");
-var user_1 = require("./entitys/user");
-var fs_1 = __importDefault(require("fs"));
-var anios_1 = require("./entitys/anios");
-var periodo_1 = require("./entitys/periodo");
-var ruta = electron_1.app.getPath("userData") + "/database.json";
-var file = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var file, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 5]);
-                return [4 /*yield*/, fs_1.default.readFileSync(ruta, "utf8")];
-            case 1:
-                file = _a.sent();
-                return [3 /*break*/, 5];
-            case 2:
-                error_1 = _a.sent();
-                return [4 /*yield*/, fs_1.default.writeFileSync(ruta, JSON.stringify({}))];
-            case 3:
-                _a.sent();
-                return [4 /*yield*/, fs_1.default.readFileSync(ruta, "utf8")];
-            case 4:
-                file = _a.sent();
-                return [3 /*break*/, 5];
-            case 5:
-                console.log(file);
-                return [2 /*return*/, file];
-        }
+const electron_1 = require("electron");
+const typeorm_1 = require("typeorm");
+const user_1 = require("./entitys/user");
+const fs_1 = __importDefault(require("fs"));
+const anios_1 = require("./entitys/anios");
+const periodo_1 = require("./entitys/periodo");
+const materias_1 = require("./entitys/materias");
+const secciones_1 = require("./entitys/secciones");
+const alumnos_1 = require("./entitys/alumnos");
+const ruta = electron_1.app.getPath("userData") + "/database.json";
+const file = () => __awaiter(void 0, void 0, void 0, function* () {
+    let file;
+    try {
+        file = yield fs_1.default.readFileSync(ruta, "utf8");
+    }
+    catch (error) {
+        yield fs_1.default.writeFileSync(ruta, JSON.stringify({}));
+        file = yield fs_1.default.readFileSync(ruta, "utf8");
+    }
+    console.log(file);
+    return file;
+});
+const ConnectionDB = () => __awaiter(void 0, void 0, void 0, function* () {
+    const credentialsDB = JSON.parse(yield file());
+    console.log("file:DATABASE credentials ", credentialsDB);
+    const connection = new typeorm_1.DataSource({
+        type: "mysql",
+        host: credentialsDB.host,
+        port: credentialsDB.port,
+        username: credentialsDB.user,
+        password: credentialsDB.password,
+        database: credentialsDB.database,
+        entities: [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+        synchronize: true,
+        logging: false,
     });
-}); };
-var ConnectionDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var credentialsDB, _a, _b, connection;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                _b = (_a = JSON).parse;
-                return [4 /*yield*/, file()];
-            case 1:
-                credentialsDB = _b.apply(_a, [_c.sent()]);
-                console.log("credentials", credentialsDB);
-                return [4 /*yield*/, (0, typeorm_1.createConnection)({
-                        type: "mysql",
-                        host: credentialsDB.host,
-                        port: credentialsDB.port,
-                        username: credentialsDB.user,
-                        password: credentialsDB.password,
-                        database: credentialsDB.database,
-                        entities: [user_1.User, anios_1.Anio, periodo_1.Periodo],
-                        synchronize: true,
-                    })];
-            case 2:
-                connection = _c.sent();
-                return [2 /*return*/, connection];
+    if (!connection.isInitialized) {
+        try {
+            yield connection.initialize();
         }
-    });
-}); };
+        catch (error) {
+            console.log("dataBase Error", error);
+        }
+    }
+    return connection;
+});
 exports.ConnectionDB = ConnectionDB;
 //# sourceMappingURL=database.js.map

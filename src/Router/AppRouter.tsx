@@ -4,6 +4,7 @@ import { Setup } from "../views/setup/Setup";
 import { CreateUser } from "../views/setup/CreateClient";
 import Auth from "../views/auth/Auth";
 import Dashboard from "../views/home/Dashboard";
+import Year from "../views/years/Year";
 
 const AppRouter = () => {
   return (
@@ -13,6 +14,7 @@ const AppRouter = () => {
         <Route path="/setup" element={<Setup />} />
         <Route path="/home" element={<Dashboard element="home" />} />
         <Route path="/anos" element={<Dashboard element="anos" />} />
+        <Route path="/anio/:id" element={<Dashboard element="Year" />} />
         <Route path="/perfil" element={<Dashboard element="perfil" />} />
         <Route path="/admin" element={<Dashboard element="admin" />} />
         <Route path="/logout" element={<Auth />} />

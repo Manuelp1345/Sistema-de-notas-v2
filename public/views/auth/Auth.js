@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -25,34 +14,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var jsx_runtime_1 = require("react/jsx-runtime");
+const jsx_runtime_1 = require("react/jsx-runtime");
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-var react_1 = require("react");
-var Box_1 = __importDefault(require("@mui/material/Box"));
-var prop_types_1 = __importDefault(require("prop-types"));
-var Typography_1 = __importDefault(require("@mui/material/Typography"));
-var material_1 = require("@mui/material");
-var styled_1 = __importDefault(require("@emotion/styled"));
-var Register_1 = __importDefault(require("./Register"));
-var Login_1 = __importDefault(require("./Login"));
-var AntTabs = (0, styled_1.default)(material_1.Tabs)({
+const react_1 = require("react");
+const Box_1 = __importDefault(require("@mui/material/Box"));
+const prop_types_1 = __importDefault(require("prop-types"));
+const Typography_1 = __importDefault(require("@mui/material/Typography"));
+const material_1 = require("@mui/material");
+const styled_1 = __importDefault(require("@emotion/styled"));
+const Register_1 = __importDefault(require("./Register"));
+const Login_1 = __importDefault(require("./Login"));
+const AntTabs = (0, styled_1.default)(material_1.Tabs)({
     borderBottom: "1px solid gray",
     "& .MuiTabs-indicator": {
         backgroundColor: "white",
     },
 });
-var AntTab = (0, styled_1.default)(function (props) { return (0, jsx_runtime_1.jsx)(material_1.Tab, __assign({ disableRipple: true }, props), void 0); })(function (_a) {
-    var theme = _a.theme;
-    return ({
+const AntTab = (0, styled_1.default)((props) => (0, jsx_runtime_1.jsx)(material_1.Tab, Object.assign({ disableRipple: true }, props), void 0))(({ theme }) => ({
+    color: "white",
+    "&.Mui-selected": {
         color: "white",
-        "&.Mui-selected": {
-            color: "white",
-        },
-    });
-});
+    },
+}));
 function TabPanel(props) {
-    var children = props.children, value = props.value, index = props.index, other = __rest(props, ["children", "value", "index"]);
-    return ((0, jsx_runtime_1.jsx)("div", __assign({ role: "tabpanel", hidden: value !== index, id: "simple-tabpanel-".concat(index), "aria-labelledby": "simple-tab-".concat(index), style: { display: "flex", flexDirection: "column" } }, other, { children: value === index && ((0, jsx_runtime_1.jsx)(Box_1.default, __assign({ sx: {
+    const { children, value, index } = props, other = __rest(props, ["children", "value", "index"]);
+    return ((0, jsx_runtime_1.jsx)("div", Object.assign({ role: "tabpanel", hidden: value !== index, id: `simple-tabpanel-${index}`, "aria-labelledby": `simple-tab-${index}`, style: { display: "flex", flexDirection: "column" } }, other, { children: value === index && ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                 width: "100%",
                 height: "50vh",
                 display: "flex",
@@ -65,23 +51,23 @@ TabPanel.propTypes = {
     index: prop_types_1.default.number.isRequired,
     value: prop_types_1.default.number.isRequired,
 };
-var Auth = function () {
-    var _a = (0, react_1.useState)(0), value = _a[0], setValue = _a[1];
-    var setBgImg = function () {
+const Auth = () => {
+    const [value, setValue] = (0, react_1.useState)(0);
+    const setBgImg = () => {
         //@ts-ignore
         window.API.imgLogin();
     };
     (0, react_1.useEffect)(setBgImg, []);
-    var handleChange = function (_event, newValue) {
+    const handleChange = (_event, newValue) => {
         setValue(newValue);
     };
-    return ((0, jsx_runtime_1.jsx)(Box_1.default, __assign({ sx: {
+    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
             width: "100%",
             height: "100vh",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-        } }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, __assign({ sx: {
+        } }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                 backgroundColor: "rgba(0,155,221,0.95)",
                 color: "info.contrastText",
                 height: "76%",
@@ -91,12 +77,12 @@ var Auth = function () {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-            } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, __assign({ sx: {
+            } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         marginLeft: "-10rem",
-                    } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, __assign({ sx: { height: "5rem", padding: "1rem" } }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { height: "8rem" }, component: "img", src: "/img/logo.png" }, void 0) }), void 0), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, __assign({ sx: { textAlign: "center", marginTop: "1rem" }, variant: "h3" }, { children: "Bienvenido" }), void 0), (0, jsx_runtime_1.jsx)(Typography_1.default, __assign({ sx: { textAlign: "center" }, variant: "h5" }, { children: "\u00BFDesea ingresar al sistema?" }), void 0)] }, void 0)] }), void 0), (0, jsx_runtime_1.jsxs)(AntTabs, __assign({ value: value, onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 0, label: "Ingresar" }, void 0), (0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 1, label: "Registrarse" }, void 0)] }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, __assign({ value: value, index: 0 }, { children: (0, jsx_runtime_1.jsx)(Login_1.default, {}, void 0) }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, __assign({ value: value, index: 1 }, { children: (0, jsx_runtime_1.jsx)(Register_1.default, {}, void 0) }), void 0)] }), void 0) }), void 0));
+                    } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: { height: "5rem", padding: "1rem" } }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { height: "8rem" }, component: "img", src: "/img/logo.png" }, void 0) }), void 0), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center", marginTop: "1rem" }, variant: "h3" }, { children: "Bienvenido" }), void 0), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center" }, variant: "h5" }, { children: "\u00BFDesea ingresar al sistema?" }), void 0)] }, void 0)] }), void 0), (0, jsx_runtime_1.jsxs)(AntTabs, Object.assign({ value: value, onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 0, label: "Ingresar" }, void 0), (0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 1, label: "Registrarse" }, void 0)] }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 0 }, { children: (0, jsx_runtime_1.jsx)(Login_1.default, {}, void 0) }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 1 }, { children: (0, jsx_runtime_1.jsx)(Register_1.default, {}, void 0) }), void 0)] }), void 0) }), void 0));
 };
 exports.default = Auth;
 //# sourceMappingURL=Auth.js.map

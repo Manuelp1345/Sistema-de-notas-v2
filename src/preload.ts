@@ -19,6 +19,10 @@ const getAnios = async (id) => {
   return await ipcRenderer.invoke("GET_AÑOS", id);
 };
 
+const getAnio = async (id) => {
+  return await ipcRenderer.invoke("GET_AÑO", id);
+};
+
 const createAnio = async (anio) => {
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
 };
