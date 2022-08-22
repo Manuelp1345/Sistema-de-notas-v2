@@ -1,13 +1,12 @@
 import { Anio } from "./anios";
-import { Periodo } from "./periodo";
+import {} from "./periodo";
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   JoinTable,
   BaseEntity,
-  ManyToMany,
+  ManyToOne,
 } from "typeorm";
 
 @Entity()
@@ -18,11 +17,7 @@ export class Seccion extends BaseEntity {
   @Column()
   seccion!: string;
 
-  @ManyToOne(() => Periodo)
+  @ManyToOne(() => Anio)
   @JoinTable()
-  periodo!: Periodo;
-
-  @ManyToMany(() => Anio)
-  @JoinTable()
-  anios!: Anio[];
+  anio!: Anio;
 }

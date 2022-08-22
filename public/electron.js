@@ -42,6 +42,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const periodo_1 = require("./config/entitys/periodo");
 const anios_1 = require("./config/entitys/anios");
 require("reflect-metadata");
+const secciones_1 = require("./config/entitys/secciones");
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -300,7 +301,6 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
     console.log("Periodo ID", id);
     try {
         año = yield anios_1.Anio.findOne({
-            relations: ["periodo"],
             where: {
                 id: id,
             },
@@ -311,37 +311,105 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
     catch (error) {
         console.log("2", error);
     }
-})),
-    electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
-        const periodo = yield periodo_1.Periodo.findOne({
+}));
+electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
+    const periodo = yield periodo_1.Periodo.findOne({
+        where: {
+            estado: true,
+        },
+    });
+    const anio = new anios_1.Anio();
+    anio.anio = anioFron.anio;
+    anio.periodo = periodo;
+    try {
+        yield anio.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Notificacion",
+            body: "Año creado correctamente",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Error",
+            body: "No se pudo crear el año",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
+}));
+electron_1.ipcMain.handle("GET_SECCIONES", (evet, id) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("get Secciones", id);
+    let secciones;
+    try {
+        secciones = yield secciones_1.Seccion.find({
+            relations: ["anio"],
             where: {
-                estado: true,
+                anio: {
+                    id: id,
+                },
             },
         });
-        const anio = new anios_1.Anio();
-        anio.anio = anioFron.anio;
-        anio.periodo = periodo;
-        try {
-            yield anio.save();
+        console.log(secciones);
+        return secciones;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("GET_SECCION", (evet, filter) => __awaiter(void 0, void 0, void 0, function* () {
+    let seccion;
+    try {
+        seccion = yield secciones_1.Seccion.findOne({
+            relations: ["anio"],
+            where: {
+                id: filter,
+            },
+        });
+        return seccion;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(seccion);
+    const anio = yield anios_1.Anio.findOne({
+        where: {
+            id: seccion.anio,
+        },
+    });
+    console.log("insert seccion", anio);
+    const seccionDB = new secciones_1.Seccion();
+    seccionDB.seccion = seccion.seccion;
+    seccionDB.anio = anio;
+    try {
+        yield seccionDB.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Notificacion",
+            body: "Seccion creada correctamente",
+            icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
-            new electron_1.Notification({
-                title: "Notificacion",
-                body: "Año creado correctamente",
-                icon: path.join(__dirname, "./img/logo.png"),
-                //@ts-ignore
-            }).show();
-            return true;
-        }
-        catch (error) {
-            console.log(error);
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Error",
+            body: "No se pudo crear la seccion",
+            icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
-            new electron_1.Notification({
-                title: "Error",
-                body: "No se pudo crear el año",
-                icon: path.join(__dirname, "./img/logo.png"),
-                //@ts-ignore
-            }).show();
-            return false;
-        }
-    }));
+        }).show();
+        return false;
+    }
+}));
 //# sourceMappingURL=electron.js.map

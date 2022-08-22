@@ -9,6 +9,7 @@ import crypto from "crypto";
 import { Periodo } from "./config/entitys/periodo";
 import { Anio } from "./config/entitys/anios";
 import "reflect-metadata";
+import { Seccion } from "./config/entitys/secciones";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -291,7 +292,6 @@ ipcMain.handle("GET_AÑO", async (eve, id) => {
   console.log("Periodo ID", id);
   try {
     año = await Anio.findOne({
-      relations: ["periodo"],
       where: {
         id: id,
       },
@@ -301,37 +301,108 @@ ipcMain.handle("GET_AÑO", async (eve, id) => {
   } catch (error) {
     console.log("2", error);
   }
-}),
-  ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
-    const periodo = await Periodo.findOne({
+});
+
+ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
+  const periodo = await Periodo.findOne({
+    where: {
+      estado: true,
+    },
+  });
+  const anio = new Anio();
+  anio.anio = anioFron.anio;
+  anio.periodo = periodo as Periodo;
+
+  try {
+    await anio.save();
+    //@ts-ignore
+    new Notification({
+      title: "Notificacion",
+      body: "Año creado correctamente",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return true;
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+
+    new Notification({
+      title: "Error",
+      body: "No se pudo crear el año",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+});
+
+ipcMain.handle("GET_SECCIONES", async (evet, id) => {
+  console.log("get Secciones", id);
+  let secciones;
+  try {
+    secciones = await Seccion.find({
+      relations: ["anio"],
       where: {
-        estado: true,
+        anio: {
+          id: id,
+        },
       },
     });
-    const anio = new Anio();
-    anio.anio = anioFron.anio;
-    anio.periodo = periodo as Periodo;
+    console.log(secciones);
+    return secciones;
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-    try {
-      await anio.save();
-      //@ts-ignore
-      new Notification({
-        title: "Notificacion",
-        body: "Año creado correctamente",
-        icon: path.join(__dirname, "./img/logo.png"),
-        //@ts-ignore
-      }).show();
-      return true;
-    } catch (error) {
-      console.log(error);
-      //@ts-ignore
+ipcMain.handle("GET_SECCION", async (evet, filter) => {
+  let seccion;
+  try {
+    seccion = await Seccion.findOne({
+      relations: ["anio"],
+      where: {
+        id: filter,
+      },
+    });
+    return seccion;
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-      new Notification({
-        title: "Error",
-        body: "No se pudo crear el año",
-        icon: path.join(__dirname, "./img/logo.png"),
-        //@ts-ignore
-      }).show();
-      return false;
-    }
+ipcMain.handle("INSERT_SECCION", async (event, seccion) => {
+  console.log(seccion);
+  const anio = await Anio.findOne({
+    where: {
+      id: seccion.anio,
+    },
   });
+
+  console.log("insert seccion", anio);
+  const seccionDB = new Seccion();
+  seccionDB.seccion = seccion.seccion;
+  seccionDB.anio = anio as Anio;
+  try {
+    await seccionDB.save();
+    //@ts-ignore
+    new Notification({
+      title: "Notificacion",
+      body: "Seccion creada correctamente",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return true;
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+
+    new Notification({
+      title: "Error",
+      body: "No se pudo crear la seccion",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+});

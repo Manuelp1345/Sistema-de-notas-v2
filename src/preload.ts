@@ -23,6 +23,14 @@ const getAnio = async (id) => {
   return await ipcRenderer.invoke("GET_AÑO", id);
 };
 
+const getSecciones = async (id) => {
+  return await ipcRenderer.invoke("GET_SECCIONES", id);
+};
+
+const insertSeccion = async (seccion) => {
+  return await ipcRenderer.invoke("INSERT_SECCION", seccion);
+};
+
 const createAnio = async (anio) => {
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
 };
@@ -63,6 +71,9 @@ const API = {
   createAnio,
   getAnios,
   insertPeriodo,
+  getAnio,
+  getSecciones,
+  insertSeccion,
   login,
   imgLogin,
   background,
