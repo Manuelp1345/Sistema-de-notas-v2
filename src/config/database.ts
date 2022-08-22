@@ -23,8 +23,8 @@ const file = async () => {
   return file;
 };
 
-export const ConnectionDB = async (): Promise<DataSource> => {
-  const credentialsDB = JSON.parse(await file());
+export const ConnectionDB = async (credentials?): Promise<DataSource> => {
+  const credentialsDB = credentials ? credentials : JSON.parse(await file());
   console.log("file:DATABASE credentials ", credentialsDB);
 
   const connection = new DataSource({
@@ -32,9 +32,11 @@ export const ConnectionDB = async (): Promise<DataSource> => {
     host: credentialsDB.host,
     port: credentialsDB.port,
     username: credentialsDB.user,
-    password: credentialsDB.password,
-    database: credentialsDB.database,
-    entities: [User, Anio, Periodo, Materia, Seccion, Alumno],
+    password: credentials ? credentials.pass : credentialsDB.password,
+    database: credentials ? "" : credentialsDB.database,
+    entities: credentials
+      ? []
+      : [User, Anio, Periodo, Materia, Seccion, Alumno],
     synchronize: true,
     logging: false,
   });

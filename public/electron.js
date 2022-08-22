@@ -43,6 +43,8 @@ const periodo_1 = require("./config/entitys/periodo");
 const anios_1 = require("./config/entitys/anios");
 require("reflect-metadata");
 const secciones_1 = require("./config/entitys/secciones");
+const materias_1 = require("./config/entitys/materias");
+const alumnos_1 = require("./config/entitys/alumnos");
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -115,17 +117,11 @@ electron_1.ipcMain.handle("VALIDATE_CREDENTIALS", () => __awaiter(void 0, void 0
 }));
 electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const connection = yield new typeorm_1.DataSource({
-            type: "mysql",
-            host: credentials.host,
-            port: credentials.port,
-            username: credentials.user,
-            password: credentials.pass,
-            database: "",
-        });
-        yield connection.initialize();
-        if (connection.isInitialized) {
-            yield connection.query("CREATE DATABASE IF NOT EXISTS db_notas");
+        credentials.database = "database";
+        const connect = yield (0, database_1.ConnectionDB)(credentials);
+        console.log("File:electron.ts create credentials connect", connect.isInitialized);
+        if (connect.isInitialized) {
+            yield connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
             const credentialsDB = {
                 host: credentials.host,
                 user: credentials.user,
@@ -140,11 +136,30 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
                         throw err;
                     console.log("The file has been saved!");
                 });
-                connection.close();
+                const connectDB = connect.createQueryRunner();
+                yield connectDB.release();
             }
             catch (error) {
                 return false;
             }
+        }
+        try {
+            const connectTwo = new typeorm_1.DataSource({
+                type: "mysql",
+                host: credentials.host,
+                port: credentials.port,
+                username: credentials.user,
+                password: credentials.pass,
+                database: "db_notas",
+                entities: [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+                synchronize: true,
+                logging: false,
+            });
+            yield connectTwo.initialize();
+        }
+        catch (error) {
+            console.log(error);
+            return false;
         }
         return true;
     }
@@ -153,6 +168,7 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
     }
 }));
 electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("File:electron.ts CREATE_USER_DB", user);
     //@ts-ignore
     const userDB = new user_1.User();
     userDB.nombre = user.nombre;

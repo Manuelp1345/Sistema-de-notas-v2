@@ -10,6 +10,8 @@ import { Periodo } from "./config/entitys/periodo";
 import { Anio } from "./config/entitys/anios";
 import "reflect-metadata";
 import { Seccion } from "./config/entitys/secciones";
+import { Materia } from "./config/entitys/materias";
+import { Alumno } from "./config/entitys/alumnos";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -92,17 +94,15 @@ ipcMain.handle("VALIDATE_CREDENTIALS", async () => {
 
 ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
   try {
-    const connection = await new DataSource({
-      type: "mysql",
-      host: credentials.host,
-      port: credentials.port,
-      username: credentials.user,
-      password: credentials.pass,
-      database: "",
-    });
-    await connection.initialize();
-    if (connection.isInitialized) {
-      await connection.query("CREATE DATABASE IF NOT EXISTS db_notas");
+    credentials.database = "database";
+    const connect = await ConnectionDB(credentials);
+
+    console.log(
+      "File:electron.ts create credentials connect",
+      connect.isInitialized
+    );
+    if (connect.isInitialized) {
+      await connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
       const credentialsDB = {
         host: credentials.host,
         user: credentials.user,
@@ -121,12 +121,30 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
             console.log("The file has been saved!");
           }
         );
-        connection.close();
+        const connectDB = connect.createQueryRunner();
+        await connectDB.release();
       } catch (error) {
         return false;
       }
     }
 
+    try {
+      const connectTwo = new DataSource({
+        type: "mysql",
+        host: credentials.host,
+        port: credentials.port,
+        username: credentials.user,
+        password: credentials.pass,
+        database: "db_notas",
+        entities: [User, Anio, Periodo, Materia, Seccion, Alumno],
+        synchronize: true,
+        logging: false,
+      });
+      await connectTwo.initialize();
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
     return true;
   } catch (error) {
     return false;
@@ -134,6 +152,7 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
 });
 
 ipcMain.handle("CREATE_USER_DB", async (event, user) => {
+  console.log("File:electron.ts CREATE_USER_DB", user);
   //@ts-ignore
   const userDB = new User();
   userDB.nombre = user.nombre;
