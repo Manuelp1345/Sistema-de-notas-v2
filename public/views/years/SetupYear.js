@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -284,7 +288,7 @@ const SetupYear = ({ idPedioro }) => {
             display: "flex",
             height: "100vh",
             flexDirection: "column",
-        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}, void 0), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "0.5rem" }, id: "periodo", component: "div" }, void 0), (0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "1rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" }), void 0), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "jsGrid", component: "div" }, void 0)] }), void 0));
+        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "0.5rem" }, id: "periodo", component: "div" }), (0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "1rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "jsGrid", component: "div" })] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

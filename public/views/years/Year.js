@@ -140,17 +140,17 @@ const Year = () => {
             console.log("id", id);
         }))();
     }, []);
-    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}, void 0), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
+    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones({});
                     navigate(-1);
-                } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }, void 0), "Volver"] }), void 0), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     flexWrap: "nowrap",
                     alignItems: "center",
                     justifyContent: "center",
                 } }, { children: (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", component: "h1", gutterBottom: true }, { children: 
                     // @ts-ignore
-                    anio.anio }), void 0) }), void 0), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }, void 0)] }), void 0));
+                    anio.anio })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" })] })));
 };
 exports.default = Year;
 //# sourceMappingURL=Year.js.map
