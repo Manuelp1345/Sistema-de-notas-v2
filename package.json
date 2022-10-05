@@ -60,7 +60,7 @@
     "reflect-metadata": "^0.1.13",
     "sweetalert2": "^11.4.4",
     "typeorm": "^0.3.7",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^3.0.3"
   },
   "browserslist": {
     "production": [
