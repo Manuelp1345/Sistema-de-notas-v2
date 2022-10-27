@@ -97,64 +97,10 @@ const SetupYear = ({ idPedioro }) => {
 
   React.useEffect(() => {
     // @ts-ignore
-    $("#jsGrid").jsGrid({
-      width: "100%",
-      paging: true,
-      autoload: false,
-      pageLoading: true,
-      pageSize: 3,
-      pageIndex: 1,
-      heading: true,
-      inserting: true,
-      loadIndication: true,
-      loadMessage: "Por favor espere",
-      loadShading: true,
-      noDataContent: "No hay años registrados",
-      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-      pagePrevText: "Anterior",
-      pageNextText: "Siguiente",
-      pageFirstText: "Primera",
-      pageLastText: "Ultima",
-      pageNavigatorNextText: "...",
-      pageNavigatorPrevText: "...",
-      invalidMessage: "Por favor ingreser un valor valido",
-
-      controller: {
-        loadData: (filter: any) => {
-          return getAnios(idPedioro);
-        },
-
-        insertItem: async (item: any) => {
-          await insertAnio(item);
-          // @ts-ignore
-          $("#jsGrid").jsGrid("refresh");
-        },
-      },
-
-      rowClick: function (args: any) {
-        navigate("/anio/" + args.item.id);
-      },
-      fields: [
-        {
-          name: "anio",
-          title: "Años",
-          align: "center",
-          type: "text",
-        },
-        {
-          name: "id",
-          title: "ids",
-          align: "center",
-          type: "text",
-          visible: false,
-        },
-        { type: "control", width: 10, editButton: false },
-      ],
-    });
-    // @ts-ignore
 
     $("#periodo").jsGrid({
       width: "100%",
+
       paging: true,
       autoload: false,
       pageLoading: true,
@@ -182,6 +128,7 @@ const SetupYear = ({ idPedioro }) => {
         $("#jsGrid").jsGrid("loadData", anios);
         // @ts-ignore
       },
+
       controller: {
         loadData: async (filter: any) => {
           try {
@@ -256,6 +203,195 @@ const SetupYear = ({ idPedioro }) => {
       ],
     });
 
+    // @ts-ignore
+    $("#jsGrid").jsGrid({
+      width: "100%",
+
+      paging: true,
+      autoload: false,
+      pageLoading: true,
+      pageSize: 3,
+      pageIndex: 1,
+      heading: true,
+      inserting: true,
+      loadIndication: true,
+      loadMessage: "Por favor espere",
+      loadShading: true,
+      noDataContent: "No hay años registrados",
+      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
+      pagePrevText: "Anterior",
+      pageNextText: "Siguiente",
+      pageFirstText: "Primera",
+      pageLastText: "Ultima",
+      pageNavigatorNextText: "...",
+      pageNavigatorPrevText: "...",
+      invalidMessage: "Por favor ingreser un valor valido",
+
+      confirmDeleting: true,
+      deleteConfirm: (item) => {
+        return `seguro sea eliminar "${item.anio}"`;
+      },
+      onItemDeleting: async (element) => {
+        console.log("item delete", element);
+        let deleteAnio;
+        try {
+          //@ts-ignore
+          deleteAnio = await window.API.deleteAnio(element.item.id);
+        } catch (error) {
+          Swal.fire({
+            title: `Error al borrar ${element.item.anio}`,
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+        console.log("delete response", deleteAnio);
+        if (deleteAnio === "error") {
+          return Swal.fire({
+            title: `NO puedes borrar la sección. Sección en uso `,
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+
+        Swal.fire({
+          title: `${element.item.anio} Borrado`,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // @ts-ignore
+
+        $("#jsGrid").jsGrid("refresh");
+        // @ts-ignore
+
+        $("#jsGrid").jsGrid("reset");
+      },
+
+      controller: {
+        loadData: (filter: any) => {
+          return getAnios(idPedioro);
+        },
+
+        insertItem: async (item: any) => {
+          await insertAnio(item);
+          // @ts-ignore
+          $("#jsGrid").jsGrid("refresh");
+        },
+      },
+
+      rowClick: function (args: any) {
+        navigate("/anio/" + args.item.id);
+      },
+      fields: [
+        {
+          name: "anio",
+          title: "Años",
+          align: "center",
+          type: "text",
+        },
+        {
+          name: "id",
+          title: "ids",
+          align: "center",
+          type: "text",
+          visible: false,
+        },
+        { type: "control", width: 10, editButton: false },
+      ],
+    });
+    // @ts-ignore
+
+    // @ts-ignore
+    $("#Areas").jsGrid({
+      width: "100%",
+      height: "100%",
+      paging: true,
+      pageLoading: true,
+      pageSize: 3,
+      pageIndex: 1,
+      heading: true,
+      inserting: true,
+      loadMessage: "Por favor espere",
+      loadShading: true,
+      noDataContent: "No hay Areas",
+      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
+      pagePrevText: "Anterior",
+      pageNextText: "Siguiente",
+      pageFirstText: "Primera",
+      pageLastText: "Ultima",
+      pageNavigatorNextText: "...",
+      pageNavigatorPrevText: "...",
+      invalidMessage: "Por favor ingreser un valor valido",
+      data: [
+        {
+          area: "Matematica",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Ingles",
+        },
+        {
+          area: "Inglesss",
+        },
+      ],
+      controller: {
+        loadData: (filter: any) => {
+          console.log("");
+        },
+
+        insertItem: async (item: any) => {
+          await insertAnio(item);
+          // @ts-ignore
+          $("#Areas").jsGrid("refresh");
+        },
+      },
+
+      rowClick: function (args: any) {
+        //
+      },
+      fields: [
+        {
+          name: "area",
+          title: "Area",
+          align: "center",
+          type: "text",
+        },
+        {
+          name: "id",
+          title: "ids",
+          align: "center",
+          type: "text",
+          visible: false,
+        },
+        { type: "control", width: 10, editButton: false },
+      ],
+    });
+
     (async () => {
       await getData();
     })();
@@ -267,19 +403,35 @@ const SetupYear = ({ idPedioro }) => {
       component="main"
       sx={{
         flexGrow: 1,
-        p: 3,
+        p: 4,
         alignItems: "center",
         display: "flex",
-        height: "100vh",
         flexDirection: "column",
       }}
     >
       <DrawerHeader />
-      <Box sx={{ marginTop: "0.5rem" }} id="periodo" component="div"></Box>
-      <Typography variant="h4" sx={{ marginTop: "1rem", textAlign: "center" }}>
-        Lista de Años
-      </Typography>
-      <Box sx={{ marginTop: "2.5rem" }} id="jsGrid" component="div"></Box>
+      <Box>
+        <Box id="periodo" component="div"></Box>
+      </Box>
+
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{ marginTop: "0.5rem", textAlign: "center" }}
+        >
+          Lista de Años
+        </Typography>
+        <Box id="jsGrid" component="div"></Box>
+      </Box>
+      <Box>
+        <Typography
+          variant="h4"
+          sx={{ marginTop: "0.5rem", textAlign: "center" }}
+        >
+          Lista de Areas
+        </Typography>
+        <Box id="Areas" component="div"></Box>
+      </Box>
     </Box>
   );
 };

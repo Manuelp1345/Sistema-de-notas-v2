@@ -22,19 +22,19 @@ const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
 const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
-const Year = () => {
+const Seccion = () => {
     const { id } = (0, react_router_dom_1.useParams)();
-    const [anio, setAnio] = (0, react_1.useState)([{}]);
-    const [secciones, setSecciones] = (0, react_1.useState)({});
+    const [anio, setAnio] = (0, react_1.useState)({});
+    const [secciones, setSecciones] = (0, react_1.useState)({ seccion: "loading" });
     const navigate = (0, react_router_dom_1.useNavigate)();
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
-        const anio = yield window.API.getAnio(id);
+        const findSecciones = yield getSecciones(id);
+        console.log(findSecciones);
+        // @ts-ignore
+        const anio = yield window.API.getAnio(findSecciones.data.anio.id);
         console.log(anio);
         setAnio(anio);
-        // @ts-ignore
-        const findSecciones = yield getSecciones(anio.id);
-        console.log(findSecciones);
         // @ts-ignore
         $("#Secciones").jsGrid("loadData", findSecciones);
         // @ts-ignore
@@ -43,9 +43,9 @@ const Year = () => {
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
         // @ts-ignore
-        const findSecciones = yield window.API.getSecciones(id);
+        const findSecciones = yield window.API.getSeccion(id);
         console.log(findSecciones);
-        setSecciones({ data: findSecciones, itemsCount: 0 });
+        setSecciones(findSecciones);
         // @ts-ignore
         return { data: findSecciones, itemsCount: 0 };
     });
@@ -65,7 +65,7 @@ const Year = () => {
     });
     (0, react_1.useEffect)(() => {
         // @ts-ignore
-        $("#Secciones").jsGrid({
+        $("#Alumnos").jsGrid({
             width: "100%",
             paging: true,
             autoload: false,
@@ -73,11 +73,11 @@ const Year = () => {
             pageSize: 3,
             pageIndex: 1,
             heading: true,
-            inserting: true,
+            inserting: false,
             loadIndication: true,
             loadMessage: "Por favor espere",
             loadShading: true,
-            noDataContent: "No hay Secciones",
+            noDataContent: "No hay Alumnos",
             pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
             pagePrevText: "Anterior",
             pageNextText: "Siguiente",
@@ -88,7 +88,7 @@ const Year = () => {
             invalidMessage: "Por favor ingreser un valor valido",
             rowClick: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    console.log(args.item.id);
+                    console.log("");
                     navigate("/seccion/" + args.item.id);
                 });
             },
@@ -110,7 +110,7 @@ const Year = () => {
                 if (item.periodo === "") {
                     sweetalert2_1.default.fire({
                         title: "Error",
-                        text: "Ingrese una seccion",
+                        text: "Ingrese un Alumno",
                         icon: "error",
                         timer: 2000,
                         showConfirmButton: false,
@@ -120,8 +120,22 @@ const Year = () => {
             },
             fields: [
                 {
-                    name: "seccion",
-                    title: "Secciones",
+                    name: "cedula",
+                    title: "C.I",
+                    align: "center",
+                    type: "text",
+                    validate: "required",
+                },
+                {
+                    name: "nombre",
+                    title: "Nombres",
+                    align: "center",
+                    type: "text",
+                    validate: "required",
+                },
+                {
+                    name: "apellido",
+                    title: "Apellidos",
                     align: "center",
                     type: "text",
                     validate: "required",
@@ -142,7 +156,7 @@ const Year = () => {
         }))();
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
-                    setSecciones({});
+                    setSecciones({ seccion: "loading" });
                     navigate(-1);
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
@@ -151,7 +165,14 @@ const Year = () => {
                     justifyContent: "center",
                 } }, { children: (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", component: "h1", gutterBottom: true }, { children: 
                     // @ts-ignore
-                    anio.anio })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" })] })));
+                    `${anio.anio} SECCIÓN "${(secciones && secciones.seccion) || "loading"}"` })) })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row-reverse",
+                    marginTop: "2rem",
+                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ sx: {
+                        fontWeight: "bold",
+                    }, variant: "outlined" }, { children: "Agregar Alumno" })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2rem" }, id: "Alumnos", component: "div" })] })));
 };
-exports.default = Year;
-//# sourceMappingURL=Year.js.map
+exports.default = Seccion;
+//# sourceMappingURL=seccion.js.map

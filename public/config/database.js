@@ -35,17 +35,19 @@ const file = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(file);
     return file;
 });
-const ConnectionDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const credentialsDB = JSON.parse(yield file());
+const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function* () {
+    const credentialsDB = credentials ? credentials : JSON.parse(yield file());
     console.log("file:DATABASE credentials ", credentialsDB);
     const connection = new typeorm_1.DataSource({
         type: "mysql",
         host: credentialsDB.host,
         port: credentialsDB.port,
         username: credentialsDB.user,
-        password: credentialsDB.password,
-        database: credentialsDB.database,
-        entities: [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+        password: credentials ? credentials.pass : credentialsDB.password,
+        database: credentials ? "" : credentialsDB.database,
+        entities: credentials
+            ? []
+            : [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
         synchronize: true,
         logging: false,
     });

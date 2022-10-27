@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -42,6 +46,9 @@ const crypto_1 = __importDefault(require("crypto"));
 const periodo_1 = require("./config/entitys/periodo");
 const anios_1 = require("./config/entitys/anios");
 require("reflect-metadata");
+const secciones_1 = require("./config/entitys/secciones");
+const materias_1 = require("./config/entitys/materias");
+const alumnos_1 = require("./config/entitys/alumnos");
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -114,17 +121,11 @@ electron_1.ipcMain.handle("VALIDATE_CREDENTIALS", () => __awaiter(void 0, void 0
 }));
 electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const connection = yield new typeorm_1.DataSource({
-            type: "mysql",
-            host: credentials.host,
-            port: credentials.port,
-            username: credentials.user,
-            password: credentials.pass,
-            database: "",
-        });
-        yield connection.initialize();
-        if (connection.isInitialized) {
-            yield connection.query("CREATE DATABASE IF NOT EXISTS db_notas");
+        credentials.database = "database";
+        const connect = yield (0, database_1.ConnectionDB)(credentials);
+        console.log("File:electron.ts create credentials connect", connect.isInitialized);
+        if (connect.isInitialized) {
+            yield connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
             const credentialsDB = {
                 host: credentials.host,
                 user: credentials.user,
@@ -139,11 +140,30 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
                         throw err;
                     console.log("The file has been saved!");
                 });
-                connection.close();
+                const connectDB = connect.createQueryRunner();
+                yield connectDB.release();
             }
             catch (error) {
                 return false;
             }
+        }
+        try {
+            const connectTwo = new typeorm_1.DataSource({
+                type: "mysql",
+                host: credentials.host,
+                port: credentials.port,
+                username: credentials.user,
+                password: credentials.pass,
+                database: "db_notas",
+                entities: [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+                synchronize: true,
+                logging: false,
+            });
+            yield connectTwo.initialize();
+        }
+        catch (error) {
+            console.log(error);
+            return false;
         }
         return true;
     }
@@ -152,6 +172,7 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
     }
 }));
 electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("File:electron.ts CREATE_USER_DB", user);
     //@ts-ignore
     const userDB = new user_1.User();
     userDB.nombre = user.nombre;
@@ -300,7 +321,6 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
     console.log("Periodo ID", id);
     try {
         año = yield anios_1.Anio.findOne({
-            relations: ["periodo"],
             where: {
                 id: id,
             },
@@ -311,37 +331,127 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
     catch (error) {
         console.log("2", error);
     }
-})),
-    electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
-        const periodo = yield periodo_1.Periodo.findOne({
+}));
+electron_1.ipcMain.handle("DELETE_AÑO", (eve, id) => __awaiter(void 0, void 0, void 0, function* () {
+    let año;
+    try {
+        año = yield anios_1.Anio.findOne({
             where: {
-                estado: true,
+                id: id,
             },
         });
-        const anio = new anios_1.Anio();
-        anio.anio = anioFron.anio;
-        anio.periodo = periodo;
-        try {
-            yield anio.save();
+        console.log(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
+    }
+    try {
+        yield anios_1.Anio.delete(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
+    }
+}));
+electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
+    const periodo = yield periodo_1.Periodo.findOne({
+        where: {
+            estado: true,
+        },
+    });
+    const anio = new anios_1.Anio();
+    anio.anio = anioFron.anio;
+    anio.periodo = periodo;
+    try {
+        yield anio.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Notificacion",
+            body: "Año creado correctamente",
+            icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
-            new electron_1.Notification({
-                title: "Notificacion",
-                body: "Año creado correctamente",
-                icon: path.join(__dirname, "./img/logo.png"),
-                //@ts-ignore
-            }).show();
-            return true;
-        }
-        catch (error) {
-            console.log(error);
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Error",
+            body: "No se pudo crear el año",
+            icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
-            new electron_1.Notification({
-                title: "Error",
-                body: "No se pudo crear el año",
-                icon: path.join(__dirname, "./img/logo.png"),
-                //@ts-ignore
-            }).show();
-            return false;
-        }
-    }));
+        }).show();
+        return false;
+    }
+}));
+electron_1.ipcMain.handle("GET_SECCIONES", (evet, id) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("get Secciones", id);
+    let secciones;
+    try {
+        secciones = yield secciones_1.Seccion.find({
+            relations: ["anio"],
+            where: {
+                anio: {
+                    id: id,
+                },
+            },
+        });
+        console.log(secciones);
+        return secciones;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("GET_SECCION", (evet, filter) => __awaiter(void 0, void 0, void 0, function* () {
+    let seccion;
+    try {
+        seccion = yield secciones_1.Seccion.findOne({
+            relations: ["anio"],
+            where: {
+                id: filter,
+            },
+        });
+        return seccion;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(seccion);
+    const anio = yield anios_1.Anio.findOne({
+        where: {
+            id: seccion.anio,
+        },
+    });
+    console.log("insert seccion", anio);
+    const seccionDB = new secciones_1.Seccion();
+    seccionDB.seccion = seccion.seccion;
+    seccionDB.anio = anio;
+    try {
+        yield seccionDB.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Notificacion",
+            body: "Seccion creada correctamente",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Error",
+            body: "No se pudo crear la seccion",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
+}));
 //# sourceMappingURL=electron.js.map

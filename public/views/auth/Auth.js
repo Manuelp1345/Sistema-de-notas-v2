@@ -30,7 +30,7 @@ const AntTabs = (0, styled_1.default)(material_1.Tabs)({
         backgroundColor: "white",
     },
 });
-const AntTab = (0, styled_1.default)((props) => (0, jsx_runtime_1.jsx)(material_1.Tab, Object.assign({ disableRipple: true }, props), void 0))(({ theme }) => ({
+const AntTab = (0, styled_1.default)((props) => (0, jsx_runtime_1.jsx)(material_1.Tab, Object.assign({ disableRipple: true }, props)))(({ theme }) => ({
     color: "white",
     "&.Mui-selected": {
         color: "white",
@@ -44,7 +44,7 @@ function TabPanel(props) {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-            } }, { children: (0, jsx_runtime_1.jsx)(Typography_1.default, { children: children }, void 0) }), void 0)) }), void 0));
+            } }, { children: (0, jsx_runtime_1.jsx)(Typography_1.default, { children: children }) }))) })));
 }
 TabPanel.propTypes = {
     children: prop_types_1.default.node,
@@ -82,7 +82,7 @@ const Auth = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         marginLeft: "-10rem",
-                    } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: { height: "5rem", padding: "1rem" } }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { height: "8rem" }, component: "img", src: "/img/logo.png" }, void 0) }), void 0), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center", marginTop: "1rem" }, variant: "h3" }, { children: "Bienvenido" }), void 0), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center" }, variant: "h5" }, { children: "\u00BFDesea ingresar al sistema?" }), void 0)] }, void 0)] }), void 0), (0, jsx_runtime_1.jsxs)(AntTabs, Object.assign({ value: value, onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 0, label: "Ingresar" }, void 0), (0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 1, label: "Registrarse" }, void 0)] }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 0 }, { children: (0, jsx_runtime_1.jsx)(Login_1.default, {}, void 0) }), void 0), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 1 }, { children: (0, jsx_runtime_1.jsx)(Register_1.default, {}, void 0) }), void 0)] }), void 0) }), void 0));
+                    } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: { height: "5rem", padding: "1rem" } }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { height: "8rem" }, component: "img", src: "/img/logo.png" }) })), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center", marginTop: "1rem" }, variant: "h3" }, { children: "Bienvenido" })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { textAlign: "center" }, variant: "h5" }, { children: "\u00BFDesea ingresar al sistema?" }))] })] })), (0, jsx_runtime_1.jsxs)(AntTabs, Object.assign({ value: value, onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 0, label: "Ingresar" }), (0, jsx_runtime_1.jsx)(AntTab, { href: "", value: 1, label: "Registrarse" })] })), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 0 }, { children: (0, jsx_runtime_1.jsx)(Login_1.default, {}) })), (0, jsx_runtime_1.jsx)(TabPanel, Object.assign({ value: value, index: 1 }, { children: (0, jsx_runtime_1.jsx)(Register_1.default, {}) }))] })) })));
 };
 exports.default = Auth;
 //# sourceMappingURL=Auth.js.map

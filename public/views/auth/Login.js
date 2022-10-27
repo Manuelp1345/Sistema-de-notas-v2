@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -117,7 +121,7 @@ const Login = () => {
     const handlePassChange = (event) => {
         setPassword(event.target.value);
     };
-    return ((0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ sx: { width: "28.5rem", display: "flex", flexDirection: "column" } }, { children: [(0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleEmailChange, type: "email", sx: { marginY: "0.3rem" }, label: "Correo", value: correo }, void 0), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePassChange, type: "password", sx: { marginY: "0.3rem" }, label: "Contrase\u00F1a", value: password }, void 0), (0, jsx_runtime_1.jsx)(ColorButton, Object.assign({ onClick: handledClick }, { children: "Ingresar" }), void 0), (0, jsx_runtime_1.jsx)(material_1.Stack, Object.assign({ spacing: 2, sx: { width: "100%" } }, { children: (0, jsx_runtime_1.jsx)(material_1.Snackbar, Object.assign({ anchorOrigin: { vertical: "bottom", horizontal: "right" }, open: open, autoHideDuration: 6000, onClose: handleClose }, { children: (0, jsx_runtime_1.jsx)(material_1.Alert, Object.assign({ onClose: handleClose, severity: "error", sx: { width: "100%" } }, { children: "Contrase\u00F1a o correo incorrecto" }), void 0) }), void 0) }), void 0)] }), void 0));
+    return ((0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ sx: { width: "28.5rem", display: "flex", flexDirection: "column" } }, { children: [(0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleEmailChange, type: "email", sx: { marginY: "0.3rem" }, label: "Correo", value: correo }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePassChange, type: "password", sx: { marginY: "0.3rem" }, label: "Contrase\u00F1a", value: password }), (0, jsx_runtime_1.jsx)(ColorButton, Object.assign({ onClick: handledClick }, { children: "Ingresar" })), (0, jsx_runtime_1.jsx)(material_1.Stack, Object.assign({ spacing: 2, sx: { width: "100%" } }, { children: (0, jsx_runtime_1.jsx)(material_1.Snackbar, Object.assign({ anchorOrigin: { vertical: "bottom", horizontal: "right" }, open: open, autoHideDuration: 6000, onClose: handleClose }, { children: (0, jsx_runtime_1.jsx)(material_1.Alert, Object.assign({ onClose: handleClose, severity: "error", sx: { width: "100%" } }, { children: "Contrase\u00F1a o correo incorrecto" })) })) }))] })));
 };
 exports.default = Login;
 //# sourceMappingURL=Login.js.map

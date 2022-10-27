@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Seccion = void 0;
 const anios_1 = require("./anios");
-const periodo_1 = require("./periodo");
 const typeorm_1 = require("typeorm");
 let Seccion = class Seccion extends typeorm_1.BaseEntity {
 };
@@ -24,15 +23,10 @@ __decorate([
     __metadata("design:type", String)
 ], Seccion.prototype, "seccion", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo),
+    (0, typeorm_1.ManyToOne)(() => anios_1.Anio, { cascade: true, orphanedRowAction: "delete" }),
     (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", periodo_1.Periodo)
-], Seccion.prototype, "periodo", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => anios_1.Anio),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Array)
-], Seccion.prototype, "anios", void 0);
+    __metadata("design:type", anios_1.Anio)
+], Seccion.prototype, "anio", void 0);
 Seccion = __decorate([
     (0, typeorm_1.Entity)()
 ], Seccion);

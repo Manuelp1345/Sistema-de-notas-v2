@@ -21,7 +21,7 @@ export default function Home() {
     <Box
       className="animate__animated animate__fadeInRight"
       component="main"
-      sx={{ flexGrow: 1, p: 3 }}
+      sx={{ flexGrow: 1, p: 3, overflow: "auto !important" }}
     >
       <DrawerHeader />
       <Box>
