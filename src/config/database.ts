@@ -7,6 +7,7 @@ import { Periodo } from "./entitys/periodo";
 import { Materia } from "./entitys/materias";
 import { Seccion } from "./entitys/secciones";
 import { Alumno } from "./entitys/alumnos";
+import { CredentialDB } from "./types";
 
 const ruta = app.getPath("userData") + "/database.json";
 
@@ -23,7 +24,9 @@ const file = async () => {
   return file;
 };
 
-export const ConnectionDB = async (credentials?): Promise<DataSource> => {
+export const ConnectionDB = async (
+  credentials?: CredentialDB
+): Promise<DataSource> => {
   const credentialsDB = credentials ? credentials : JSON.parse(await file());
   console.log("file:DATABASE credentials ", credentialsDB);
 

@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], Anio.prototype, "anio", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo),
+    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo, { cascade: true, orphanedRowAction: "delete" }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", periodo_1.Periodo)
 ], Anio.prototype, "periodo", void 0);

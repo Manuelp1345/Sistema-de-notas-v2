@@ -37,7 +37,7 @@ const Loading = () => {
             alignItems: "center",
             width: "100%",
             height: "100vh",
-        } }, { children: (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {}, void 0) }), void 0));
+        } }, { children: (0, jsx_runtime_1.jsx)(material_1.CircularProgress, {}) })));
 };
 exports.Loading = Loading;
 //# sourceMappingURL=Loading.js.map

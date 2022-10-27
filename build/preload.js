@@ -28,8 +28,14 @@ const getAnios = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const getAnio = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_AÑO", id);
 });
+const deleteAnio = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("DELETE_AÑO", id);
+});
 const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_SECCIONES", id);
+});
+const getSeccion = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_SECCION", id);
 });
 const insertSeccion = (seccion) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_SECCION", seccion);
@@ -68,6 +74,8 @@ const API = {
     getAnios,
     insertPeriodo,
     getAnio,
+    deleteAnio,
+    getSeccion,
     getSecciones,
     insertSeccion,
     login,

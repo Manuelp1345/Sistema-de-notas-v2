@@ -17,20 +17,21 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Year = () => {
+const Seccion = () => {
   const { id } = useParams();
-  const [anio, setAnio] = useState([{}]);
-  const [secciones, setSecciones] = useState({});
+  const [anio, setAnio] = useState({});
+  const [secciones, setSecciones] = useState({ seccion: "loading" });
   const navigate = useNavigate();
 
   const getData = async () => {
     // @ts-ignore
-    const anio = await window.API.getAnio(id);
+    const findSecciones = await getSecciones(id);
+    console.log(findSecciones);
+
+    // @ts-ignore
+    const anio = await window.API.getAnio(findSecciones.data.anio.id);
     console.log(anio);
     setAnio(anio);
-    // @ts-ignore
-    const findSecciones = await getSecciones(anio.id);
-    console.log(findSecciones);
     // @ts-ignore
     $("#Secciones").jsGrid("loadData", findSecciones);
     // @ts-ignore
@@ -40,9 +41,9 @@ const Year = () => {
   const getSecciones = async (id) => {
     console.log("id anio", id);
     // @ts-ignore
-    const findSecciones = await window.API.getSecciones(id);
+    const findSecciones = await window.API.getSeccion(id);
     console.log(findSecciones);
-    setSecciones({ data: findSecciones, itemsCount: 0 });
+    setSecciones(findSecciones);
     // @ts-ignore
     return { data: findSecciones, itemsCount: 0 };
   };
@@ -66,7 +67,7 @@ const Year = () => {
   useEffect(() => {
     // @ts-ignore
 
-    $("#Secciones").jsGrid({
+    $("#Alumnos").jsGrid({
       width: "100%",
       paging: true,
       autoload: false,
@@ -74,11 +75,11 @@ const Year = () => {
       pageSize: 3,
       pageIndex: 1,
       heading: true,
-      inserting: true,
+      inserting: false,
       loadIndication: true,
       loadMessage: "Por favor espere",
       loadShading: true,
-      noDataContent: "No hay Secciones",
+      noDataContent: "No hay Alumnos",
       pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
       pagePrevText: "Anterior",
       pageNextText: "Siguiente",
@@ -88,7 +89,7 @@ const Year = () => {
       pageNavigatorPrevText: "...",
       invalidMessage: "Por favor ingreser un valor valido",
       rowClick: async function (args: any) {
-        console.log(args.item.id);
+        console.log("");
         navigate("/seccion/" + args.item.id);
       },
       controller: {
@@ -108,7 +109,7 @@ const Year = () => {
         if (item.periodo === "") {
           Swal.fire({
             title: "Error",
-            text: "Ingrese una seccion",
+            text: "Ingrese un Alumno",
             icon: "error",
             timer: 2000,
             showConfirmButton: false,
@@ -118,8 +119,22 @@ const Year = () => {
       },
       fields: [
         {
-          name: "seccion",
-          title: "Secciones",
+          name: "cedula",
+          title: "C.I",
+          align: "center",
+          type: "text",
+          validate: "required",
+        },
+        {
+          name: "nombre",
+          title: "Nombres",
+          align: "center",
+          type: "text",
+          validate: "required",
+        },
+        {
+          name: "apellido",
+          title: "Apellidos",
           align: "center",
           type: "text",
           validate: "required",
@@ -151,7 +166,7 @@ const Year = () => {
       <DrawerHeader />
       <Button
         onClick={() => {
-          setSecciones({});
+          setSecciones({ seccion: "loading" });
           navigate(-1);
         }}
       >
@@ -175,14 +190,32 @@ const Year = () => {
         >
           {
             // @ts-ignore
-            anio.anio
+            `${anio.anio} SECCIÓN "${
+              (secciones && secciones.seccion) || "loading"
+            }"`
           }
         </Typography>
       </Box>
-
-      <Box sx={{ marginTop: "2.5rem" }} id="Secciones" component="div"></Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row-reverse",
+          marginTop: "2rem",
+        }}
+      >
+        <Button
+          sx={{
+            fontWeight: "bold",
+          }}
+          variant="outlined"
+        >
+          Agregar Alumno
+        </Button>
+      </Box>
+      <Box sx={{ marginTop: "2rem" }} id="Alumnos" component="div"></Box>
     </Box>
   );
 };
 
-export default Year;
+export default Seccion;

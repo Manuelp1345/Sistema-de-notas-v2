@@ -16,7 +16,7 @@ export class Anio extends BaseEntity {
   @Column()
   anio!: string;
 
-  @ManyToOne(() => Periodo)
+  @ManyToOne(() => Periodo, { cascade: true, orphanedRowAction: "delete" })
   @JoinTable()
   periodo!: Periodo;
 }

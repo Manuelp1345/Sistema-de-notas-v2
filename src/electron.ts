@@ -12,6 +12,7 @@ import "reflect-metadata";
 import { Seccion } from "./config/entitys/secciones";
 import { Materia } from "./config/entitys/materias";
 import { Alumno } from "./config/entitys/alumnos";
+import { CredentialDB } from "./config/types";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -103,7 +104,7 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
     );
     if (connect.isInitialized) {
       await connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
-      const credentialsDB = {
+      const credentialsDB: CredentialDB = {
         host: credentials.host,
         user: credentials.user,
         password: credentials.pass,
@@ -319,6 +320,26 @@ ipcMain.handle("GET_AÑO", async (eve, id) => {
     return año;
   } catch (error) {
     console.log("2", error);
+  }
+});
+ipcMain.handle("DELETE_AÑO", async (eve, id) => {
+  let año;
+  try {
+    año = await Anio.findOne({
+      where: {
+        id: id,
+      },
+    });
+    console.log(año);
+  } catch (error) {
+    console.log("2", error);
+    return "error";
+  }
+  try {
+    await Anio.delete(año);
+  } catch (error) {
+    console.log("2", error);
+    return "error";
   }
 });
 

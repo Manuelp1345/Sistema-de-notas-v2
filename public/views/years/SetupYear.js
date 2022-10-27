@@ -119,58 +119,6 @@ const SetupYear = ({ idPedioro }) => {
     });
     React.useEffect(() => {
         // @ts-ignore
-        $("#jsGrid").jsGrid({
-            width: "100%",
-            paging: true,
-            autoload: false,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: true,
-            loadIndication: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay años registrados",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            controller: {
-                loadData: (filter) => {
-                    return getAnios(idPedioro);
-                },
-                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio(item);
-                    // @ts-ignore
-                    $("#jsGrid").jsGrid("refresh");
-                }),
-            },
-            rowClick: function (args) {
-                navigate("/anio/" + args.item.id);
-            },
-            fields: [
-                {
-                    name: "anio",
-                    title: "Años",
-                    align: "center",
-                    type: "text",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                { type: "control", width: 10, editButton: false },
-            ],
-        });
-        // @ts-ignore
         $("#periodo").jsGrid({
             width: "100%",
             paging: true,
@@ -277,18 +225,195 @@ const SetupYear = ({ idPedioro }) => {
                 { type: "control", editButton: false, deleteButton: false },
             ],
         });
+        // @ts-ignore
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            paging: true,
+            autoload: false,
+            pageLoading: true,
+            pageSize: 3,
+            pageIndex: 1,
+            heading: true,
+            inserting: true,
+            loadIndication: true,
+            loadMessage: "Por favor espere",
+            loadShading: true,
+            noDataContent: "No hay años registrados",
+            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
+            pagePrevText: "Anterior",
+            pageNextText: "Siguiente",
+            pageFirstText: "Primera",
+            pageLastText: "Ultima",
+            pageNavigatorNextText: "...",
+            pageNavigatorPrevText: "...",
+            invalidMessage: "Por favor ingreser un valor valido",
+            confirmDeleting: true,
+            deleteConfirm: (item) => {
+                return `seguro sea eliminar "${item.anio}"`;
+            },
+            onItemDeleting: (element) => __awaiter(void 0, void 0, void 0, function* () {
+                console.log("item delete", element);
+                let deleteAnio;
+                try {
+                    //@ts-ignore
+                    deleteAnio = yield window.API.deleteAnio(element.item.id);
+                }
+                catch (error) {
+                    sweetalert2_1.default.fire({
+                        title: `Error al borrar ${element.item.anio}`,
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+                console.log("delete response", deleteAnio);
+                if (deleteAnio === "error") {
+                    return sweetalert2_1.default.fire({
+                        title: `NO puedes borrar la sección. Sección en uso `,
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+                sweetalert2_1.default.fire({
+                    title: `${element.item.anio} Borrado`,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                // @ts-ignore
+                $("#jsGrid").jsGrid("refresh");
+                // @ts-ignore
+                $("#jsGrid").jsGrid("reset");
+            }),
+            controller: {
+                loadData: (filter) => {
+                    return getAnios(idPedioro);
+                },
+                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertAnio(item);
+                    // @ts-ignore
+                    $("#jsGrid").jsGrid("refresh");
+                }),
+            },
+            rowClick: function (args) {
+                navigate("/anio/" + args.item.id);
+            },
+            fields: [
+                {
+                    name: "anio",
+                    title: "Años",
+                    align: "center",
+                    type: "text",
+                },
+                {
+                    name: "id",
+                    title: "ids",
+                    align: "center",
+                    type: "text",
+                    visible: false,
+                },
+                { type: "control", width: 10, editButton: false },
+            ],
+        });
+        // @ts-ignore
+        // @ts-ignore
+        $("#Areas").jsGrid({
+            width: "100%",
+            height: "100%",
+            paging: true,
+            pageLoading: true,
+            pageSize: 3,
+            pageIndex: 1,
+            heading: true,
+            inserting: true,
+            loadMessage: "Por favor espere",
+            loadShading: true,
+            noDataContent: "No hay Areas",
+            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
+            pagePrevText: "Anterior",
+            pageNextText: "Siguiente",
+            pageFirstText: "Primera",
+            pageLastText: "Ultima",
+            pageNavigatorNextText: "...",
+            pageNavigatorPrevText: "...",
+            invalidMessage: "Por favor ingreser un valor valido",
+            data: [
+                {
+                    area: "Matematica",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Inglesss",
+                },
+            ],
+            controller: {
+                loadData: (filter) => {
+                    console.log("");
+                },
+                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertAnio(item);
+                    // @ts-ignore
+                    $("#Areas").jsGrid("refresh");
+                }),
+            },
+            rowClick: function (args) {
+                //
+            },
+            fields: [
+                {
+                    name: "area",
+                    title: "Area",
+                    align: "center",
+                    type: "text",
+                },
+                {
+                    name: "id",
+                    title: "ids",
+                    align: "center",
+                    type: "text",
+                    visible: false,
+                },
+                { type: "control", width: 10, editButton: false },
+            ],
+        });
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
         }))();
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: {
             flexGrow: 1,
-            p: 3,
+            p: 4,
             alignItems: "center",
             display: "flex",
-            height: "100vh",
             flexDirection: "column",
-        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "0.5rem" }, id: "periodo", component: "div" }), (0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "1rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "jsGrid", component: "div" })] })));
+        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Box_1.default, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { id: "periodo", component: "div" }) }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "jsGrid", component: "div" })] }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de Areas" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "Areas", component: "div" })] })] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

@@ -11,7 +11,7 @@
     "react": "react-scripts start",
     "lint": "eslint -c .eslintrc --ext .ts ./src",
     "start": "npm run build && electron ./public/electron.js",
-    "dist": "electron-builder"
+    "dist": "npm run breact && npm run build &&  electron-builder"
   },
   "keywords": [
     "Electron",

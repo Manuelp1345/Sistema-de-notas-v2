@@ -332,6 +332,28 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
         console.log("2", error);
     }
 }));
+electron_1.ipcMain.handle("DELETE_AÑO", (eve, id) => __awaiter(void 0, void 0, void 0, function* () {
+    let año;
+    try {
+        año = yield anios_1.Anio.findOne({
+            where: {
+                id: id,
+            },
+        });
+        console.log(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
+    }
+    try {
+        yield anios_1.Anio.delete(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
+    }
+}));
 electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
     const periodo = yield periodo_1.Periodo.findOne({
         where: {

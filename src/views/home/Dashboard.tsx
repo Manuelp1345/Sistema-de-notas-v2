@@ -24,6 +24,7 @@ import { House } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import SetupYear from "../years/SetupYear";
 import Year from "../years/Year";
+import Seccion from "../years/seccion";
 
 const drawerWidth = 240;
 
@@ -95,6 +96,9 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function Dashboard({ element }: { element: string }) {
+  //@ts-ignore
+  document.querySelector("html").style.removeProperty("overflow");
+
   const [open, setOpen] = React.useState(false);
   const [periodo, setPeriodo] = React.useState({ periodo: "", id: 0 });
   const navigate = useNavigate();
@@ -128,6 +132,8 @@ export default function Dashboard({ element }: { element: string }) {
   };
 
   React.useEffect(() => {
+    //@ts-ignore
+
     setBgColor();
     if (periodo.id === 0) {
       getPeriodos(1);
@@ -135,7 +141,11 @@ export default function Dashboard({ element }: { element: string }) {
   }, [navigate]);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+      }}
+    >
       <CssBaseline />
       {/* @ts-ignore */}
       <AppBar position="fixed" open={open}>
@@ -223,6 +233,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "home" && <Home />}
       {element === "anos" && <SetupYear idPedioro={periodo.id} />}
       {element === "Year" && <Year />}
+      {element === "seccion" && <Seccion />}
     </Box>
   );
 }

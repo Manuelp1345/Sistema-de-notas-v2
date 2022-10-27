@@ -17,7 +17,7 @@ export class Seccion extends BaseEntity {
   @Column()
   seccion!: string;
 
-  @ManyToOne(() => Anio)
+  @ManyToOne(() => Anio, { cascade: true, orphanedRowAction: "delete" })
   @JoinTable()
   anio!: Anio;
 }

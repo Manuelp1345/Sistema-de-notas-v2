@@ -62,6 +62,7 @@ const icons_material_1 = require("@mui/icons-material");
 const react_router_dom_1 = require("react-router-dom");
 const SetupYear_1 = __importDefault(require("../years/SetupYear"));
 const Year_1 = __importDefault(require("../years/Year"));
+const seccion_1 = __importDefault(require("../years/seccion"));
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -102,6 +103,8 @@ const Drawer = (0, styles_1.styled)(Drawer_1.default, {
     //@ts-ignore
 })(({ theme, open }) => (Object.assign(Object.assign({ width: drawerWidth, flexShrink: 0, whiteSpace: "nowrap", boxSizing: "border-box" }, (open && Object.assign(Object.assign({}, openedMixin(theme)), { "& .MuiDrawer-paper": openedMixin(theme) }))), (!open && Object.assign(Object.assign({}, closedMixin(theme)), { "& .MuiDrawer-paper": closedMixin(theme) })))));
 function Dashboard({ element }) {
+    //@ts-ignore
+    document.querySelector("html").style.removeProperty("overflow");
     const [open, setOpen] = React.useState(false);
     const [periodo, setPeriodo] = React.useState({ periodo: "", id: 0 });
     const navigate = (0, react_router_dom_1.useNavigate)();
@@ -130,12 +133,15 @@ function Dashboard({ element }) {
         window.API.background();
     };
     React.useEffect(() => {
+        //@ts-ignore
         setBgColor();
         if (periodo.id === 0) {
             getPeriodos(1);
         }
     }, [navigate]);
-    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { display: "flex" } }, { children: [(0, jsx_runtime_1.jsx)(CssBaseline_1.default, {}), (0, jsx_runtime_1.jsx)(AppBar, Object.assign({ position: "fixed", open: open }, { children: (0, jsx_runtime_1.jsxs)(Toolbar_1.default, { children: [(0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ color: "inherit", "aria-label": "open drawer", onClick: handleDrawerOpen, edge: "start", sx: Object.assign({ marginRight: "36px" }, (open && { display: "none" })) }, { children: (0, jsx_runtime_1.jsx)(Menu_1.default, {}) })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h6", noWrap: true, component: "div" }, { children: "U.E | Jose Enrique Arias | Sistema de Notas" })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { marginLeft: "10rem" }, variant: "h6", noWrap: true, component: "div" }, { children: ["Periodo Actual: ", periodo.periodo] }))] }) })), (0, jsx_runtime_1.jsxs)(Drawer, Object.assign({ variant: "permanent", open: open }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, { children: (0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ onClick: handleDrawerClose }, { children: theme.direction === "rtl" ? ((0, jsx_runtime_1.jsx)(ChevronRight_1.default, {})) : ((0, jsx_runtime_1.jsx)(ChevronLeft_1.default, {})) })) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {}), (0, jsx_runtime_1.jsx)(List_1.default, { children: ["Inicio", "Años", "Administracion", "Perfil", "Salir"].map((text, index) => ((0, jsx_runtime_1.jsxs)(ListItem_1.default, Object.assign({ button: true, selected: (element === "home" && index === 0) ||
+    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+            display: "flex",
+        } }, { children: [(0, jsx_runtime_1.jsx)(CssBaseline_1.default, {}), (0, jsx_runtime_1.jsx)(AppBar, Object.assign({ position: "fixed", open: open }, { children: (0, jsx_runtime_1.jsxs)(Toolbar_1.default, { children: [(0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ color: "inherit", "aria-label": "open drawer", onClick: handleDrawerOpen, edge: "start", sx: Object.assign({ marginRight: "36px" }, (open && { display: "none" })) }, { children: (0, jsx_runtime_1.jsx)(Menu_1.default, {}) })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h6", noWrap: true, component: "div" }, { children: "U.E | Jose Enrique Arias | Sistema de Notas" })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { marginLeft: "10rem" }, variant: "h6", noWrap: true, component: "div" }, { children: ["Periodo Actual: ", periodo.periodo] }))] }) })), (0, jsx_runtime_1.jsxs)(Drawer, Object.assign({ variant: "permanent", open: open }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, { children: (0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ onClick: handleDrawerClose }, { children: theme.direction === "rtl" ? ((0, jsx_runtime_1.jsx)(ChevronRight_1.default, {})) : ((0, jsx_runtime_1.jsx)(ChevronLeft_1.default, {})) })) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {}), (0, jsx_runtime_1.jsx)(List_1.default, { children: ["Inicio", "Años", "Administracion", "Perfil", "Salir"].map((text, index) => ((0, jsx_runtime_1.jsxs)(ListItem_1.default, Object.assign({ button: true, selected: (element === "home" && index === 0) ||
                                 (element === "anos" && index === 1) ||
                                 (element === "perfil" && index === 2) ||
                                 (element === "admin" && index === 3), 
@@ -150,7 +156,7 @@ function Dashboard({ element }) {
                                 //@ts-ignore
                                 (index === 3 && navigate("/admin")) ||
                                 //@ts-ignore
-                                (index === 4 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && (0, jsx_runtime_1.jsx)(icons_material_1.House, {}), index === 1 && (0, jsx_runtime_1.jsx)(DateRange_1.default, {}), index === 2 && (0, jsx_runtime_1.jsx)(AccountCircle_1.default, {}), index === 3 && (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}), index === 4 && (0, jsx_runtime_1.jsx)(Logout_1.default, {})] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPedioro: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {})] })));
+                                (index === 4 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && (0, jsx_runtime_1.jsx)(icons_material_1.House, {}), index === 1 && (0, jsx_runtime_1.jsx)(DateRange_1.default, {}), index === 2 && (0, jsx_runtime_1.jsx)(AccountCircle_1.default, {}), index === 3 && (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}), index === 4 && (0, jsx_runtime_1.jsx)(Logout_1.default, {})] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPedioro: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {}), element === "seccion" && (0, jsx_runtime_1.jsx)(seccion_1.default, {})] })));
 }
 exports.default = Dashboard;
 //# sourceMappingURL=Dashboard.js.map

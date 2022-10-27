@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -326,6 +330,28 @@ electron_1.ipcMain.handle("GET_AÑO", (eve, id) => __awaiter(void 0, void 0, voi
     }
     catch (error) {
         console.log("2", error);
+    }
+}));
+electron_1.ipcMain.handle("DELETE_AÑO", (eve, id) => __awaiter(void 0, void 0, void 0, function* () {
+    let año;
+    try {
+        año = yield anios_1.Anio.findOne({
+            where: {
+                id: id,
+            },
+        });
+        console.log(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
+    }
+    try {
+        yield anios_1.Anio.delete(año);
+    }
+    catch (error) {
+        console.log("2", error);
+        return "error";
     }
 }));
 electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0, void 0, void 0, function* () {
