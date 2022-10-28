@@ -64,6 +64,154 @@ const Year = () => {
         }
     });
     (0, react_1.useEffect)(() => {
+        const MyDateField = function (config) {
+            // @ts-ignore
+            jsGrid.Field.call(this, config);
+        };
+        // @ts-ignore
+        MyDateField.prototype = new jsGrid.Field({
+            sorter: function (date1, date2) {
+                // @ts-ignore
+                return new Date(date1) - new Date(date2);
+            },
+            itemTemplate: function (value) {
+                return new Date(value).toDateString();
+            },
+            insertTemplate: function (value) {
+                // @ts-ignore
+                return (this._insertPicker = $('input[name="daterange"]'
+                // @ts-ignore
+                ).daterangepicker({
+                    showDropdowns: true,
+                    opens: "center",
+                    linkedCalendars: false,
+                    locale: {
+                        format: "YYYY",
+                    },
+                }, function (start, end, label) {
+                    console.log("A new date selection was made: " +
+                        start.format("YYYY-MM-DD") +
+                        " to " +
+                        end.format("YYYY-MM-DD"));
+                }));
+            },
+            editTemplate: function (value) {
+                // @ts-ignore
+                return (this._editPicker = $('input[name="daterange"]').daterangepicker({
+                    showDropdowns: true,
+                    opens: "center",
+                    linkedCalendars: false,
+                    locale: {
+                        format: "YYYY",
+                    },
+                }, function (start, end, label) {
+                    console.log("A new date selection was made: " +
+                        start.format("YYYY-MM-DD") +
+                        " to " +
+                        end.format("YYYY-MM-DD"));
+                }));
+            },
+            insertValue: function () {
+                return this._insertPicker.toISOString();
+            },
+            editValue: function () {
+                return this._editPicker.toISOString();
+            },
+        });
+        // @ts-ignore
+        jsGrid.fields.myDateField = MyDateField;
+        // @ts-ignore
+        $("#Areas").jsGrid({
+            width: "100%",
+            height: "100%",
+            paging: true,
+            pageLoading: true,
+            pageSize: 3,
+            pageIndex: 1,
+            heading: true,
+            inserting: true,
+            loadMessage: "Por favor espere",
+            loadShading: true,
+            noDataContent: "No hay Áreas",
+            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
+            pagePrevText: "Anterior",
+            pageNextText: "Siguiente",
+            pageFirstText: "Primera",
+            pageLastText: "Ultima",
+            pageNavigatorNextText: "...",
+            pageNavigatorPrevText: "...",
+            invalidMessage: "Por favor ingreser un valor valido",
+            data: [
+                {
+                    area: "Matematica",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Ingles",
+                },
+                {
+                    area: "Inglesss",
+                },
+            ],
+            controller: {
+                loadData: () => {
+                    console.log("");
+                },
+                insertItem: () => __awaiter(void 0, void 0, void 0, function* () {
+                    // await insertAnio(item);
+                    // @ts-ignore
+                    $("#Areas").jsGrid("refresh");
+                }),
+            },
+            rowClick: function () {
+                //
+            },
+            fields: [
+                {
+                    name: "area",
+                    title: "Área",
+                    align: "center",
+                    type: "text",
+                },
+                {
+                    name: "RegisterDate",
+                    type: "myDateField",
+                    width: 100,
+                    align: "center",
+                },
+                {
+                    name: "id",
+                    title: "ids",
+                    align: "center",
+                    type: "text",
+                    visible: false,
+                },
+                { type: "control", width: 10, editButton: false },
+            ],
+        });
         // @ts-ignore
         $("#Secciones").jsGrid({
             width: "100%",
@@ -93,7 +241,7 @@ const Year = () => {
                 });
             },
             controller: {
-                loadData: (filter) => __awaiter(void 0, void 0, void 0, function* () {
+                loadData: () => __awaiter(void 0, void 0, void 0, function* () {
                     return yield getSecciones(id);
                 }),
                 insertItem: function (item) {
@@ -105,7 +253,7 @@ const Year = () => {
                 },
             },
             // @ts-ignore
-            invalidNotify: ({ errors, item }) => {
+            invalidNotify: ({ item }) => {
                 console.log(item);
                 if (item.periodo === "") {
                     sweetalert2_1.default.fire({
@@ -151,7 +299,7 @@ const Year = () => {
                     justifyContent: "center",
                 } }, { children: (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", component: "h1", gutterBottom: true }, { children: 
                     // @ts-ignore
-                    anio.anio })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" })] })));
+                    anio.anio })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "\u00C1reas" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "Areas", component: "div" })] })] })));
 };
 exports.default = Year;
 //# sourceMappingURL=Year.js.map

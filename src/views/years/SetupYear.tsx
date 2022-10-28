@@ -3,7 +3,6 @@ import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
-import { ArrowForwardIosTwoTone } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const SetupYear = ({ idPedioro }) => {
+const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const [periodos, setPeriodos] = useState({});
   const navigate = useNavigate();
   const getPeriodos = async (filter: any) => {
@@ -42,7 +41,7 @@ const SetupYear = ({ idPedioro }) => {
     // @ts-ignore
     const data = await window.API.insertPeriodo(periodo);
     if (data) {
-      idPedioro += 1;
+      idPeriodo += 1;
       getData();
       Swal.fire({
         title: "Periodo creado",
@@ -81,7 +80,7 @@ const SetupYear = ({ idPedioro }) => {
   };
 
   const insertAnio = async (anio: any) => {
-    anio.periodoId = idPedioro;
+    anio.periodoId = idPeriodo;
     anio.anio = anio.anio.toUpperCase();
     // @ts-ignore
     const data = await window.API.createAnio(anio);
@@ -96,11 +95,88 @@ const SetupYear = ({ idPedioro }) => {
   };
 
   React.useEffect(() => {
+    const MyDateField = function (config) {
+      // @ts-ignore
+
+      jsGrid.Field.call(this, config);
+    };
+    // @ts-ignore
+    MyDateField.prototype = new jsGrid.Field({
+      sorter: function (date1, date2) {
+        // @ts-ignore
+
+        return date1;
+      },
+
+      itemTemplate: function (value) {
+        console.log(value);
+        return value;
+      },
+
+      insertTemplate: function (value) {
+        // @ts-ignore
+
+        return (this._insertPicker = $(
+          "<input>"
+          // @ts-ignore
+        ).daterangepicker(
+          {
+            showDropdowns: true,
+            opens: "center",
+            linkedCalendars: false,
+            locale: {
+              format: "YYYY",
+            },
+          },
+          function (start, end, label) {
+            console.log(
+              "A new date selection was made: " +
+                start.format("YYYY-MM-DD") +
+                " to " +
+                end.format("YYYY-MM-DD")
+            );
+          }
+        ));
+      },
+
+      editTemplate: function (value) {
+        // @ts-ignore
+
+        return (this._editPicker = $('input[name="daterange"]').daterangepicker(
+          {
+            showDropdowns: true,
+            opens: "center",
+            linkedCalendars: false,
+            locale: {
+              format: "YYYY",
+            },
+          },
+          function (start, end, label) {
+            console.log(
+              "A new date selection was made: " +
+                start.format("YYYY-MM-DD") +
+                " to " +
+                end.format("YYYY-MM-DD")
+            );
+          }
+        ));
+      },
+
+      insertValue: function () {
+        return String(this._insertPicker[0].value);
+      },
+
+      editValue: function () {
+        return String(this._editPicker[0].value);
+      },
+    });
     // @ts-ignore
 
+    jsGrid.fields.myDateField = MyDateField;
+
+    // @ts-ignore
     $("#periodo").jsGrid({
       width: "100%",
-
       paging: true,
       autoload: false,
       pageLoading: true,
@@ -121,7 +197,7 @@ const SetupYear = ({ idPedioro }) => {
       pageNavigatorPrevText: "...",
       invalidMessage: "Por favor ingreser un valor valido",
       rowClick: async function (args: any) {
-        idPedioro = args.item.id;
+        idPeriodo = args.item.id;
         const anios = await getAnios(args.item.id);
         console.log("anios", anios);
         // @ts-ignore
@@ -149,7 +225,7 @@ const SetupYear = ({ idPedioro }) => {
         },
       },
       // @ts-ignore
-      invalidNotify: ({ errors, item }) => {
+      invalidNotify: ({ item }) => {
         console.log(item);
         if (item.periodo === "") {
           Swal.fire({
@@ -172,12 +248,13 @@ const SetupYear = ({ idPedioro }) => {
           return;
         }
       },
+
       fields: [
         {
           name: "periodo",
           title: "Periodos",
           align: "center",
-          type: "text",
+          type: "myDateField",
           validate: "required",
         },
         {
@@ -270,8 +347,8 @@ const SetupYear = ({ idPedioro }) => {
       },
 
       controller: {
-        loadData: (filter: any) => {
-          return getAnios(idPedioro);
+        loadData: () => {
+          return getAnios(idPeriodo);
         },
 
         insertItem: async (item: any) => {
@@ -303,95 +380,6 @@ const SetupYear = ({ idPedioro }) => {
     });
     // @ts-ignore
 
-    // @ts-ignore
-    $("#Areas").jsGrid({
-      width: "100%",
-      height: "100%",
-      paging: true,
-      pageLoading: true,
-      pageSize: 3,
-      pageIndex: 1,
-      heading: true,
-      inserting: true,
-      loadMessage: "Por favor espere",
-      loadShading: true,
-      noDataContent: "No hay Areas",
-      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-      pagePrevText: "Anterior",
-      pageNextText: "Siguiente",
-      pageFirstText: "Primera",
-      pageLastText: "Ultima",
-      pageNavigatorNextText: "...",
-      pageNavigatorPrevText: "...",
-      invalidMessage: "Por favor ingreser un valor valido",
-      data: [
-        {
-          area: "Matematica",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Inglesss",
-        },
-      ],
-      controller: {
-        loadData: (filter: any) => {
-          console.log("");
-        },
-
-        insertItem: async (item: any) => {
-          await insertAnio(item);
-          // @ts-ignore
-          $("#Areas").jsGrid("refresh");
-        },
-      },
-
-      rowClick: function (args: any) {
-        //
-      },
-      fields: [
-        {
-          name: "area",
-          title: "Area",
-          align: "center",
-          type: "text",
-        },
-        {
-          name: "id",
-          title: "ids",
-          align: "center",
-          type: "text",
-          visible: false,
-        },
-        { type: "control", width: 10, editButton: false },
-      ],
-    });
-
     (async () => {
       await getData();
     })();
@@ -422,15 +410,6 @@ const SetupYear = ({ idPedioro }) => {
           Lista de Años
         </Typography>
         <Box id="jsGrid" component="div"></Box>
-      </Box>
-      <Box>
-        <Typography
-          variant="h4"
-          sx={{ marginTop: "0.5rem", textAlign: "center" }}
-        >
-          Lista de Areas
-        </Typography>
-        <Box id="Areas" component="div"></Box>
       </Box>
     </Box>
   );

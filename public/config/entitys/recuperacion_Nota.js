@@ -9,32 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Anio = void 0;
+exports.RecuperacionNota = void 0;
 const typeorm_1 = require("typeorm");
-const periodo_1 = require("./periodo");
-const secciones_1 = require("./secciones");
-let Anio = class Anio extends typeorm_1.BaseEntity {
+const nota_1 = require("./nota");
+let RecuperacionNota = class RecuperacionNota extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", String)
-], Anio.prototype, "id", void 0);
+], RecuperacionNota.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Anio.prototype, "anio", void 0);
+], RecuperacionNota.prototype, "recuperacionNota", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => periodo_1.Periodo, { cascade: true, orphanedRowAction: "delete" }),
+    (0, typeorm_1.ManyToOne)(() => nota_1.Nota),
     (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", periodo_1.Periodo)
-], Anio.prototype, "periodo", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => secciones_1.Seccion, (sec) => sec.id),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", Array)
-], Anio.prototype, "secciones", void 0);
-Anio = __decorate([
+    __metadata("design:type", nota_1.Nota)
+], RecuperacionNota.prototype, "nota", void 0);
+RecuperacionNota = __decorate([
     (0, typeorm_1.Entity)()
-], Anio);
-exports.Anio = Anio;
-//# sourceMappingURL=anios.js.map
+], RecuperacionNota);
+exports.RecuperacionNota = RecuperacionNota;
+//# sourceMappingURL=recuperacion_Nota.js.map

@@ -23,8 +23,8 @@ __decorate([
     __metadata("design:type", String)
 ], Seccion.prototype, "seccion", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => anios_1.Anio, { cascade: true, orphanedRowAction: "delete" }),
-    (0, typeorm_1.JoinTable)(),
+    (0, typeorm_1.ManyToOne)(() => anios_1.Anio, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", anios_1.Anio)
 ], Seccion.prototype, "anio", void 0);
 Seccion = __decorate([

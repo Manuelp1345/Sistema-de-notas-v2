@@ -45,9 +45,22 @@ const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
-const SetupYear = ({ idPedioro }) => {
+const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+};
+const SetupYear = ({ idPeriodo }) => {
     const [periodos, setPeriodos] = (0, react_1.useState)({});
     const navigate = (0, react_router_dom_1.useNavigate)();
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
     const getPeriodos = (filter) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const data = yield window.API.getPeriodos(filter);
@@ -67,7 +80,7 @@ const SetupYear = ({ idPedioro }) => {
         // @ts-ignore
         const data = yield window.API.insertPeriodo(periodo);
         if (data) {
-            idPedioro += 1;
+            idPeriodo += 1;
             getData();
             sweetalert2_1.default.fire({
                 title: "Periodo creado",
@@ -104,7 +117,7 @@ const SetupYear = ({ idPedioro }) => {
         }
     });
     const insertAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
-        anio.periodoId = idPedioro;
+        anio.periodoId = idPeriodo;
         anio.anio = anio.anio.toUpperCase();
         // @ts-ignore
         const data = yield window.API.createAnio(anio);
@@ -127,7 +140,7 @@ const SetupYear = ({ idPedioro }) => {
             pageSize: 3,
             pageIndex: 1,
             heading: true,
-            inserting: true,
+            inserting: false,
             loadIndication: true,
             loadMessage: "Por favor espere",
             loadShading: true,
@@ -142,7 +155,7 @@ const SetupYear = ({ idPedioro }) => {
             invalidMessage: "Por favor ingreser un valor valido",
             rowClick: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    idPedioro = args.item.id;
+                    idPeriodo = args.item.id;
                     const anios = yield getAnios(args.item.id);
                     console.log("anios", anios);
                     // @ts-ignore
@@ -172,7 +185,7 @@ const SetupYear = ({ idPedioro }) => {
                 },
             },
             // @ts-ignore
-            invalidNotify: ({ errors, item }) => {
+            invalidNotify: ({ item }) => {
                 console.log(item);
                 if (item.periodo === "") {
                     sweetalert2_1.default.fire({
@@ -287,8 +300,8 @@ const SetupYear = ({ idPedioro }) => {
                 $("#jsGrid").jsGrid("reset");
             }),
             controller: {
-                loadData: (filter) => {
-                    return getAnios(idPedioro);
+                loadData: () => {
+                    return getAnios(idPeriodo);
                 },
                 insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertAnio(item);
@@ -317,92 +330,6 @@ const SetupYear = ({ idPedioro }) => {
             ],
         });
         // @ts-ignore
-        // @ts-ignore
-        $("#Areas").jsGrid({
-            width: "100%",
-            height: "100%",
-            paging: true,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay Areas",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            data: [
-                {
-                    area: "Matematica",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Inglesss",
-                },
-            ],
-            controller: {
-                loadData: (filter) => {
-                    console.log("");
-                },
-                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio(item);
-                    // @ts-ignore
-                    $("#Areas").jsGrid("refresh");
-                }),
-            },
-            rowClick: function (args) {
-                //
-            },
-            fields: [
-                {
-                    name: "area",
-                    title: "Area",
-                    align: "center",
-                    type: "text",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                { type: "control", width: 10, editButton: false },
-            ],
-        });
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
         }))();
@@ -413,7 +340,34 @@ const SetupYear = ({ idPedioro }) => {
             alignItems: "center",
             display: "flex",
             flexDirection: "column",
-        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Box_1.default, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { id: "periodo", component: "div" }) }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "jsGrid", component: "div" })] }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de Areas" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "Areas", component: "div" })] })] })));
+        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row-reverse",
+                    marginTop: "2rem",
+                    position: "relative",
+                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleOpen, sx: {
+                            fontWeight: "bold",
+                            position: "absolute",
+                            top: 3,
+                            right: 50,
+                            zIndex: 50,
+                        }, variant: "outlined" }, { children: "Agregar Periodo" })), (0, jsx_runtime_1.jsx)(Box_1.default, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { id: "periodo", component: "div" }) }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: style }, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ id: "modal-modal-title", variant: "h6", component: "h2" }, { children: "Agregar Periodo" })), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "text", value: "01/01/2018 - 01/15/2018", name: "daterange", onFocus: () => {
+                                        //@ts-ignore
+                                        return $('input[name="daterange"]').daterangepicker({
+                                            showDropdowns: true,
+                                            opens: "center",
+                                            linkedCalendars: false,
+                                            locale: {
+                                                format: "YYYY",
+                                            },
+                                        }, function (start, end, label) {
+                                            console.log("A new date selection was made: " +
+                                                start.format("YYYY-MM-DD") +
+                                                " to " +
+                                                end.format("YYYY-MM-DD"));
+                                        });
+                                    } })] })) }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de A\u00F1os" })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "jsGrid", component: "div" })] })] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

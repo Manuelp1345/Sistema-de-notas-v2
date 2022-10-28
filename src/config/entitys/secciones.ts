@@ -4,9 +4,9 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  JoinTable,
   BaseEntity,
   ManyToOne,
+  JoinColumn,
 } from "typeorm";
 
 @Entity()
@@ -17,7 +17,7 @@ export class Seccion extends BaseEntity {
   @Column()
   seccion!: string;
 
-  @ManyToOne(() => Anio, { cascade: true, orphanedRowAction: "delete" })
-  @JoinTable()
+  @ManyToOne(() => Anio, { onDelete: "CASCADE" })
+  @JoinColumn()
   anio!: Anio;
 }

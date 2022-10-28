@@ -10,9 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Materia = void 0;
-const periodo_1 = require("./periodo");
 const anios_1 = require("./anios");
-const alumnos_1 = require("./alumnos");
 const typeorm_1 = require("typeorm");
 let Materia = class Materia extends typeorm_1.BaseEntity {
 };
@@ -25,27 +23,10 @@ __decorate([
     __metadata("design:type", String)
 ], Materia.prototype, "nombre", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Materia.prototype, "momento", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
-], Materia.prototype, "nota", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", periodo_1.Periodo)
-], Materia.prototype, "periodo", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => anios_1.Anio),
+    (0, typeorm_1.ManyToOne)(() => anios_1.Anio),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Materia.prototype, "anios", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => alumnos_1.Alumno),
-    __metadata("design:type", alumnos_1.Alumno)
-], Materia.prototype, "alumno", void 0);
 Materia = __decorate([
     (0, typeorm_1.Entity)()
 ], Materia);

@@ -2,11 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinTable,
   BaseEntity,
+  OneToOne,
+  JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { Periodo } from "./periodo";
+import { Seccion } from "./secciones";
 
 @Entity()
 export class Anio extends BaseEntity {
@@ -16,7 +18,11 @@ export class Anio extends BaseEntity {
   @Column()
   anio!: string;
 
-  @ManyToOne(() => Periodo, { cascade: true, orphanedRowAction: "delete" })
-  @JoinTable()
+  @OneToOne(() => Periodo, { cascade: true, orphanedRowAction: "delete" })
+  @JoinColumn()
   periodo!: Periodo;
+
+  @OneToMany(() => Seccion, (sec) => sec.id)
+  @JoinColumn()
+  secciones!: Seccion[];
 }

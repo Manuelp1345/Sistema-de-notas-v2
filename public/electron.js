@@ -49,6 +49,7 @@ require("reflect-metadata");
 const secciones_1 = require("./config/entitys/secciones");
 const materias_1 = require("./config/entitys/materias");
 const alumnos_1 = require("./config/entitys/alumnos");
+const basicData_1 = require("./config/entitys/basicData");
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -174,10 +175,19 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
 electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("File:electron.ts CREATE_USER_DB", user);
     //@ts-ignore
+    const dataBasic = new basicData_1.BasicData();
+    dataBasic.firstName = user.nombre;
+    dataBasic.Surname = user.apellido;
+    dataBasic.email = user.email;
+    let dataBasicId;
+    try {
+        dataBasicId = yield dataBasic.save();
+    }
+    catch (error) {
+        console.log(error);
+    }
     const userDB = new user_1.User();
-    userDB.nombre = user.nombre;
-    userDB.apellido = user.apellido;
-    userDB.correo = user.email;
+    userDB.datosBasicos = dataBasicId;
     userDB.contraseña = crypto_1.default
         //@ts-ignore
         .createHash("sha256")
@@ -208,11 +218,15 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
     }
 }));
 electron_1.ipcMain.handle("LOGIN", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(user);
     const userJson = yield user_1.User.findOne({
         where: {
-            correo: user.email,
+            datosBasicos: {
+                email: user.email,
+            },
         },
     });
+    console.log(userJson);
     if (userJson) {
         if (userJson.contraseña ===
             //@ts-ignore

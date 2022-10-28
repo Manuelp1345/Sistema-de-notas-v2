@@ -9,32 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Anio = void 0;
+exports.Documents = void 0;
 const typeorm_1 = require("typeorm");
-const periodo_1 = require("./periodo");
-const secciones_1 = require("./secciones");
-let Anio = class Anio extends typeorm_1.BaseEntity {
+let Documents = class Documents extends typeorm_1.BaseEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", String)
-], Anio.prototype, "id", void 0);
+], Documents.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: "text" }),
     __metadata("design:type", String)
-], Anio.prototype, "anio", void 0);
+], Documents.prototype, "cedula", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => periodo_1.Periodo, { cascade: true, orphanedRowAction: "delete" }),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", periodo_1.Periodo)
-], Anio.prototype, "periodo", void 0);
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Documents.prototype, "pasaporte", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => secciones_1.Seccion, (sec) => sec.id),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", Array)
-], Anio.prototype, "secciones", void 0);
-Anio = __decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Documents.prototype, "partida_nacimiento", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Documents.prototype, "fotos_carnet", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "text" }),
+    __metadata("design:type", String)
+], Documents.prototype, "notas_escuela", void 0);
+Documents = __decorate([
     (0, typeorm_1.Entity)()
-], Anio);
-exports.Anio = Anio;
-//# sourceMappingURL=anios.js.map
+], Documents);
+exports.Documents = Documents;
+//# sourceMappingURL=documents.js.map

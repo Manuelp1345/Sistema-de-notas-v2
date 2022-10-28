@@ -231,7 +231,7 @@ export default function Dashboard({ element }: { element: string }) {
         <Divider />
       </Drawer>
       {element === "home" && <Home />}
-      {element === "anos" && <SetupYear idPedioro={periodo.id} />}
+      {element === "anos" && <SetupYear idPeriodo={periodo.id} />}
       {element === "Year" && <Year />}
       {element === "seccion" && <Seccion />}
     </Box>

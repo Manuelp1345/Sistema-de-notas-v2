@@ -1,16 +1,19 @@
 import { Periodo } from "./periodo";
 import { Anio } from "./anios";
-import { Materia } from "./materias";
+
 import { Seccion } from "./secciones";
+import { BasicData } from "./basicData";
+import { Representante } from "./representante";
+import { Nota } from "./nota";
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   JoinTable,
   BaseEntity,
-  OneToMany,
   OneToOne,
+  JoinColumn,
+  OneToMany,
 } from "typeorm";
 
 @Entity()
@@ -19,27 +22,25 @@ export class Alumno extends BaseEntity {
   id!: string;
 
   @Column()
-  nombre!: string;
-
-  @Column()
-  apellido!: string;
-
-  @Column()
-  matricula!: string;
+  observacion!: string;
 
   @OneToOne(() => Periodo)
-  @JoinTable()
+  @JoinColumn()
   periodo!: Periodo;
 
-  @OneToOne(() => Anio)
-  @JoinTable()
-  anios!: Anio[];
+  @OneToMany(() => Nota, (notas) => notas.id)
+  @JoinColumn()
+  notas!: Nota[];
 
-  @OneToMany(() => Materia, (materia) => materia.alumno)
-  @JoinTable()
-  materias!: Materia[];
+  @OneToOne(() => Anio)
+  @JoinColumn()
+  anio!: Anio;
 
   @OneToOne(() => Seccion)
-  @JoinTable()
+  @JoinColumn()
   seccion!: Seccion;
+
+  @OneToOne(() => BasicData)
+  @JoinColumn()
+  DatosPersonales!: BasicData;
 }

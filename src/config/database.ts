@@ -8,6 +8,11 @@ import { Materia } from "./entitys/materias";
 import { Seccion } from "./entitys/secciones";
 import { Alumno } from "./entitys/alumnos";
 import { CredentialDB } from "./types";
+import { Documents } from "./entitys/documents";
+import { BasicData } from "./entitys/basicData";
+import { Representante } from "./entitys/representante";
+import { Nota } from "./entitys/nota";
+import { RecuperacionNota } from "./entitys/recuperacion_Nota";
 
 const ruta = app.getPath("userData") + "/database.json";
 
@@ -39,7 +44,19 @@ export const ConnectionDB = async (
     database: credentials ? "" : credentialsDB.database,
     entities: credentials
       ? []
-      : [User, Anio, Periodo, Materia, Seccion, Alumno],
+      : [
+          User,
+          Nota,
+          Anio,
+          Periodo,
+          Materia,
+          Seccion,
+          Alumno,
+          BasicData,
+          Documents,
+          Representante,
+          RecuperacionNota,
+        ],
     synchronize: true,
     logging: false,
   });

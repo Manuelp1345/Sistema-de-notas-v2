@@ -13,6 +13,7 @@ import { Seccion } from "./config/entitys/secciones";
 import { Materia } from "./config/entitys/materias";
 import { Alumno } from "./config/entitys/alumnos";
 import { CredentialDB } from "./config/types";
+import { BasicData } from "./config/entitys/basicData";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -155,10 +156,19 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
 ipcMain.handle("CREATE_USER_DB", async (event, user) => {
   console.log("File:electron.ts CREATE_USER_DB", user);
   //@ts-ignore
+  const dataBasic = new BasicData();
+  dataBasic.firstName = user.nombre;
+  dataBasic.Surname = user.apellido;
+  dataBasic.email = user.email;
+  let dataBasicId;
+  try {
+    dataBasicId = await dataBasic.save();
+  } catch (error) {
+    console.log(error);
+  }
+
   const userDB = new User();
-  userDB.nombre = user.nombre;
-  userDB.apellido = user.apellido;
-  userDB.correo = user.email;
+  userDB.datosBasicos = dataBasicId;
   userDB.contraseña = crypto
     //@ts-ignore
     .createHash("sha256")
@@ -191,12 +201,16 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
 });
 
 ipcMain.handle("LOGIN", async (event, user) => {
+  console.log(user);
   const userJson = await User.findOne({
     where: {
-      correo: user.email,
+      datosBasicos: {
+        email: user.email,
+      },
     },
   });
 
+  console.log(userJson);
   if (userJson) {
     if (
       userJson.contraseña ===

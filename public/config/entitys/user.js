@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
+const basicData_1 = require("./basicData");
 let User = class User extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -20,23 +21,16 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: "text" }),
     __metadata("design:type", String)
-], User.prototype, "nombre", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
-], User.prototype, "apellido", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
-], User.prototype, "correo", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
 ], User.prototype, "contrase\u00F1a", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "text" }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)(() => basicData_1.BasicData),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", basicData_1.BasicData)
+], User.prototype, "datosBasicos", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

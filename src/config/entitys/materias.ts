@@ -19,20 +19,7 @@ export class Materia extends BaseEntity {
   @Column()
   nombre!: string;
 
-  @Column()
-  momento!: string;
-
-  @Column()
-  nota!: number;
-
-  @ManyToOne(() => Periodo)
-  @JoinTable()
-  periodo!: Periodo;
-
-  @ManyToMany(() => Anio)
+  @ManyToOne(() => Anio)
   @JoinTable()
   anios!: Anio[];
-
-  @ManyToOne(() => Alumno)
-  alumno!: Alumno;
 }
