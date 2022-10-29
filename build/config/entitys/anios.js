@@ -10,8 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Anio = void 0;
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const typeorm_1 = require("typeorm");
 const periodo_1 = require("./periodo");
+const secciones_1 = require("./secciones");
 let Anio = class Anio extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -23,10 +25,15 @@ __decorate([
     __metadata("design:type", String)
 ], Anio.prototype, "anio", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo, { cascade: true, orphanedRowAction: "delete" }),
-    (0, typeorm_1.JoinTable)(),
+    (0, typeorm_1.OneToOne)(() => periodo_1.Periodo, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", periodo_1.Periodo)
 ], Anio.prototype, "periodo", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => secciones_1.Seccion, (sec) => sec.id),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Array)
+], Anio.prototype, "secciones", void 0);
 Anio = __decorate([
     (0, typeorm_1.Entity)()
 ], Anio);

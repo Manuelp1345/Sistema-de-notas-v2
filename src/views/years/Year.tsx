@@ -31,10 +31,16 @@ const Year = (): JSX.Element => {
     // @ts-ignore
     const findSecciones = await getSecciones(anio.id);
     console.log(findSecciones);
+    const findAreas = await getAreas(anio.id);
+    console.log(findAreas);
     // @ts-ignore
     $("#Secciones").jsGrid("loadData", findSecciones);
     // @ts-ignore
     $("#Secciones").jsGrid("refresh");
+    // @ts-ignore
+    $("#Areas").jsGrid("loadData", findAreas);
+    // @ts-ignore
+    $("#Areas").jsGrid("refresh");
   };
 
   const getSecciones = async (id) => {
@@ -45,6 +51,15 @@ const Year = (): JSX.Element => {
     setSecciones({ data: findSecciones, itemsCount: 0 });
     // @ts-ignore
     return { data: findSecciones, itemsCount: 0 };
+  };
+  const getAreas = async (id) => {
+    console.log("id anio", id);
+    // @ts-ignore
+    const findAreas = await window.API.getAreas(id);
+    console.log(findAreas);
+
+    // @ts-ignore
+    return { data: findAreas, itemsCount: 0 };
   };
 
   const insertSeccion = async ({ seccion }: any) => {
@@ -62,21 +77,37 @@ const Year = (): JSX.Element => {
       });
     }
   };
+  const insertArea = async ({ nombre }: any) => {
+    console.log("Area", nombre);
+    // @ts-ignore
+    const data = await window.API.insertArea({ area: nombre, anio: id });
+
+    if (data) {
+      getData();
+      Swal.fire({
+        title: "Área creada",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
 
   useEffect(() => {
     // @ts-ignore
     $("#Areas").jsGrid({
       width: "100%",
-      height: "100%",
       paging: true,
+      autoload: false,
       pageLoading: true,
       pageSize: 3,
       pageIndex: 1,
       heading: true,
       inserting: true,
+      loadIndication: true,
       loadMessage: "Por favor espere",
       loadShading: true,
-      noDataContent: "No hay Áreas",
+      noDataContent: "No hay años registrados",
       pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
       pagePrevText: "Anterior",
       pageNextText: "Siguiente",
@@ -85,59 +116,65 @@ const Year = (): JSX.Element => {
       pageNavigatorNextText: "...",
       pageNavigatorPrevText: "...",
       invalidMessage: "Por favor ingreser un valor valido",
-      data: [
-        {
-          area: "Matematica",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Ingles",
-        },
-        {
-          area: "Inglesss",
-        },
-      ],
+
+      confirmDeleting: true,
+      deleteConfirm: (item) => {
+        return `seguro sea eliminar "${item.anio}"`;
+      },
+      onItemDeleting: async (element) => {
+        console.log("item delete", element);
+        let deleteAnio;
+        try {
+          //@ts-ignore
+          deleteAnio = await window.API.deleteAnio(element.item.id);
+        } catch (error) {
+          Swal.fire({
+            title: `Error al borrar ${element.item.anio}`,
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+        console.log("delete response", deleteAnio);
+        if (deleteAnio === "error") {
+          return Swal.fire({
+            title: `NO puedes borrar la sección. Sección en uso `,
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+
+        Swal.fire({
+          title: `${element.item.anio} Borrado`,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        // @ts-ignore
+
+        $("#jsGrid").jsGrid("refresh");
+        // @ts-ignore
+
+        $("#jsGrid").jsGrid("reset");
+      },
+
       controller: {
         loadData: () => {
-          console.log("");
+          return getAreas(id);
         },
 
-        insertItem: async () => {
-          // await insertAnio(item);
+        insertItem: async (item: any) => {
+          await insertArea(item);
           // @ts-ignore
-          $("#Areas").jsGrid("refresh");
+          $("#jsGrid").jsGrid("refresh");
         },
       },
-
-      rowClick: function () {
-        //
-      },
+      /* 
+      rowClick: function (args: any) {}, */
       fields: [
         {
-          name: "area",
+          name: "nombre",
           title: "Área",
           align: "center",
           type: "text",
@@ -186,7 +223,7 @@ const Year = (): JSX.Element => {
           await insertSeccion(item);
           // @ts-ignore
 
-          $("#periodo").jsGrid("refresh");
+          $("#Secciones").jsGrid("refresh");
         },
       },
       // @ts-ignore

@@ -13,6 +13,7 @@ import { BasicData } from "./entitys/basicData";
 import { Representante } from "./entitys/representante";
 import { Nota } from "./entitys/nota";
 import { RecuperacionNota } from "./entitys/recuperacion_Nota";
+import { Etapas } from "./entitys/etapas";
 
 const ruta = app.getPath("userData") + "/database.json";
 
@@ -48,10 +49,11 @@ export const ConnectionDB = async (
           User,
           Nota,
           Anio,
+          Etapas,
+          Alumno,
           Periodo,
           Materia,
           Seccion,
-          Alumno,
           BasicData,
           Documents,
           Representante,
@@ -59,6 +61,9 @@ export const ConnectionDB = async (
         ],
     synchronize: true,
     logging: false,
+    extra: {
+      connectionLimit: 4000,
+    },
   });
 
   if (!connection.isInitialized) {

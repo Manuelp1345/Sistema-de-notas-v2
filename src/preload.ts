@@ -37,11 +37,18 @@ const insertSeccion = async (seccion) => {
   return await ipcRenderer.invoke("INSERT_SECCION", seccion);
 };
 
+const getAreas = async (id) => {
+  return await ipcRenderer.invoke("GET_AREAS", id);
+};
+const insertArea = async (area) => {
+  return await ipcRenderer.invoke("INSERT_AREA", area);
+};
+
 const createAnio = async (anio) => {
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
 };
 
-const imgLogin = async (user) => {
+const imgLogin = async () => {
   const html = document.querySelector("html");
 
   html.style.backgroundImage = `url("./img/background.jpg")`;
@@ -82,6 +89,8 @@ const API = {
   getSeccion,
   getSecciones,
   insertSeccion,
+  getAreas,
+  insertArea,
   login,
   imgLogin,
   background,

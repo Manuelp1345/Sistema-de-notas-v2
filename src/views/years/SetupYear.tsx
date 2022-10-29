@@ -19,10 +19,15 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const [periodos, setPeriodos] = useState({});
+  const [periodo, setPeriodo] = useState();
+
   const navigate = useNavigate();
   const getPeriodos = async (filter: any) => {
     // @ts-ignore
     const data = await window.API.getPeriodos(filter);
+    const pActive = data[0].find((p) => p.estado === true);
+    console.log("pactive", pActive);
+    if (pActive) setPeriodo(pActive.periodo);
     console.log(data);
     setPeriodos({ data: data[0], itemsCount: data[1] });
     return { data: data[0], itemsCount: data[1] };
@@ -198,6 +203,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
       invalidMessage: "Por favor ingreser un valor valido",
       rowClick: async function (args: any) {
         idPeriodo = args.item.id;
+        setPeriodo(args.item.periodo);
         const anios = await getAnios(args.item.id);
         console.log("anios", anios);
         // @ts-ignore
@@ -407,7 +413,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           variant="h4"
           sx={{ marginTop: "0.5rem", textAlign: "center" }}
         >
-          Lista de Años
+          Lista de Años ({periodo})
         </Typography>
         <Box id="jsGrid" component="div"></Box>
       </Box>

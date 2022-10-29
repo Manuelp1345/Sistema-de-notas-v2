@@ -40,10 +40,16 @@ const getSeccion = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const insertSeccion = (seccion) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_SECCION", seccion);
 });
+const getAreas = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_AREAS", id);
+});
+const insertArea = (area) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("INSERT_AREA", area);
+});
 const createAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_AÑOS", anio);
 });
-const imgLogin = (user) => __awaiter(void 0, void 0, void 0, function* () {
+const imgLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     const html = document.querySelector("html");
     html.style.backgroundImage = `url("./img/background.jpg")`;
     html.style.backgroundRepeat = "no-repeat";
@@ -78,6 +84,8 @@ const API = {
     getSeccion,
     getSecciones,
     insertSeccion,
+    getAreas,
+    insertArea,
     login,
     imgLogin,
     background,

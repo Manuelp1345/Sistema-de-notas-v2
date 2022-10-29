@@ -27,6 +27,7 @@ const basicData_1 = require("./entitys/basicData");
 const representante_1 = require("./entitys/representante");
 const nota_1 = require("./entitys/nota");
 const recuperacion_Nota_1 = require("./entitys/recuperacion_Nota");
+const etapas_1 = require("./entitys/etapas");
 const ruta = electron_1.app.getPath("userData") + "/database.json";
 const file = () => __awaiter(void 0, void 0, void 0, function* () {
     let file;
@@ -56,10 +57,11 @@ const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function
                 user_1.User,
                 nota_1.Nota,
                 anios_1.Anio,
+                etapas_1.Etapas,
+                alumnos_1.Alumno,
                 periodo_1.Periodo,
                 materias_1.Materia,
                 secciones_1.Seccion,
-                alumnos_1.Alumno,
                 basicData_1.BasicData,
                 documents_1.Documents,
                 representante_1.Representante,

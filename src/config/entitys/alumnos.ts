@@ -5,6 +5,7 @@ import { Seccion } from "./secciones";
 import { BasicData } from "./basicData";
 import { Representante } from "./representante";
 import { Nota } from "./nota";
+import { Etapas } from "./etapas";
 import {
   Entity,
   Column,
@@ -43,4 +44,8 @@ export class Alumno extends BaseEntity {
   @OneToOne(() => BasicData)
   @JoinColumn()
   DatosPersonales!: BasicData;
+
+  @OneToMany(() => Etapas, (etapas) => etapas.id)
+  @JoinColumn()
+  Etapas!: Etapas[];
 }

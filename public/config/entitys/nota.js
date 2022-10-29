@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const alumnos_1 = require("./alumnos");
 const anios_1 = require("./anios");
 const recuperacion_Nota_1 = require("./recuperacion_Nota");
+const materias_1 = require("./materias");
 let Nota = class Nota extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -33,6 +34,11 @@ __decorate([
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", anios_1.Anio)
 ], Nota.prototype, "anio", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => materias_1.Materia),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", materias_1.Materia)
+], Nota.prototype, "materia", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => alumnos_1.Alumno),
     (0, typeorm_1.JoinColumn)(),

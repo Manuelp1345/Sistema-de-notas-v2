@@ -21,5 +21,5 @@ export class Materia extends BaseEntity {
 
   @ManyToOne(() => Anio)
   @JoinTable()
-  anios!: Anio[];
+  anio!: Anio;
 }

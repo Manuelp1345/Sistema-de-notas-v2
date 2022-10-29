@@ -50,6 +50,11 @@ const secciones_1 = require("./config/entitys/secciones");
 const materias_1 = require("./config/entitys/materias");
 const alumnos_1 = require("./config/entitys/alumnos");
 const basicData_1 = require("./config/entitys/basicData");
+const nota_1 = require("./config/entitys/nota");
+const documents_1 = require("./config/entitys/documents");
+const representante_1 = require("./config/entitys/representante");
+const recuperacion_Nota_1 = require("./config/entitys/recuperacion_Nota");
+const etapas_1 = require("./config/entitys/etapas");
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -156,7 +161,20 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
                 username: credentials.user,
                 password: credentials.pass,
                 database: "db_notas",
-                entities: [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+                entities: [
+                    user_1.User,
+                    nota_1.Nota,
+                    anios_1.Anio,
+                    etapas_1.Etapas,
+                    alumnos_1.Alumno,
+                    periodo_1.Periodo,
+                    materias_1.Materia,
+                    secciones_1.Seccion,
+                    basicData_1.BasicData,
+                    documents_1.Documents,
+                    representante_1.Representante,
+                    recuperacion_Nota_1.RecuperacionNota,
+                ],
                 synchronize: true,
                 logging: false,
             });
@@ -198,7 +216,7 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
         yield userDB.save();
         //@ts-ignore
         new electron_1.Notification({
-            title: "Notificacion",
+            title: "Sistema De Notas",
             body: "Usuario creado correctamente",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -209,7 +227,7 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
         console.log(error);
         //@ts-ignore
         new electron_1.Notification({
-            title: "Error",
+            title: "Sistema De Notas",
             body: "No se pudo crear el usuario",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -236,7 +254,7 @@ electron_1.ipcMain.handle("LOGIN", (event, user) => __awaiter(void 0, void 0, vo
     }
     //@ts-ignore
     new electron_1.Notification({
-        title: "Error",
+        title: "Sistema De Notas",
         body: "Usuario o contraseña incorrectos",
         icon: path.join(__dirname, "./img/logo.png"),
         //@ts-ignore
@@ -292,7 +310,7 @@ electron_1.ipcMain.handle("INSER_PERIODO", (event, periodo) => __awaiter(void 0,
         yield periodo_1.Periodo.save(periodo);
         //@ts-ignore
         new electron_1.Notification({
-            title: "Notificacion",
+            title: "Sistema De Notas",
             body: "Periodo creado correctamente",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -303,7 +321,7 @@ electron_1.ipcMain.handle("INSER_PERIODO", (event, periodo) => __awaiter(void 0,
         console.log(error);
         //@ts-ignore
         new electron_1.Notification({
-            title: "Error",
+            title: "Sistema De Notas",
             body: "No se pudo crear el periodo",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -381,7 +399,7 @@ electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0,
         yield anio.save();
         //@ts-ignore
         new electron_1.Notification({
-            title: "Notificacion",
+            title: "Sistema De Notas",
             body: "Año creado correctamente",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -392,7 +410,7 @@ electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0,
         console.log(error);
         //@ts-ignore
         new electron_1.Notification({
-            title: "Error",
+            title: "Sistema De Notas",
             body: "No se pudo crear el año",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -449,7 +467,7 @@ electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0
         yield seccionDB.save();
         //@ts-ignore
         new electron_1.Notification({
-            title: "Notificacion",
+            title: "Sistema De Notas",
             body: "Seccion creada correctamente",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
@@ -460,8 +478,61 @@ electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0
         console.log(error);
         //@ts-ignore
         new electron_1.Notification({
-            title: "Error",
+            title: "Sistema De Notas",
             body: "No se pudo crear la seccion",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
+}));
+electron_1.ipcMain.handle("GET_AREAS", (evet, id) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("get Areas", id);
+    let areas;
+    try {
+        areas = yield materias_1.Materia.find({
+            relations: ["anio"],
+            where: {
+                anio: {
+                    id: id,
+                },
+            },
+        });
+        console.log(areas);
+        return areas;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("INSERT_AREA", (event, area) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(area);
+    const anio = yield anios_1.Anio.findOne({
+        where: {
+            id: area.anio,
+        },
+    });
+    console.log("insert area", anio);
+    const materiaDB = new materias_1.Materia();
+    materiaDB.nombre = area.area;
+    materiaDB.anio = anio;
+    try {
+        yield materiaDB.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Área creada correctamente",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "No se pudo crear la Área",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
         }).show();

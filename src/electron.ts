@@ -14,6 +14,11 @@ import { Materia } from "./config/entitys/materias";
 import { Alumno } from "./config/entitys/alumnos";
 import { CredentialDB } from "./config/types";
 import { BasicData } from "./config/entitys/basicData";
+import { Nota } from "./config/entitys/nota";
+import { Documents } from "./config/entitys/documents";
+import { Representante } from "./config/entitys/representante";
+import { RecuperacionNota } from "./config/entitys/recuperacion_Nota";
+import { Etapas } from "./config/entitys/etapas";
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -138,9 +143,25 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
         username: credentials.user,
         password: credentials.pass,
         database: "db_notas",
-        entities: [User, Anio, Periodo, Materia, Seccion, Alumno],
+        entities: [
+          User,
+          Nota,
+          Anio,
+          Etapas,
+          Alumno,
+          Periodo,
+          Materia,
+          Seccion,
+          BasicData,
+          Documents,
+          Representante,
+          RecuperacionNota,
+        ],
         synchronize: true,
         logging: false,
+        extra: {
+          connectionLimit: 4000,
+        },
       });
       await connectTwo.initialize();
     } catch (error) {
@@ -180,7 +201,7 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
     await userDB.save();
     //@ts-ignore
     new Notification({
-      title: "Notificacion",
+      title: "Sistema De Notas",
       body: "Usuario creado correctamente",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -191,7 +212,7 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
     console.log(error);
     //@ts-ignore
     new Notification({
-      title: "Error",
+      title: "Sistema De Notas",
       body: "No se pudo crear el usuario",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -223,7 +244,7 @@ ipcMain.handle("LOGIN", async (event, user) => {
   //@ts-ignore
 
   new Notification({
-    title: "Error",
+    title: "Sistema De Notas",
     body: "Usuario o contraseña incorrectos",
     icon: path.join(__dirname, "./img/logo.png"),
     //@ts-ignore
@@ -282,7 +303,7 @@ ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
     await Periodo.save(periodo);
     //@ts-ignore
     new Notification({
-      title: "Notificacion",
+      title: "Sistema De Notas",
       body: "Periodo creado correctamente",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -293,7 +314,7 @@ ipcMain.handle("INSER_PERIODO", async (event, periodo) => {
     //@ts-ignore
 
     new Notification({
-      title: "Error",
+      title: "Sistema De Notas",
       body: "No se pudo crear el periodo",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -371,7 +392,7 @@ ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
     await anio.save();
     //@ts-ignore
     new Notification({
-      title: "Notificacion",
+      title: "Sistema De Notas",
       body: "Año creado correctamente",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -382,7 +403,7 @@ ipcMain.handle("INSERT_AÑOS", async (event, anioFron) => {
     //@ts-ignore
 
     new Notification({
-      title: "Error",
+      title: "Sistema De Notas",
       body: "No se pudo crear el año",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -441,7 +462,7 @@ ipcMain.handle("INSERT_SECCION", async (event, seccion) => {
     await seccionDB.save();
     //@ts-ignore
     new Notification({
-      title: "Notificacion",
+      title: "Sistema De Notas",
       body: "Seccion creada correctamente",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
@@ -452,8 +473,63 @@ ipcMain.handle("INSERT_SECCION", async (event, seccion) => {
     //@ts-ignore
 
     new Notification({
-      title: "Error",
+      title: "Sistema De Notas",
       body: "No se pudo crear la seccion",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+});
+
+ipcMain.handle("GET_AREAS", async (evet, id) => {
+  console.log("get Areas", id);
+  let areas;
+  try {
+    areas = await Materia.find({
+      relations: ["anio"],
+      where: {
+        anio: {
+          id: id,
+        },
+      },
+    });
+    console.log(areas);
+    return areas;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+ipcMain.handle("INSERT_AREA", async (event, area) => {
+  console.log(area);
+  const anio = await Anio.findOne({
+    where: {
+      id: area.anio,
+    },
+  });
+
+  console.log("insert area", anio);
+  const materiaDB = new Materia();
+  materiaDB.nombre = area.area;
+  materiaDB.anio = anio as Anio;
+  try {
+    await materiaDB.save();
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Área creada correctamente",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return true;
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo crear la Área",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();

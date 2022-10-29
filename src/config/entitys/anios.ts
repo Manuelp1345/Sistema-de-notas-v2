@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Entity,
   Column,
@@ -6,9 +7,11 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { Periodo } from "./periodo";
 import { Seccion } from "./secciones";
+import { Etapas } from "./etapas";
 
 @Entity()
 export class Anio extends BaseEntity {
@@ -18,7 +21,7 @@ export class Anio extends BaseEntity {
   @Column()
   anio!: string;
 
-  @OneToOne(() => Periodo, { cascade: true, orphanedRowAction: "delete" })
+  @OneToOne(() => Periodo, { onDelete: "CASCADE" })
   @JoinColumn()
   periodo!: Periodo;
 

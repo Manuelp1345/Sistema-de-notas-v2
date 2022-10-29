@@ -12,6 +12,7 @@ import { Seccion } from "./secciones";
 import { Alumno } from "./alumnos";
 import { Anio } from "./anios";
 import { RecuperacionNota } from "./recuperacion_Nota";
+import { Materia } from "./materias";
 
 @Entity()
 export class Nota extends BaseEntity {
@@ -27,6 +28,10 @@ export class Nota extends BaseEntity {
   @ManyToOne(() => Anio)
   @JoinColumn()
   anio!: Anio;
+
+  @ManyToOne(() => Materia)
+  @JoinColumn()
+  materia!: Materia;
 
   @ManyToOne(() => Alumno)
   @JoinColumn()

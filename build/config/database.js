@@ -22,6 +22,12 @@ const periodo_1 = require("./entitys/periodo");
 const materias_1 = require("./entitys/materias");
 const secciones_1 = require("./entitys/secciones");
 const alumnos_1 = require("./entitys/alumnos");
+const documents_1 = require("./entitys/documents");
+const basicData_1 = require("./entitys/basicData");
+const representante_1 = require("./entitys/representante");
+const nota_1 = require("./entitys/nota");
+const recuperacion_Nota_1 = require("./entitys/recuperacion_Nota");
+const etapas_1 = require("./entitys/etapas");
 const ruta = electron_1.app.getPath("userData") + "/database.json";
 const file = () => __awaiter(void 0, void 0, void 0, function* () {
     let file;
@@ -47,7 +53,20 @@ const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function
         database: credentials ? "" : credentialsDB.database,
         entities: credentials
             ? []
-            : [user_1.User, anios_1.Anio, periodo_1.Periodo, materias_1.Materia, secciones_1.Seccion, alumnos_1.Alumno],
+            : [
+                user_1.User,
+                nota_1.Nota,
+                anios_1.Anio,
+                etapas_1.Etapas,
+                alumnos_1.Alumno,
+                periodo_1.Periodo,
+                materias_1.Materia,
+                secciones_1.Seccion,
+                basicData_1.BasicData,
+                documents_1.Documents,
+                representante_1.Representante,
+                recuperacion_Nota_1.RecuperacionNota,
+            ],
         synchronize: true,
         logging: false,
     });

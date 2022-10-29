@@ -15,6 +15,7 @@ const anios_1 = require("./anios");
 const secciones_1 = require("./secciones");
 const basicData_1 = require("./basicData");
 const nota_1 = require("./nota");
+const etapas_1 = require("./etapas");
 const typeorm_1 = require("typeorm");
 let Alumno = class Alumno extends typeorm_1.BaseEntity {
 };
@@ -51,6 +52,11 @@ __decorate([
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", basicData_1.BasicData)
 ], Alumno.prototype, "DatosPersonales", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => etapas_1.Etapas, (etapas) => etapas.id),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Array)
+], Alumno.prototype, "Etapas", void 0);
 Alumno = __decorate([
     (0, typeorm_1.Entity)()
 ], Alumno);

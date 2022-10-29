@@ -35,10 +35,16 @@ const Year = () => {
         // @ts-ignore
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
+        const findAreas = yield getAreas(anio.id);
+        console.log(findAreas);
         // @ts-ignore
         $("#Secciones").jsGrid("loadData", findSecciones);
         // @ts-ignore
         $("#Secciones").jsGrid("refresh");
+        // @ts-ignore
+        $("#Areas").jsGrid("loadData", findAreas);
+        // @ts-ignore
+        $("#Areas").jsGrid("refresh");
     });
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
@@ -48,6 +54,14 @@ const Year = () => {
         setSecciones({ data: findSecciones, itemsCount: 0 });
         // @ts-ignore
         return { data: findSecciones, itemsCount: 0 };
+    });
+    const getAreas = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("id anio", id);
+        // @ts-ignore
+        const findAreas = yield window.API.getAreas(id);
+        console.log(findAreas);
+        // @ts-ignore
+        return { data: findAreas, itemsCount: 0 };
     });
     const insertSeccion = ({ seccion }) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("seccion", seccion);
@@ -63,76 +77,35 @@ const Year = () => {
             });
         }
     });
+    const insertArea = ({ nombre }) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("Area", nombre);
+        // @ts-ignore
+        const data = yield window.API.insertArea({ area: nombre, anio: id });
+        if (data) {
+            getData();
+            sweetalert2_1.default.fire({
+                title: "Área creada",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        }
+    });
     (0, react_1.useEffect)(() => {
-        const MyDateField = function (config) {
-            // @ts-ignore
-            jsGrid.Field.call(this, config);
-        };
-        // @ts-ignore
-        MyDateField.prototype = new jsGrid.Field({
-            sorter: function (date1, date2) {
-                // @ts-ignore
-                return new Date(date1) - new Date(date2);
-            },
-            itemTemplate: function (value) {
-                return new Date(value).toDateString();
-            },
-            insertTemplate: function (value) {
-                // @ts-ignore
-                return (this._insertPicker = $('input[name="daterange"]'
-                // @ts-ignore
-                ).daterangepicker({
-                    showDropdowns: true,
-                    opens: "center",
-                    linkedCalendars: false,
-                    locale: {
-                        format: "YYYY",
-                    },
-                }, function (start, end, label) {
-                    console.log("A new date selection was made: " +
-                        start.format("YYYY-MM-DD") +
-                        " to " +
-                        end.format("YYYY-MM-DD"));
-                }));
-            },
-            editTemplate: function (value) {
-                // @ts-ignore
-                return (this._editPicker = $('input[name="daterange"]').daterangepicker({
-                    showDropdowns: true,
-                    opens: "center",
-                    linkedCalendars: false,
-                    locale: {
-                        format: "YYYY",
-                    },
-                }, function (start, end, label) {
-                    console.log("A new date selection was made: " +
-                        start.format("YYYY-MM-DD") +
-                        " to " +
-                        end.format("YYYY-MM-DD"));
-                }));
-            },
-            insertValue: function () {
-                return this._insertPicker.toISOString();
-            },
-            editValue: function () {
-                return this._editPicker.toISOString();
-            },
-        });
-        // @ts-ignore
-        jsGrid.fields.myDateField = MyDateField;
         // @ts-ignore
         $("#Areas").jsGrid({
             width: "100%",
-            height: "100%",
             paging: true,
+            autoload: false,
             pageLoading: true,
             pageSize: 3,
             pageIndex: 1,
             heading: true,
             inserting: true,
+            loadIndication: true,
             loadMessage: "Por favor espere",
             loadShading: true,
-            noDataContent: "No hay Áreas",
+            noDataContent: "No hay años registrados",
             pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
             pagePrevText: "Anterior",
             pageNextText: "Siguiente",
@@ -141,66 +114,63 @@ const Year = () => {
             pageNavigatorNextText: "...",
             pageNavigatorPrevText: "...",
             invalidMessage: "Por favor ingreser un valor valido",
-            data: [
-                {
-                    area: "Matematica",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Ingles",
-                },
-                {
-                    area: "Inglesss",
-                },
-            ],
+            confirmDeleting: true,
+            deleteConfirm: (item) => {
+                return `seguro sea eliminar "${item.anio}"`;
+            },
+            onItemDeleting: (element) => __awaiter(void 0, void 0, void 0, function* () {
+                console.log("item delete", element);
+                let deleteAnio;
+                try {
+                    //@ts-ignore
+                    deleteAnio = yield window.API.deleteAnio(element.item.id);
+                }
+                catch (error) {
+                    sweetalert2_1.default.fire({
+                        title: `Error al borrar ${element.item.anio}`,
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+                console.log("delete response", deleteAnio);
+                if (deleteAnio === "error") {
+                    return sweetalert2_1.default.fire({
+                        title: `NO puedes borrar la sección. Sección en uso `,
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+                sweetalert2_1.default.fire({
+                    title: `${element.item.anio} Borrado`,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                // @ts-ignore
+                $("#jsGrid").jsGrid("refresh");
+                // @ts-ignore
+                $("#jsGrid").jsGrid("reset");
+            }),
             controller: {
                 loadData: () => {
-                    console.log("");
+                    return getAreas(id);
                 },
-                insertItem: () => __awaiter(void 0, void 0, void 0, function* () {
-                    // await insertAnio(item);
+                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertArea(item);
                     // @ts-ignore
-                    $("#Areas").jsGrid("refresh");
+                    $("#jsGrid").jsGrid("refresh");
                 }),
             },
-            rowClick: function () {
-                //
-            },
+            /*
+            rowClick: function (args: any) {}, */
             fields: [
                 {
-                    name: "area",
+                    name: "nombre",
                     title: "Área",
                     align: "center",
                     type: "text",
-                },
-                {
-                    name: "RegisterDate",
-                    type: "myDateField",
-                    width: 100,
-                    align: "center",
                 },
                 {
                     name: "id",
@@ -248,7 +218,7 @@ const Year = () => {
                     return __awaiter(this, void 0, void 0, function* () {
                         yield insertSeccion(item);
                         // @ts-ignore
-                        $("#periodo").jsGrid("refresh");
+                        $("#Secciones").jsGrid("refresh");
                     });
                 },
             },
