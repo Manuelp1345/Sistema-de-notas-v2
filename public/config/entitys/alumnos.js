@@ -10,9 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Alumno = void 0;
-const periodo_1 = require("./periodo");
-const anios_1 = require("./anios");
-const secciones_1 = require("./secciones");
 const basicData_1 = require("./basicData");
 const nota_1 = require("./nota");
 const etapas_1 = require("./etapas");
@@ -28,25 +25,18 @@ __decorate([
     __metadata("design:type", String)
 ], Alumno.prototype, "observacion", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => periodo_1.Periodo),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", periodo_1.Periodo)
-], Alumno.prototype, "periodo", void 0);
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Alumno.prototype, "condicion", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Alumno.prototype, "grupoEstable", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => nota_1.Nota, (notas) => notas.id),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Array)
 ], Alumno.prototype, "notas", void 0);
-__decorate([
-    (0, typeorm_1.OneToOne)(() => anios_1.Anio),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", anios_1.Anio)
-], Alumno.prototype, "anio", void 0);
-__decorate([
-    (0, typeorm_1.OneToOne)(() => secciones_1.Seccion),
-    (0, typeorm_1.JoinColumn)(),
-    __metadata("design:type", secciones_1.Seccion)
-], Alumno.prototype, "seccion", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => basicData_1.BasicData),
     (0, typeorm_1.JoinColumn)(),

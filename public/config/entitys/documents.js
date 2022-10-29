@@ -18,24 +18,24 @@ __decorate([
     __metadata("design:type", String)
 ], Documents.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
 ], Documents.prototype, "cedula", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
 ], Documents.prototype, "pasaporte", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
 ], Documents.prototype, "partida_nacimiento", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
 ], Documents.prototype, "fotos_carnet", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "boolean" }),
+    __metadata("design:type", Boolean)
 ], Documents.prototype, "notas_escuela", void 0);
 Documents = __decorate([
     (0, typeorm_1.Entity)()

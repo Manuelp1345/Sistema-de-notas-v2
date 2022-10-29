@@ -2,9 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   BaseEntity,
-  OneToOne,
   JoinColumn,
-  OneToMany,
+  ManyToOne,
 } from "typeorm";
 import { Alumno } from "./alumnos";
 import { Anio } from "./anios";
@@ -15,15 +14,15 @@ export class Etapas extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @OneToOne(() => Alumno)
+  @ManyToOne(() => Alumno)
   @JoinColumn()
   alumno!: Alumno;
 
-  @OneToOne(() => Anio)
+  @ManyToOne(() => Anio)
   @JoinColumn()
   anio!: Anio;
 
-  @OneToOne(() => Seccion)
+  @ManyToOne(() => Seccion)
   @JoinColumn()
   seccione!: Seccion;
 }

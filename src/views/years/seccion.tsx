@@ -7,9 +7,14 @@ import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
   FormGroup,
+  Input,
+  InputLabel,
+  MenuItem,
   Modal,
+  Select,
   Step,
   StepLabel,
   Stepper,
@@ -17,6 +22,8 @@ import {
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
+import { CircularProgress } from "@mui/material";
+import moment from "moment";
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -40,30 +47,96 @@ const style = {
   p: 4,
 };
 
-const steps = ["Datos del Alumno", "Datos de representantes", "Finalizar"];
+const steps = [
+  "Datos del Alumno",
+  "Datos de Representantes",
+  "Datos Academicos",
+];
 
 const Seccion = () => {
   const { id } = useParams();
   const [anio, setAnio] = useState({});
-  const [secciones, setSecciones] = useState({ seccion: "loading" });
+  const [secciones, setSecciones] = useState({ seccion: "loading", id: 0 });
   const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
-
+  const [skipped, setSkipped] = useState(new Set());
+  const [datosAlumno, setDatosAlumno] = useState({
+    firsName: "",
+    SecondName: "",
+    surname: "",
+    secondSurname: "",
+    dni: "",
+    address: "",
+    municipality: "",
+    state: "",
+    cedula: false,
+    pasaporte: false,
+    partidaDeNacimiento: false,
+    fotos: false,
+    notasEscolares: false,
+    observacion: "",
+    condicion: "",
+    grupoEstable: "",
+    fechaNacimiento: new Date(),
+    phone: 0,
+    sexo: "",
+    email: "",
+  });
+  const [datosRepresetante, setDatosRepresetante] = useState({
+    firstName: "",
+    secondName: "",
+    surname: "",
+    secondSurname: "",
+    dni: "",
+    address: "",
+    municipality: "",
+    state: "",
+    filiacion: "",
+    phone: 0,
+    alumnoAddress: false,
+    email: "",
+  });
   const [open, setOpen] = React.useState(false);
+  const [loading, setloading] = React.useState(true);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const navigate = useNavigate();
 
-  const isStepOptional = (step) => {
-    return step === 1;
+  const handleChange = (event) => {
+    setDatosAlumno({
+      ...datosAlumno,
+      //@ts-ignore
+      condicion: event.target.value,
+    });
   };
 
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
 
-  const handleNext = () => {
+  const insertAlumno = async () => {
+    const data = {
+      seccion: secciones.id,
+      alumno: datosAlumno,
+      representante: datosRepresetante,
+    };
+    //@ts-ignore
+    const response = await window.API.insertAlumno(data);
+    setloading(false);
+
+    const findAlumnos = await getAlumno(secciones.id);
+    console.log(findAlumnos);
+
+    // @ts-ignore
+    $("#Alumnos").jsGrid("loadData", findAlumnos);
+    // @ts-ignore
+    $("#Alumnos").jsGrid("refresh");
+
+    return response;
+  };
+
+  const handleNext = async () => {
     let newSkipped = skipped;
+    const newActive = activeStep;
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
@@ -71,28 +144,32 @@ const Seccion = () => {
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
+
+    if (newActive === 2) {
+      if (datosRepresetante.alumnoAddress === true) {
+        console.log("misma dirrecion");
+        setDatosRepresetante({
+          ...datosRepresetante,
+          address: datosAlumno.address,
+          municipality: datosAlumno.municipality,
+          state: datosAlumno.state,
+        });
+        setDatosAlumno({
+          ...datosAlumno,
+          fechaNacimiento: moment(datosAlumno.fechaNacimiento).toDate(),
+        });
+      }
+      await insertAlumno();
+      console.log("completado");
+    }
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
   const handleReset = () => {
+    setloading(true);
     setActiveStep(0);
   };
 
@@ -102,13 +179,17 @@ const Seccion = () => {
     console.log(findSecciones);
 
     // @ts-ignore
-    const anio = await window.API.getAnio(findSecciones.data.anio.id);
+    const anio = await window.API.getAnio(findSecciones.anio.id);
     console.log(anio);
     setAnio(anio);
+
+    const findAlumnos = await getAlumno(findSecciones.id);
+    console.log(findAlumnos);
+
     // @ts-ignore
-    $("#Secciones").jsGrid("loadData", findSecciones);
+    $("#Alumnos").jsGrid("loadData", findAlumnos);
     // @ts-ignore
-    $("#Secciones").jsGrid("refresh");
+    $("#Alumnos").jsGrid("refresh");
   };
 
   const getSecciones = async (id) => {
@@ -118,23 +199,18 @@ const Seccion = () => {
     console.log(findSecciones);
     setSecciones(findSecciones);
     // @ts-ignore
-    return { data: findSecciones, itemsCount: 0 };
+    return findSecciones;
   };
 
-  const insertSeccion = async ({ seccion }: any) => {
-    console.log("seccion", seccion);
+  const getAlumno = async (id) => {
+    console.log("id seccion", id);
     // @ts-ignore
-    const data = await window.API.insertSeccion({ seccion, anio: id });
+    const findSecciones = await window.API.getAlumno(id);
 
-    if (data) {
-      getData();
-      Swal.fire({
-        title: "Sección creada",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
+    const alumnos = findSecciones.map((data) => data.alumno.DatosPersonales);
+
+    // @ts-ignore
+    return { data: alumnos, itemsCount: 0 };
   };
 
   useEffect(() => {
@@ -147,6 +223,7 @@ const Seccion = () => {
       pageLoading: true,
       pageSize: 3,
       pageIndex: 1,
+      sort: true,
       heading: true,
       inserting: false,
       loadIndication: true,
@@ -163,17 +240,15 @@ const Seccion = () => {
       invalidMessage: "Por favor ingreser un valor valido",
       rowClick: async function (args: any) {
         console.log("");
-        navigate("/seccion/" + args.item.id);
       },
       controller: {
         loadData: async (filter: any) => {
-          return await getSecciones(id);
+          return await getAlumno(secciones.id);
         },
         insertItem: async function (item: any) {
-          await insertSeccion(item);
           // @ts-ignore
 
-          $("#periodo").jsGrid("refresh");
+          $("#Alumnos").jsGrid("refresh");
         },
       },
       // @ts-ignore
@@ -192,21 +267,21 @@ const Seccion = () => {
       },
       fields: [
         {
-          name: "cedula",
+          name: "dni",
           title: "C.I",
           align: "center",
           type: "text",
           validate: "required",
         },
         {
-          name: "nombre",
+          name: "firstName",
           title: "Nombres",
           align: "center",
           type: "text",
           validate: "required",
         },
         {
-          name: "apellido",
+          name: "secondName",
           title: "Apellidos",
           align: "center",
           type: "text",
@@ -239,7 +314,7 @@ const Seccion = () => {
       <DrawerHeader />
       <Button
         onClick={() => {
-          setSecciones({ seccion: "loading" });
+          setSecciones({ seccion: "loading", id: 0 });
           navigate(-1);
         }}
       >
@@ -312,6 +387,12 @@ const Seccion = () => {
                     <Typography variant="caption">Paso Dos</Typography>
                   );
                 }
+                if (index === 2) {
+                  //@ts-ignore
+                  labelProps.optional = (
+                    <Typography variant="caption">Paso Tre</Typography>
+                  );
+                }
                 if (isStepSkipped(index)) {
                   //@ts-ignore
 
@@ -326,21 +407,38 @@ const Seccion = () => {
             </Stepper>
             {activeStep === steps.length ? (
               <React.Fragment>
-                <Typography sx={{ mt: 2, mb: 1 }}>
-                  All steps completed - you&apos;re finished
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                  <Box sx={{ flex: "1 1 auto" }} />
-                  <Button onClick={handleReset}>Ingresar Otro Alumno</Button>
-                  <Button
-                    onClick={() => {
-                      handleClose();
-                      handleReset();
+                {loading ? (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
                     }}
                   >
-                    Cerrar
-                  </Button>
-                </Box>
+                    <CircularProgress sx={{ my: "5rem" }} />
+                  </Box>
+                ) : (
+                  <>
+                    {" "}
+                    <Typography sx={{ mt: 2, mb: 1 }}>
+                      All steps completed - you&apos;re finished
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                      <Box sx={{ flex: "1 1 auto" }} />
+                      <Button onClick={handleReset}>
+                        Ingresar Otro Alumno
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          handleClose();
+                          handleReset();
+                        }}
+                      >
+                        Cerrar
+                      </Button>
+                    </Box>
+                  </>
+                )}
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -372,22 +470,46 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.firsName}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                firsName: e.target.value,
+                              })
+                            }
                             label="Primer Nombre"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.SecondName}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                SecondName: e.target.value,
+                              })
+                            }
                             label="Segundo Nombre"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.surname}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                surname: e.target.value,
+                              })
+                            }
                             label="Primer Apellido"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.secondSurname}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                secondSurname: e.target.value,
+                              })
+                            }
                             label="Segundo Apellido"
                             variant="standard"
                           />
@@ -400,24 +522,77 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.dni}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                dni: e.target.value,
+                              })
+                            }
                             label="Cedula /Pasaporte /Cedula Escolar"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.address}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                address: e.target.value,
+                              })
+                            }
                             label="Direccion"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.municipality}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                municipality: e.target.value,
+                              })
+                            }
                             label="Municipio"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosAlumno.state}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                state: e.target.value,
+                              })
+                            }
                             label="Estado"
                             variant="standard"
+                          />
+                          <Input
+                            type="Date"
+                            onBlur={(e) => {
+                              //@ts-ignore
+
+                              console.log(e.target.value);
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                fechaNacimiento:
+                                  //@ts-ignore
+                                  e.target.value,
+                              });
+                              console.log(datosAlumno);
+                            }}
+                            onChangeCapture={(e) => {
+                              //@ts-ignore
+
+                              console.log(e.target.value);
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                fechaNacimiento:
+                                  //@ts-ignore
+                                  e.target.value,
+                              });
+                              console.log(datosAlumno);
+                            }}
                           />
                         </Box>
                         <Typography
@@ -437,6 +612,14 @@ const Seccion = () => {
                           <FormGroup>
                             <FormControlLabel
                               control={<Checkbox />}
+                              value={datosAlumno.cedula}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  cedula: e.target.checked,
+                                })
+                              }
                               label="Cedula"
                             />
                           </FormGroup>
@@ -444,24 +627,56 @@ const Seccion = () => {
                             <FormControlLabel
                               control={<Checkbox />}
                               label="Pasaporte"
+                              value={datosAlumno.pasaporte}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  pasaporte: e.target.checked,
+                                })
+                              }
                             />
                           </FormGroup>
                           <FormGroup>
                             <FormControlLabel
                               control={<Checkbox />}
                               label="Partida de nacimiento"
+                              value={datosAlumno.partidaDeNacimiento}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  partidaDeNacimiento: e.target.checked,
+                                })
+                              }
                             />
                           </FormGroup>
                           <FormGroup>
                             <FormControlLabel
                               control={<Checkbox />}
                               label="Fotos tipo carnet"
+                              value={datosAlumno.fotos}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  fotos: e.target.checked,
+                                })
+                              }
                             />
                           </FormGroup>
                           <FormGroup>
                             <FormControlLabel
                               control={<Checkbox />}
                               label="Notas Escolares"
+                              value={datosAlumno.notasEscolares}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  notasEscolares: e.target.checked,
+                                })
+                              }
                             />
                           </FormGroup>
                         </Box>
@@ -474,12 +689,19 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            id="nameAlumno"
                             label="Nota ( Opcional )"
                             variant="standard"
                             sx={{
                               width: "100%",
                             }}
+                            value={datosAlumno.observacion}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                observacion: e.target.value,
+                              })
+                            }
                           />
                         </Box>
                       </Box>
@@ -512,22 +734,50 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            id="nameAlumno"
+                            value={datosRepresetante.firstName}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                firstName: e.target.value,
+                              })
+                            }
                             label="Primer Nombre"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosRepresetante.secondName}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                secondName: e.target.value,
+                              })
+                            }
                             label="Segundo Nombre"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosRepresetante.surname}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                surname: e.target.value,
+                              })
+                            }
                             label="Primer Apellido"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosRepresetante.secondSurname}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                secondSurname: e.target.value,
+                              })
+                            }
                             label="Segundo Apellido"
                             variant="standard"
                           />
@@ -541,12 +791,26 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            id="nameAlumno"
-                            label="Parentesco"
+                            value={datosRepresetante.filiacion}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                filiacion: e.target.value,
+                              })
+                            }
+                            label="Filiación"
                             variant="standard"
                           />
                           <TextField
-                            id="nameAlumno"
+                            value={datosRepresetante.dni}
+                            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                dni: e.target.value,
+                              })
+                            }
                             label="Cedula / Pasaporte"
                             variant="standard"
                           />
@@ -573,23 +837,121 @@ const Seccion = () => {
                               }}
                               control={<Checkbox />}
                               label="¿El estudiante vive con el represetante?"
+                              value={datosRepresetante.alumnoAddress}
+                              onChange={(e) =>
+                                setDatosRepresetante({
+                                  ...datosRepresetante,
+                                  //@ts-ignore
+                                  alumnoAddress: e.target.checked,
+                                })
+                              }
                             />
                           </FormGroup>
+                          {!datosRepresetante.alumnoAddress && (
+                            <>
+                              <TextField
+                                value={datosRepresetante.address}
+                                onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    address: e.target.value,
+                                  })
+                                }
+                                label="Direccion"
+                                variant="standard"
+                              />
+                              <TextField
+                                value={datosRepresetante.municipality}
+                                onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    municipality: e.target.value,
+                                  })
+                                }
+                                label="Municipio"
+                                variant="standard"
+                              />
+                              <TextField
+                                value={datosRepresetante.state}
+                                onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    state: e.target.value,
+                                  })
+                                }
+                                label="Estado"
+                                variant="standard"
+                              />
+                            </>
+                          )}
+                        </Box>
+                      </Box>
+                    </>
+                  )}
+                  {activeStep === 2 && (
+                    <>
+                      {" "}
+                      <Typography
+                        textAlign="center"
+                        width="100%"
+                        fontWeight="bold"
+                      >
+                        Información académica
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "1rem",
+                          flexWrap: "wrap",
+                          rowGap: "3rem",
+                          mt: 5,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "1rem",
+                            width: "80%",
+                          }}
+                        >
                           <TextField
-                            id="nameAlumno"
-                            label="Direccion"
+                            sx={{ width: "100%" }}
+                            label="Grupo Estable"
                             variant="standard"
+                            value={datosAlumno.grupoEstable}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                grupoEstable: e.target.value,
+                              })
+                            }
                           />
-                          <TextField
-                            id="nameAlumno"
-                            label="Municipio"
-                            variant="standard"
-                          />
-                          <TextField
-                            id="nameAlumno"
-                            label="Estado"
-                            variant="standard"
-                          />
+                          <FormControl sx={{ width: "100%" }}>
+                            <InputLabel id="demo-simple-select-label">
+                              Condicion
+                            </InputLabel>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={datosAlumno.condicion}
+                              label="Condicion"
+                              onChange={handleChange}
+                            >
+                              <MenuItem value={"Nuevo Ingreso"}>
+                                Nuevo Ingreso
+                              </MenuItem>
+                              <MenuItem value={"Regular"}>Regular</MenuItem>
+                              <MenuItem value={"Repitiente"}>
+                                Repitiente
+                              </MenuItem>
+                            </Select>
+                          </FormControl>
                         </Box>
                       </Box>
                     </>
@@ -604,7 +966,22 @@ const Seccion = () => {
                   >
                     Atras
                   </Button>
-                  <Box sx={{ flex: "1 1 auto" }} />
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flex: "1 1 auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      color="inherit"
+                      onClick={handleClose}
+                      sx={{ mr: 1 }}
+                    >
+                      Cerrar
+                    </Button>
+                  </Box>
 
                   <Button onClick={handleNext}>
                     {activeStep === steps.length - 1

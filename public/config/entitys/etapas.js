@@ -21,17 +21,17 @@ __decorate([
     __metadata("design:type", String)
 ], Etapas.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => alumnos_1.Alumno),
+    (0, typeorm_1.ManyToOne)(() => alumnos_1.Alumno),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", alumnos_1.Alumno)
 ], Etapas.prototype, "alumno", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => anios_1.Anio),
+    (0, typeorm_1.ManyToOne)(() => anios_1.Anio),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", anios_1.Anio)
 ], Etapas.prototype, "anio", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => secciones_1.Seccion),
+    (0, typeorm_1.ManyToOne)(() => secciones_1.Seccion),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", secciones_1.Seccion)
 ], Etapas.prototype, "seccione", void 0);

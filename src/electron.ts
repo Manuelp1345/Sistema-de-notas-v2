@@ -536,3 +536,181 @@ ipcMain.handle("INSERT_AREA", async (event, area) => {
     return false;
   }
 });
+
+ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
+  const seccion = await Seccion.findOne({
+    relations: ["anio"],
+    where: {
+      id: data.seccion,
+    },
+  });
+  const documentsDB = new Documents();
+  documentsDB.cedula = Boolean(data.alumno.cedula);
+  documentsDB.pasaporte = Boolean(data.alumno.pasaporte);
+  documentsDB.partida_nacimiento = Boolean(data.alumno.partidaDeNacimiento);
+  documentsDB.fotos_carnet = Boolean(data.alumno.fotos);
+  documentsDB.notas_escuela = Boolean(data.alumno.notasEscolares);
+
+  let documentsId;
+  try {
+    documentsId = await documentsDB.save();
+    //@ts-ignore
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+
+  console.log("insert area", seccion);
+  const basicDataDB = new BasicData();
+  basicDataDB.firstName = data.alumno.firsName;
+  basicDataDB.secondName = data.alumno.SecondName;
+  basicDataDB.Surname = data.alumno.surname;
+  basicDataDB.secondSurname = data.alumno.secondSurname;
+  basicDataDB.email = data.alumno.email;
+  basicDataDB.sexo = data.alumno.sexo;
+  basicDataDB.dni = data.alumno.dni;
+  basicDataDB.Phone = data.alumno.phone;
+  basicDataDB.address = data.alumno.address;
+  basicDataDB.state = data.alumno.state;
+  basicDataDB.municipality = data.alumno.municipality;
+  basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
+  basicDataDB.Documents = documentsId;
+
+  let basicDataId;
+  try {
+    basicDataId = await basicDataDB.save();
+    //@ts-ignore
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+
+  const alumnoDB = new Alumno();
+  alumnoDB.observacion = data.alumno.observacion;
+  alumnoDB.condicion = data.alumno.condicion;
+  alumnoDB.grupoEstable = data.alumno.grupoEstable;
+  alumnoDB.DatosPersonales = basicDataId;
+
+  let alumnoId;
+  try {
+    alumnoId = await alumnoDB.save();
+    //@ts-ignore
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+
+  const etapasDB = new Etapas();
+  etapasDB.alumno = alumnoId;
+  etapasDB.anio = seccion?.anio as Anio;
+  etapasDB.seccione = seccion as Seccion;
+
+  try {
+    await etapasDB.save();
+    //@ts-ignore
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+
+  const basicDataTwoDB = new BasicData();
+  basicDataTwoDB.firstName = data.representante.firsName;
+  basicDataTwoDB.secondName = data.representante.secondName;
+  basicDataTwoDB.Surname = data.representante.surname;
+  basicDataTwoDB.secondSurname = data.representante.secondSurname;
+  basicDataTwoDB.email = data.representante.email;
+  basicDataTwoDB.dni = data.representante.dni;
+  basicDataTwoDB.Phone = data.representante.phone;
+  basicDataTwoDB.address = data.representante.address;
+  basicDataTwoDB.state = data.representante.state;
+  basicDataTwoDB.municipality = data.representante.municipality;
+
+  try {
+    basicDataId = await basicDataTwoDB.save();
+    //@ts-ignore
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+
+  const representanteDB = new Representante();
+  representanteDB.DatosPersonales = basicDataId;
+  representanteDB.Alumno = alumnoId;
+  representanteDB.parentesco = data.representante.filiacion;
+
+  try {
+    await representanteDB.save();
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Alumno Registrado",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return true;
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+});
+
+ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
+  console.log("get Alumnos", id);
+  let Alumnos;
+  try {
+    Alumnos = await Etapas.find({
+      relations: ["alumno", "alumno.DatosPersonales"],
+
+      where: {
+        seccione: id,
+      },
+    });
+    console.log(Alumnos);
+    return Alumnos;
+  } catch (error) {
+    console.log(error);
+  }
+});

@@ -43,6 +43,9 @@ const getAreas = async (id) => {
 const insertArea = async (area) => {
   return await ipcRenderer.invoke("INSERT_AREA", area);
 };
+const insertAlumno = async (data) => {
+  return await ipcRenderer.invoke("INSERT_ALUMNO", data);
+};
 
 const createAnio = async (anio) => {
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
@@ -71,6 +74,9 @@ const background = async () => {
 const getPeriodos = async (filter) => {
   return await ipcRenderer.invoke("GET_PERIODO", filter);
 };
+const getAlumno = async (filter) => {
+  return await ipcRenderer.invoke("GET_ALUMNOS", filter);
+};
 
 const insertPeriodo = async (periodo) => {
   return await ipcRenderer.invoke("INSER_PERIODO", periodo);
@@ -89,6 +95,8 @@ const API = {
   getSeccion,
   getSecciones,
   insertSeccion,
+  insertAlumno,
+  getAlumno,
   getAreas,
   insertArea,
   login,

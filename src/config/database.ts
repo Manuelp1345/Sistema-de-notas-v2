@@ -60,7 +60,7 @@ export const ConnectionDB = async (
           RecuperacionNota,
         ],
     synchronize: true,
-    logging: false,
+    logging: true,
     extra: {
       connectionLimit: 4000,
     },

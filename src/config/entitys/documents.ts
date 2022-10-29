@@ -12,18 +12,18 @@ export class Documents extends BaseEntity {
   @PrimaryGeneratedColumn()
   readonly id!: string;
 
-  @Column({ type: "text" })
-  cedula!: string;
+  @Column({ type: "boolean" })
+  cedula!: boolean;
 
-  @Column({ type: "text" })
-  pasaporte!: string;
+  @Column({ type: "boolean" })
+  pasaporte!: boolean;
 
-  @Column({ type: "text" })
-  partida_nacimiento!: string;
+  @Column({ type: "boolean" })
+  partida_nacimiento!: boolean;
 
-  @Column({ type: "text" })
-  fotos_carnet!: string;
+  @Column({ type: "boolean" })
+  fotos_carnet!: boolean;
 
-  @Column({ type: "text" })
-  notas_escuela!: string;
+  @Column({ type: "boolean" })
+  notas_escuela!: boolean;
 }

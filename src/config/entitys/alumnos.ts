@@ -25,21 +25,15 @@ export class Alumno extends BaseEntity {
   @Column()
   observacion!: string;
 
-  @OneToOne(() => Periodo)
-  @JoinColumn()
-  periodo!: Periodo;
+  @Column()
+  condicion!: string;
+
+  @Column()
+  grupoEstable!: string;
 
   @OneToMany(() => Nota, (notas) => notas.id)
   @JoinColumn()
   notas!: Nota[];
-
-  @OneToOne(() => Anio)
-  @JoinColumn()
-  anio!: Anio;
-
-  @OneToOne(() => Seccion)
-  @JoinColumn()
-  seccion!: Seccion;
 
   @OneToOne(() => BasicData)
   @JoinColumn()
