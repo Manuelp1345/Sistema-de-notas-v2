@@ -46,6 +46,9 @@ const getAreas = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const insertArea = (area) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_AREA", area);
 });
+const insertAlumno = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("INSERT_ALUMNO", data);
+});
 const createAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_AÑOS", anio);
 });
@@ -68,6 +71,9 @@ const background = () => __awaiter(void 0, void 0, void 0, function* () {
 const getPeriodos = (filter) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_PERIODO", filter);
 });
+const getAlumno = (filter) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_ALUMNOS", filter);
+});
 const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSER_PERIODO", periodo);
 });
@@ -84,6 +90,8 @@ const API = {
     getSeccion,
     getSecciones,
     insertSeccion,
+    insertAlumno,
+    getAlumno,
     getAreas,
     insertArea,
     login,

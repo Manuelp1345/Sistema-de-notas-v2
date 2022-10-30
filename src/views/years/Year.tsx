@@ -3,10 +3,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Button } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
+import { GlobalContext } from "../../config/context/GlobalContext";
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -21,7 +23,9 @@ const Year = (): JSX.Element => {
   const { id } = useParams();
   const [anio, setAnio] = useState([{}]);
   const [secciones, setSecciones] = useState({});
+
   const navigate = useNavigate();
+  const { areas } = useContext(GlobalContext);
 
   const getData = async () => {
     // @ts-ignore
@@ -56,6 +60,7 @@ const Year = (): JSX.Element => {
     console.log("id anio", id);
     // @ts-ignore
     const findAreas = await window.API.getAreas(id);
+    areas.setAreas(findAreas);
     console.log(findAreas);
 
     // @ts-ignore
@@ -263,6 +268,7 @@ const Year = (): JSX.Element => {
     (async () => {
       await getData();
       console.log("id", id);
+      //@ts-ignore
     })();
   }, []);
 
@@ -276,6 +282,7 @@ const Year = (): JSX.Element => {
       <Button
         onClick={() => {
           setSecciones({});
+          areas.setAreas([]);
           navigate(-1);
         }}
       >

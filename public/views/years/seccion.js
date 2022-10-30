@@ -21,9 +21,10 @@ const react_router_dom_1 = require("react-router-dom");
 const react_2 = require("react");
 const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
-const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const material_2 = require("@mui/material");
 const moment_1 = __importDefault(require("moment"));
+const TableCustom_1 = require("../table/TableCustom");
+const GlobalContext_1 = require("../../config/context/GlobalContext");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const style = {
     position: "absolute",
@@ -49,8 +50,10 @@ const Seccion = () => {
     const [secciones, setSecciones] = (0, react_2.useState)({ seccion: "loading", id: 0 });
     const [activeStep, setActiveStep] = react_1.default.useState(0);
     const [skipped, setSkipped] = (0, react_2.useState)(new Set());
+    const [alumnos, setAlumnos] = (0, react_2.useState)([{ id: 0 }]);
+    const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const [datosAlumno, setDatosAlumno] = (0, react_2.useState)({
-        firstName: "",
+        firsName: "",
         SecondName: "",
         surname: "",
         secondSurname: "",
@@ -107,6 +110,8 @@ const Seccion = () => {
         //@ts-ignore
         const response = yield window.API.insertAlumno(data);
         setloading(false);
+        const findAlumnos = yield getAlumno(secciones.id);
+        console.log(findAlumnos);
         return response;
     });
     const handleNext = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -136,6 +141,7 @@ const Seccion = () => {
         setActiveStep(0);
     };
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("ID SECCION", id);
         // @ts-ignore
         const findSecciones = yield getSecciones(id);
         console.log(findSecciones);
@@ -145,10 +151,6 @@ const Seccion = () => {
         setAnio(anio);
         const findAlumnos = yield getAlumno(findSecciones.id);
         console.log(findAlumnos);
-        // @ts-ignore
-        $("#Alumnos").jsGrid("loadData", findAlumnos);
-        // @ts-ignore
-        $("#Alumnos").jsGrid("refresh");
     });
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
@@ -163,119 +165,41 @@ const Seccion = () => {
         console.log("id seccion", id);
         // @ts-ignore
         const findSecciones = yield window.API.getAlumno(id);
-        console.log(findSecciones);
-        setSecciones(findSecciones);
-        // @ts-ignore
-        return { data: findSecciones, itemsCount: 0 };
-    });
-    const insertSeccion = ({ seccion }) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("seccion", seccion);
-        // @ts-ignore
-        const data = yield window.API.insertSeccion({ seccion, anio: id });
-        if (data) {
-            getData();
-            sweetalert2_1.default.fire({
-                title: "Sección creada",
-                icon: "success",
-                showConfirmButton: false,
-                timer: 1500,
-            });
-        }
-    });
-    (0, react_2.useEffect)(() => {
-        // @ts-ignore
-        $("#Alumnos").jsGrid({
-            width: "100%",
-            paging: true,
-            autoload: false,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: false,
-            loadIndication: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay Alumnos",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            rowClick: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    console.log("");
-                    navigate("/seccion/" + args.item.id);
-                });
-            },
-            controller: {
-                loadData: (filter) => __awaiter(void 0, void 0, void 0, function* () {
-                    return yield getAlumno(secciones.id);
-                }),
-                insertItem: function (item) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        yield insertSeccion(item);
-                        // @ts-ignore
-                        $("#periodo").jsGrid("refresh");
-                    });
-                },
-            },
-            // @ts-ignore
-            invalidNotify: ({ errors, item }) => {
-                console.log(item);
-                if (item.periodo === "") {
-                    sweetalert2_1.default.fire({
-                        title: "Error",
-                        text: "Ingrese un Alumno",
-                        icon: "error",
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
-                    return;
-                }
-            },
-            fields: [
-                {
-                    name: "id",
-                    title: "C.I",
-                    align: "center",
-                    type: "text",
-                    validate: "required",
-                },
-                {
-                    name: "firstName",
-                    title: "Nombres",
-                    align: "center",
-                    type: "text",
-                    validate: "required",
-                },
-                {
-                    name: "secondName",
-                    title: "Apellidos",
-                    align: "center",
-                    type: "text",
-                    validate: "required",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                { type: "control", editButton: false, deleteButton: false },
-            ],
+        const alumnos = findSecciones.map((data) => {
+            data.alumno.DatosPersonales.firstName =
+                `${data.alumno.DatosPersonales.firstName}`.toUpperCase();
+            data.alumno.DatosPersonales.secondName =
+                `${data.alumno.DatosPersonales.secondName}`.toUpperCase();
+            data.alumno.DatosPersonales.Surname =
+                `${data.alumno.DatosPersonales.Surname}`.toUpperCase();
+            data.alumno.DatosPersonales.secondSurname =
+                `${data.alumno.DatosPersonales.secondSurname}`.toUpperCase();
+            data.alumno.idDatos = data.alumno.DatosPersonales.id;
+            delete data.alumno.DatosPersonales.id;
+            data.alumno = Object.assign(Object.assign({}, data.alumno), data.alumno.DatosPersonales);
+            delete data.alumno.DatosPersonales;
+            return data.alumno;
         });
+        setAlumnos(alumnos);
+        // @ts-ignore
+        return alumnos;
+    });
+    const handleClickRow = (param) => {
+        console.log(param);
+        alumno.setAlumnoId(alumnos.find((datos) => datos.id === param.id));
+        navigate("/alumno");
+    };
+    (0, react_2.useEffect)(() => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
             console.log("id", id);
         }))();
+        console.log(alumnos);
+        console.log(areas.areas);
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones({ seccion: "loading", id: 0 });
+                    setAlumnos([{ id: 0 }]);
                     navigate(-1);
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
@@ -291,7 +215,59 @@ const Seccion = () => {
                     marginTop: "2rem",
                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleOpen, sx: {
                         fontWeight: "bold",
-                    }, variant: "outlined" }, { children: "Agregar Alumno" })) })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2rem" }, id: "Alumnos", component: "div" }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
+                    }, variant: "outlined" }, { children: "Agregar Alumno" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
+                    {
+                        field: "id",
+                        headerName: "ID",
+                        disableExport: true,
+                        hide: true,
+                    },
+                    {
+                        field: "dni",
+                        headerName: "C.I",
+                        headerClassName: "backGround",
+                        width: 130,
+                        headerAlign: "center",
+                        flex: 1,
+                        align: "center",
+                    },
+                    {
+                        field: "firstName",
+                        headerName: "Nombre",
+                        width: 130,
+                        headerClassName: "backGround",
+                        headerAlign: "center",
+                        flex: 1,
+                        align: "center",
+                    },
+                    {
+                        field: "secondName",
+                        headerName: "Segundo Nombre",
+                        width: 130,
+                        headerClassName: "backGround",
+                        headerAlign: "center",
+                        flex: 1,
+                        align: "center",
+                    },
+                    {
+                        field: "Surname",
+                        headerName: "Apellido",
+                        width: 130,
+                        headerClassName: "backGround",
+                        headerAlign: "center",
+                        flex: 1,
+                        align: "center",
+                    },
+                    {
+                        field: "secondSurname",
+                        headerName: "Segundo Apellido",
+                        width: 130,
+                        headerClassName: "backGround",
+                        headerAlign: "center",
+                        flex: 1,
+                        align: "center",
+                    },
+                ], rows: alumnos, loading: false, handleClick: handleClickRow }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
                                     const stepProps = {};
                                     const labelProps = {};
                                     if (index === 0) {
@@ -328,7 +304,7 @@ const Seccion = () => {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.firstName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { firstName: e.target.value })), label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.SecondName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { SecondName: e.target.value })), label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.surname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { surname: e.target.value })), label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.secondSurname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.firsName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { firsName: e.target.value })), label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.SecondName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { SecondName: e.target.value })), label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.surname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { surname: e.target.value })), label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.secondSurname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",

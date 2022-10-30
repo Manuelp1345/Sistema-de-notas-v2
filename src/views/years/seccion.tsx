@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Button,
   Checkbox,
@@ -24,6 +24,10 @@ import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { CircularProgress } from "@mui/material";
 import moment from "moment";
+import { TableCustom } from "../table/TableCustom";
+import { GlobalContext } from "../../config/context/GlobalContext";
+import { Alumno } from "../../config/types";
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -59,6 +63,9 @@ const Seccion = () => {
   const [secciones, setSecciones] = useState({ seccion: "loading", id: 0 });
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = useState(new Set());
+  const [alumnos, setAlumnos] = useState([{ id: 0 } as Alumno]);
+  const { areas, alumno } = useContext(GlobalContext);
+
   const [datosAlumno, setDatosAlumno] = useState({
     firsName: "",
     SecondName: "",
@@ -126,11 +133,6 @@ const Seccion = () => {
     const findAlumnos = await getAlumno(secciones.id);
     console.log(findAlumnos);
 
-    // @ts-ignore
-    $("#Alumnos").jsGrid("loadData", findAlumnos);
-    // @ts-ignore
-    $("#Alumnos").jsGrid("refresh");
-
     return response;
   };
 
@@ -174,6 +176,7 @@ const Seccion = () => {
   };
 
   const getData = async () => {
+    console.log("ID SECCION", id);
     // @ts-ignore
     const findSecciones = await getSecciones(id);
     console.log(findSecciones);
@@ -185,11 +188,6 @@ const Seccion = () => {
 
     const findAlumnos = await getAlumno(findSecciones.id);
     console.log(findAlumnos);
-
-    // @ts-ignore
-    $("#Alumnos").jsGrid("loadData", findAlumnos);
-    // @ts-ignore
-    $("#Alumnos").jsGrid("refresh");
   };
 
   const getSecciones = async (id) => {
@@ -207,102 +205,45 @@ const Seccion = () => {
     // @ts-ignore
     const findSecciones = await window.API.getAlumno(id);
 
-    const alumnos = findSecciones.map((data) => data.alumno.DatosPersonales);
+    const alumnos = findSecciones.map((data) => {
+      data.alumno.DatosPersonales.firstName =
+        `${data.alumno.DatosPersonales.firstName}`.toUpperCase();
+      data.alumno.DatosPersonales.secondName =
+        `${data.alumno.DatosPersonales.secondName}`.toUpperCase();
+      data.alumno.DatosPersonales.Surname =
+        `${data.alumno.DatosPersonales.Surname}`.toUpperCase();
+      data.alumno.DatosPersonales.secondSurname =
+        `${data.alumno.DatosPersonales.secondSurname}`.toUpperCase();
+      data.alumno.idDatos = data.alumno.DatosPersonales.id;
+      delete data.alumno.DatosPersonales.id;
+
+      data.alumno = { ...data.alumno, ...data.alumno.DatosPersonales };
+      delete data.alumno.DatosPersonales;
+
+      return data.alumno;
+    });
+
+    setAlumnos(alumnos);
 
     // @ts-ignore
-    return { data: alumnos, itemsCount: 0 };
+    return alumnos;
+  };
+
+  const handleClickRow = (param) => {
+    console.log(param);
+    alumno.setAlumnoId(
+      alumnos.find((datos) => datos.id === param.id) as Alumno
+    );
+    navigate("/alumno");
   };
 
   useEffect(() => {
-    // @ts-ignore
-
-    $("#Alumnos").jsGrid({
-      width: "100%",
-      paging: true,
-      autoload: false,
-      pageLoading: true,
-      pageSize: 3,
-      pageIndex: 1,
-      sort: true,
-      heading: true,
-      inserting: false,
-      loadIndication: true,
-      loadMessage: "Por favor espere",
-      loadShading: true,
-      noDataContent: "No hay Alumnos",
-      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-      pagePrevText: "Anterior",
-      pageNextText: "Siguiente",
-      pageFirstText: "Primera",
-      pageLastText: "Ultima",
-      pageNavigatorNextText: "...",
-      pageNavigatorPrevText: "...",
-      invalidMessage: "Por favor ingreser un valor valido",
-      rowClick: async function (args: any) {
-        console.log("");
-      },
-      controller: {
-        loadData: async (filter: any) => {
-          return await getAlumno(secciones.id);
-        },
-        insertItem: async function (item: any) {
-          // @ts-ignore
-
-          $("#Alumnos").jsGrid("refresh");
-        },
-      },
-      // @ts-ignore
-      invalidNotify: ({ errors, item }) => {
-        console.log(item);
-        if (item.periodo === "") {
-          Swal.fire({
-            title: "Error",
-            text: "Ingrese un Alumno",
-            icon: "error",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-          return;
-        }
-      },
-      fields: [
-        {
-          name: "dni",
-          title: "C.I",
-          align: "center",
-          type: "text",
-          validate: "required",
-        },
-        {
-          name: "firstName",
-          title: "Nombres",
-          align: "center",
-          type: "text",
-          validate: "required",
-        },
-        {
-          name: "secondName",
-          title: "Apellidos",
-          align: "center",
-          type: "text",
-          validate: "required",
-        },
-        {
-          name: "id",
-          title: "ids",
-          align: "center",
-          type: "text",
-          visible: false,
-        },
-
-        { type: "control", editButton: false, deleteButton: false },
-      ],
-    });
-
     (async () => {
       await getData();
       console.log("id", id);
     })();
+    console.log(alumnos);
+    console.log(areas.areas);
   }, []);
 
   return (
@@ -315,6 +256,8 @@ const Seccion = () => {
       <Button
         onClick={() => {
           setSecciones({ seccion: "loading", id: 0 });
+          setAlumnos([{ id: 0 } as Alumno]);
+
           navigate(-1);
         }}
       >
@@ -362,7 +305,65 @@ const Seccion = () => {
           Agregar Alumno
         </Button>
       </Box>
-      <Box sx={{ marginTop: "2rem" }} id="Alumnos" component="div"></Box>
+      <TableCustom
+        columns={[
+          {
+            field: "id",
+            headerName: "ID",
+            disableExport: true,
+            hide: true,
+          },
+          {
+            field: "dni",
+            headerName: "C.I",
+            headerClassName: "backGround",
+            width: 130,
+
+            headerAlign: "center",
+            flex: 1,
+            align: "center",
+          },
+          {
+            field: "firstName",
+            headerName: "Nombre",
+            width: 130,
+            headerClassName: "backGround",
+            headerAlign: "center",
+            flex: 1,
+            align: "center",
+          },
+          {
+            field: "secondName",
+            headerName: "Segundo Nombre",
+            width: 130,
+            headerClassName: "backGround",
+            headerAlign: "center",
+            flex: 1,
+            align: "center",
+          },
+          {
+            field: "Surname",
+            headerName: "Apellido",
+            width: 130,
+            headerClassName: "backGround",
+            headerAlign: "center",
+            flex: 1,
+            align: "center",
+          },
+          {
+            field: "secondSurname",
+            headerName: "Segundo Apellido",
+            width: 130,
+            headerClassName: "backGround",
+            headerAlign: "center",
+            flex: 1,
+            align: "center",
+          },
+        ]}
+        rows={alumnos}
+        loading={false}
+        handleClick={handleClickRow}
+      />
       <Modal
         open={open}
         onClose={handleClose}

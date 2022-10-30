@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import AppRouter from "./Router/AppRouter";
+import { GlobalProvider } from "./config/context/GlobalContext";
 
 const root = document.getElementById("root");
 //@ts-ignore
@@ -10,7 +12,9 @@ document.querySelector("html").style.overflow = "auto !important";
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppRouter />
+    <GlobalProvider>
+      <AppRouter />
+    </GlobalProvider>
   </React.StrictMode>,
   root
 );

@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import SetupYear from "../years/SetupYear";
 import Year from "../years/Year";
 import Seccion from "../years/seccion";
+import Alumno from "../years/alumno";
 
 const drawerWidth = 240;
 
@@ -234,6 +235,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "anos" && <SetupYear idPeriodo={periodo.id} />}
       {element === "Year" && <Year />}
       {element === "seccion" && <Seccion />}
+      {element === "alumno" && <Alumno />}
     </Box>
   );
 }

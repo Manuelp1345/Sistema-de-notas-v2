@@ -21,12 +21,15 @@ const react_1 = require("react");
 const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
 const sweetalert2_1 = __importDefault(require("sweetalert2"));
+const GlobalContext_1 = require("../../config/context/GlobalContext");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Year = () => {
     const { id } = (0, react_router_dom_1.useParams)();
     const [anio, setAnio] = (0, react_1.useState)([{}]);
     const [secciones, setSecciones] = (0, react_1.useState)({});
+    const [areasDB, setAreasDB] = (0, react_1.useState)();
     const navigate = (0, react_router_dom_1.useNavigate)();
+    const { areas } = (0, react_1.useContext)(GlobalContext_1.GlobalContext);
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const anio = yield window.API.getAnio(id);
@@ -36,6 +39,7 @@ const Year = () => {
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
         const findAreas = yield getAreas(anio.id);
+        setAreasDB(findAreas.data);
         console.log(findAreas);
         // @ts-ignore
         $("#Secciones").jsGrid("loadData", findSecciones);
@@ -257,10 +261,13 @@ const Year = () => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
             console.log("id", id);
+            //@ts-ignore
+            areas.setAreas(areasDB);
         }))();
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones({});
+                    areas.setAreas([]);
                     navigate(-1);
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",

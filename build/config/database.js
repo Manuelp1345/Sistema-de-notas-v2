@@ -68,7 +68,10 @@ const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function
                 recuperacion_Nota_1.RecuperacionNota,
             ],
         synchronize: true,
-        logging: false,
+        logging: true,
+        extra: {
+            connectionLimit: 4000,
+        },
     });
     if (!connection.isInitialized) {
         try {

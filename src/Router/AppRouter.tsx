@@ -17,6 +17,7 @@ const AppRouter = () => {
         <Route path="/anio/:id" element={<Dashboard element="Year" />} />
         <Route path="/seccion/:id" element={<Dashboard element="seccion" />} />
         <Route path="/perfil" element={<Dashboard element="perfil" />} />
+        <Route path="/alumno" element={<Dashboard element="alumno" />} />
         <Route path="/admin" element={<Dashboard element="admin" />} />
         <Route path="/logout" element={<Auth />} />
         <Route path="/create-user" element={<CreateUser />} />

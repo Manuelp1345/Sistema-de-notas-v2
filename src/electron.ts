@@ -699,13 +699,15 @@ ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
 
 ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
   console.log("get Alumnos", id);
+
   let Alumnos;
   try {
     Alumnos = await Etapas.find({
       relations: ["alumno", "alumno.DatosPersonales"],
-
       where: {
-        seccione: id,
+        seccione: {
+          id: id,
+        },
       },
     });
     console.log(Alumnos);
