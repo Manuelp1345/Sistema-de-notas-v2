@@ -36,7 +36,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@fullcalendar/core": "^5.10.1",
+    "@fullcalendar/core": "^5.11.3",
     "@fullcalendar/daygrid": "^5.10.1",
     "@fullcalendar/list": "^5.10.1",
     "@fullcalendar/react": "^5.10.1",
