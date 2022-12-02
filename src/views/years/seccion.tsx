@@ -566,6 +566,37 @@ const Seccion = () => {
                             label="Estado"
                             variant="standard"
                           />
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "1rem",
+                          }}
+                        >
+                          <TextField
+                            value={datosAlumno.email}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                email: e.target.value,
+                              })
+                            }
+                            label="Correo"
+                            variant="standard"
+                          />
+                          <TextField
+                            value={datosAlumno.phone}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                phone: parseInt(e.target.value),
+                              })
+                            }
+                            label="Telefono"
+                            variant="standard"
+                          />
+
                           <Input
                             type="Date"
                             onBlur={(e) => {
@@ -595,115 +626,22 @@ const Seccion = () => {
                               console.log(datosAlumno);
                             }}
                           />
-                        </Box>
-                        <Typography
-                          textAlign="center"
-                          width="100%"
-                          fontWeight="bold"
-                        >
-                          Documentos
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: "1rem",
-                          }}
-                        >
-                          <FormGroup>
-                            <FormControlLabel
-                              control={<Checkbox />}
-                              value={datosAlumno.cedula}
-                              onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  //@ts-ignore
-                                  cedula: e.target.checked,
-                                })
-                              }
-                              label="Cedula"
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <FormControlLabel
-                              control={<Checkbox />}
-                              label="Pasaporte"
-                              value={datosAlumno.pasaporte}
-                              onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  //@ts-ignore
-                                  pasaporte: e.target.checked,
-                                })
-                              }
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <FormControlLabel
-                              control={<Checkbox />}
-                              label="Partida de nacimiento"
-                              value={datosAlumno.partidaDeNacimiento}
-                              onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  //@ts-ignore
-                                  partidaDeNacimiento: e.target.checked,
-                                })
-                              }
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <FormControlLabel
-                              control={<Checkbox />}
-                              label="Fotos tipo carnet"
-                              value={datosAlumno.fotos}
-                              onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  //@ts-ignore
-                                  fotos: e.target.checked,
-                                })
-                              }
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <FormControlLabel
-                              control={<Checkbox />}
-                              label="Notas Escolares"
-                              value={datosAlumno.notasEscolares}
-                              onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  //@ts-ignore
-                                  notasEscolares: e.target.checked,
-                                })
-                              }
-                            />
-                          </FormGroup>
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: "1rem",
-                            width: "100%",
-                          }}
-                        >
-                          <TextField
-                            label="Nota ( Opcional )"
-                            variant="standard"
-                            sx={{
-                              width: "100%",
-                            }}
-                            value={datosAlumno.observacion}
-                            onChange={(e) =>
-                              setDatosAlumno({
-                                ...datosAlumno,
-                                //@ts-ignore
-                                observacion: e.target.value,
-                              })
-                            }
-                          />
+                          <FormControl>
+                            <InputLabel id="demo-simple-select-label">
+                              Sexo
+                            </InputLabel>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={"M"}
+                              label="Condicion"
+
+                              /*           onChange={handleChange} */
+                            >
+                              <MenuItem value={"F"}>Femenino</MenuItem>
+                              <MenuItem value={"M"}>Masculino</MenuItem>
+                            </Select>
+                          </FormControl>
                         </Box>
                       </Box>
                     </>
@@ -953,6 +891,115 @@ const Seccion = () => {
                               </MenuItem>
                             </Select>
                           </FormControl>
+                        </Box>
+                        <Typography
+                          textAlign="center"
+                          width="100%"
+                          fontWeight="bold"
+                        >
+                          Documentos
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "1rem",
+                          }}
+                        >
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox />}
+                              value={datosAlumno.cedula}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  cedula: e.target.checked,
+                                })
+                              }
+                              label="Cedula"
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox />}
+                              label="Pasaporte"
+                              value={datosAlumno.pasaporte}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  pasaporte: e.target.checked,
+                                })
+                              }
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox />}
+                              label="Partida de nacimiento"
+                              value={datosAlumno.partidaDeNacimiento}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  partidaDeNacimiento: e.target.checked,
+                                })
+                              }
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox />}
+                              label="Fotos tipo carnet"
+                              value={datosAlumno.fotos}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  fotos: e.target.checked,
+                                })
+                              }
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <FormControlLabel
+                              control={<Checkbox />}
+                              label="Notas Escolares"
+                              value={datosAlumno.notasEscolares}
+                              onChange={(e) =>
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  notasEscolares: e.target.checked,
+                                })
+                              }
+                            />
+                          </FormGroup>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "1rem",
+                            width: "100%",
+                          }}
+                        >
+                          <TextField
+                            label="Nota ( Opcional )"
+                            variant="standard"
+                            sx={{
+                              width: "100%",
+                            }}
+                            value={datosAlumno.observacion}
+                            onChange={(e) =>
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                observacion: e.target.value,
+                              })
+                            }
+                          />
                         </Box>
                       </Box>
                     </>

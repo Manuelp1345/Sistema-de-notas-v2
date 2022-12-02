@@ -702,7 +702,9 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
         Alumnos = yield etapas_1.Etapas.find({
             relations: ["alumno", "alumno.DatosPersonales"],
             where: {
-                seccione: id,
+                seccione: {
+                    id: id,
+                },
             },
         });
         console.log(Alumnos);

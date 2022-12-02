@@ -29,7 +29,7 @@ export class BasicData extends BaseEntity {
   @Column({ type: "text" })
   email!: string;
 
-  @Column({ type: "bigint" })
+  @Column({ type: "bigint", unique: true })
   dni!: string;
 
   @Column({ type: "text" })

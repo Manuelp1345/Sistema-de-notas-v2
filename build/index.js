@@ -7,10 +7,11 @@ const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = __importDefault(require("react"));
 const react_dom_1 = __importDefault(require("react-dom"));
 const AppRouter_1 = __importDefault(require("./Router/AppRouter"));
+const GlobalContext_1 = require("./config/context/GlobalContext");
 const root = document.getElementById("root");
 //@ts-ignore
 root.style.overflow = "auto!important";
 //@ts-ignore
 document.querySelector("html").style.overflow = "auto !important";
-react_dom_1.default.render((0, jsx_runtime_1.jsx)(react_1.default.StrictMode, { children: (0, jsx_runtime_1.jsx)(AppRouter_1.default, {}) }), root);
+react_dom_1.default.render((0, jsx_runtime_1.jsx)(react_1.default.StrictMode, { children: (0, jsx_runtime_1.jsx)(GlobalContext_1.GlobalProvider, { children: (0, jsx_runtime_1.jsx)(AppRouter_1.default, {}) }) }), root);
 //# sourceMappingURL=index.js.map

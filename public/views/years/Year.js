@@ -27,7 +27,6 @@ const Year = () => {
     const { id } = (0, react_router_dom_1.useParams)();
     const [anio, setAnio] = (0, react_1.useState)([{}]);
     const [secciones, setSecciones] = (0, react_1.useState)({});
-    const [areasDB, setAreasDB] = (0, react_1.useState)();
     const navigate = (0, react_router_dom_1.useNavigate)();
     const { areas } = (0, react_1.useContext)(GlobalContext_1.GlobalContext);
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -39,7 +38,6 @@ const Year = () => {
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
         const findAreas = yield getAreas(anio.id);
-        setAreasDB(findAreas.data);
         console.log(findAreas);
         // @ts-ignore
         $("#Secciones").jsGrid("loadData", findSecciones);
@@ -63,6 +61,7 @@ const Year = () => {
         console.log("id anio", id);
         // @ts-ignore
         const findAreas = yield window.API.getAreas(id);
+        areas.setAreas(findAreas);
         console.log(findAreas);
         // @ts-ignore
         return { data: findAreas, itemsCount: 0 };
@@ -262,7 +261,6 @@ const Year = () => {
             yield getData();
             console.log("id", id);
             //@ts-ignore
-            areas.setAreas(areasDB);
         }))();
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {

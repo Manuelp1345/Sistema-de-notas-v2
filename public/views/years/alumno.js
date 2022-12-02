@@ -37,6 +37,8 @@ const Alumno = () => {
         // @ts-ignore
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
+        const findAreas = yield getAreas(anio.id);
+        console.log(findAreas);
     });
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
@@ -46,6 +48,14 @@ const Alumno = () => {
         setSecciones({ data: findSecciones, itemsCount: 0 });
         // @ts-ignore
         return { data: findSecciones, itemsCount: 0 };
+    });
+    const getAreas = (id) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("id anio", id);
+        // @ts-ignore
+        const findAreas = yield window.API.getAreas(id);
+        console.log(findAreas);
+        // @ts-ignore
+        return { data: findAreas, itemsCount: 0 };
     });
     (0, react_1.useEffect)(() => {
         (() => __awaiter(void 0, void 0, void 0, function* () {

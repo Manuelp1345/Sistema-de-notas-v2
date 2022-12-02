@@ -1,17 +1,13 @@
-import { Periodo } from "./periodo";
-import { Anio } from "./anios";
-
-import { Seccion } from "./secciones";
 import { BasicData } from "./basicData";
 import { Alumno } from "./alumnos";
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  JoinTable,
   BaseEntity,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 
 @Entity()
@@ -26,7 +22,7 @@ export class Representante extends BaseEntity {
   @JoinColumn()
   DatosPersonales!: BasicData;
 
-  @OneToOne(() => Alumno)
+  @OneToMany(() => Alumno, (alumno) => alumno.id)
   @JoinColumn()
-  Alumno!: Alumno;
+  Alumno!: Alumno[];
 }

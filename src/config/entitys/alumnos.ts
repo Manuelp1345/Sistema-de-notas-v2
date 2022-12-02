@@ -10,7 +10,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  JoinTable,
   BaseEntity,
   OneToOne,
   JoinColumn,
