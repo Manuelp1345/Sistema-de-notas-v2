@@ -272,7 +272,6 @@ ipcMain.handle("GET_PERIODO", async (e, { pageIndex = 1, pageSize = 0 }) => {
         id: "DESC",
       },
       skip: skip,
-      take: 3,
     });
   } catch (error) {
     console.log(error);

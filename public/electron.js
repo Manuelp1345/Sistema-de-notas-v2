@@ -283,7 +283,6 @@ electron_1.ipcMain.handle("GET_PERIODO", (e, { pageIndex = 1, pageSize = 0 }) =>
                 id: "DESC",
             },
             skip: skip,
-            take: 3,
         });
     }
     catch (error) {

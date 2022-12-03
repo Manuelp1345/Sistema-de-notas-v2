@@ -215,7 +215,7 @@ const Seccion = () => {
                     marginTop: "2rem",
                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleOpen, sx: {
                         fontWeight: "bold",
-                    }, variant: "outlined" }, { children: "Agregar Alumno" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
+                    }, variant: "outlined" }, { children: "Agregar Alumno" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { toolbar: true, columns: [
                     {
                         field: "id",
                         headerName: "ID",
@@ -267,7 +267,9 @@ const Seccion = () => {
                         flex: 1,
                         align: "center",
                     },
-                ], rows: alumnos, loading: false, handleClick: handleClickRow }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
+                ], rows: alumnos, loading: false, handleDobleClick: () => {
+                    console.log("first");
+                }, handleClick: handleClickRow }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
                                     const stepProps = {};
                                     const labelProps = {};
                                     if (index === 0) {

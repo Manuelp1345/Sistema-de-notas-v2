@@ -16,9 +16,10 @@ function CustomToolbar() {
             /*         background: "#1976d2", */
         } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { gap: "1rem", display: "flex" } }, { children: [(0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarColumnsButton, { sx: { color: "black" } }), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarFilterButton, { sx: { color: "black" } })] })), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarExport, { sx: { color: "black" } })] })));
 }
-const TableCustom = ({ rows, columns, loading, handleClick }) => {
+const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, toolbar, }) => {
     return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
-            height: 400,
+            flex: 1,
+            height: "100%",
             width: "100%",
             "& .backGround": {
                 background: "#1976d2",
@@ -47,7 +48,7 @@ const TableCustom = ({ rows, columns, loading, handleClick }) => {
                 columnsPanelTextFieldPlaceholder: "",
                 columnsPanelHideAllButton: "Ocultar todas",
                 columnsPanelShowAllButton: "Mostrar todas",
-            }, rows: rows, columns: columns, onRowClick: handleClick, pageSize: 10, autoHeight: true, rowsPerPageOptions: [5], components: { Toolbar: CustomToolbar } }) })));
+            }, rows: rows, columns: columns, onRowClick: handleClick, onRowDoubleClick: handleDobleClick, pageSize: 5, autoHeight: true, rowsPerPageOptions: [5], components: toolbar && { Toolbar: CustomToolbar } }) })));
 };
 exports.TableCustom = TableCustom;
 //# sourceMappingURL=TableCustom.js.map

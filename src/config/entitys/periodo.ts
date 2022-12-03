@@ -5,7 +5,7 @@ export class Periodo extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column()
+  @Column({ unique: true })
   periodo!: string;
 
   @Column()

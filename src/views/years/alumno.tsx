@@ -415,6 +415,10 @@ const Alumno = (): JSX.Element => {
           handleClick={() => {
             console.log("first");
           }}
+          handleDobleClick={() => {
+            console.log("first");
+          }}
+          toolbar
         />
       </Box>
     </Box>

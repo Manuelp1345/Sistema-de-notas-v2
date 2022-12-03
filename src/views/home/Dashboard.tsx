@@ -26,6 +26,8 @@ import SetupYear from "../years/SetupYear";
 import Year from "../years/Year";
 import Seccion from "../years/seccion";
 import Alumno from "../years/alumno";
+import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
+import { Tooltip } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -188,46 +190,78 @@ export default function Dashboard({ element }: { element: string }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Inicio", "Años", "Administracion", "Perfil", "Salir"].map(
-            (text, index) => (
-              <ListItem
-                button
-                selected={
-                  (element === "home" && index === 0) ||
-                  (element === "anos" && index === 1) ||
-                  (element === "perfil" && index === 2) ||
-                  (element === "admin" && index === 3)
-                }
+          {[
+            "Inicio",
+            "Años",
+            "Estadísticas",
+            "Administración",
+            "Perfil",
+            "Salir",
+          ].map((text, index) => (
+            <ListItem
+              button
+              selected={
+                (element === "home" && index === 0) ||
+                (element === "anos" && index === 1) ||
+                (element === "perfil" && index === 4) ||
+                (element === "stats" && index === 2) ||
+                (element === "admin" && index === 3)
+              }
+              //@ts-ignore
+              onClick={() =>
                 //@ts-ignore
-                onClick={() =>
-                  //@ts-ignore
-                  (index === 0 && navigate("/home")) ||
-                  //@ts-ignore
+                (index === 0 && navigate("/home")) ||
+                //@ts-ignore
 
-                  (index === 1 && navigate("/anos")) ||
-                  //@ts-ignore
+                (index === 1 && navigate("/anos")) ||
+                //@ts-ignore
 
-                  (index === 2 && navigate("/perfil")) ||
-                  //@ts-ignore
+                (index === 2 && navigate("/stats")) ||
+                //@ts-ignore
 
-                  (index === 3 && navigate("/admin")) ||
-                  //@ts-ignore
-
-                  (index === 4 && navigate("/logout"))
-                }
-                key={text}
-              >
-                <ListItemIcon>
-                  {index === 0 && <House />}
-                  {index === 1 && <DateRangeIcon />}
-                  {index === 2 && <AccountCircleIcon />}
-                  {index === 3 && <AdminPanelSettingsIcon />}
-                  {index === 4 && <LogoutIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            )
-          )}
+                (index === 3 && navigate("/admin")) ||
+                //@ts-ignore
+                (index === 4 && navigate("/perfil")) ||
+                //@ts-ignore
+                (index === 5 && navigate("/logout"))
+              }
+              key={text}
+            >
+              <ListItemIcon>
+                {index === 0 && (
+                  <Tooltip title={`inicio`} arrow placement="right">
+                    <House />
+                  </Tooltip>
+                )}
+                {index === 1 && (
+                  <Tooltip title={`Años`} arrow placement="right">
+                    <DateRangeIcon />
+                  </Tooltip>
+                )}
+                {index === 2 && (
+                  <Tooltip title={`Estadísticas`} arrow placement="right">
+                    <InsertChartOutlinedIcon />
+                  </Tooltip>
+                )}
+                {index === 3 && (
+                  <Tooltip title={`Administración`} arrow placement="right">
+                    <AdminPanelSettingsIcon />
+                  </Tooltip>
+                )}
+                {index === 4 && (
+                  <Tooltip title={`Perfil`} arrow placement="right">
+                    <AccountCircleIcon />
+                  </Tooltip>
+                )}
+                {index === 5 && (
+                  <Tooltip title={`Salir`} arrow placement="right">
+                    <LogoutIcon />
+                  </Tooltip>
+                )}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
         </List>
         <Divider />
       </Drawer>

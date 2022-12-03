@@ -306,6 +306,7 @@ const Seccion = () => {
         </Button>
       </Box>
       <TableCustom
+        toolbar
         columns={[
           {
             field: "id",
@@ -362,6 +363,9 @@ const Seccion = () => {
         ]}
         rows={alumnos}
         loading={false}
+        handleDobleClick={() => {
+          console.log("first");
+        }}
         handleClick={handleClickRow}
       />
       <Modal

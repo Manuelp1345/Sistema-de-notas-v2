@@ -223,7 +223,9 @@ const Alumno = () => {
                             },
                         ], rows: areas.areas, loading: false, handleClick: () => {
                             console.log("first");
-                        } })] })] })));
+                        }, handleDobleClick: () => {
+                            console.log("first");
+                        }, toolbar: true })] })] })));
 };
 exports.default = Alumno;
 //# sourceMappingURL=alumno.js.map

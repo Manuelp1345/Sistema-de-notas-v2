@@ -27,11 +27,19 @@ function CustomToolbar() {
     </GridToolbarContainer>
   );
 }
-export const TableCustom = ({ rows, columns, loading, handleClick }) => {
+export const TableCustom = ({
+  rows,
+  columns,
+  loading,
+  handleClick,
+  handleDobleClick,
+  toolbar,
+}) => {
   return (
     <Box
       sx={{
-        height: 400,
+        flex: 1,
+        height: "100%",
         width: "100%",
         "& .backGround": {
           background: "#1976d2",
@@ -68,10 +76,11 @@ export const TableCustom = ({ rows, columns, loading, handleClick }) => {
         rows={rows}
         columns={columns}
         onRowClick={handleClick}
-        pageSize={10}
+        onRowDoubleClick={handleDobleClick}
+        pageSize={5}
         autoHeight
         rowsPerPageOptions={[5]}
-        components={{ Toolbar: CustomToolbar }}
+        components={toolbar && { Toolbar: CustomToolbar }}
       />
     </Box>
   );

@@ -26,7 +26,7 @@ export default function Home() {
       <DrawerHeader />
       <Box>
         <FullCalendar
-          height={"20rem"}
+          height={"27rem"}
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
           locale={esLocale}
