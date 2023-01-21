@@ -82,6 +82,14 @@ const insertPeriodo = async (periodo) => {
   return await ipcRenderer.invoke("INSER_PERIODO", periodo);
 };
 
+const setNota = async (data) => {
+  return await ipcRenderer.invoke("SET_NOTA", data);
+};
+
+const getNotas = async (data) => {
+  return await ipcRenderer.invoke("GET_NOTAS", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -102,6 +110,8 @@ const API = {
   login,
   imgLogin,
   background,
+  setNota,
+  getNotas,
 };
 
 contextBridge.exposeInMainWorld("API", API);

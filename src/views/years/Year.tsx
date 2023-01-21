@@ -276,6 +276,7 @@ const Year = (): JSX.Element => {
                 headerAlign: "center",
                 flex: 1,
                 align: "center",
+                editable: true,
               },
               {
                 field: "estado",

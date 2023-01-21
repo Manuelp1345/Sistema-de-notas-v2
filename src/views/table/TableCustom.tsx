@@ -2,6 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
+  GridEventListener,
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarExport,
@@ -35,7 +36,33 @@ export const TableCustom = ({
   handleClick,
   handleDobleClick,
   toolbar,
+  handleEditCell = (params, oldCell) => {
+    console.log("edit", params);
+  },
 }): JSX.Element => {
+  const handleCellEdit = (newCell, oldCell) => {
+    console.log("new", newCell);
+    console.log("old", oldCell);
+
+    if (newCell["1"])
+      if (newCell["1"] !== oldCell["1"]) {
+        delete newCell["2"];
+        delete newCell["3"];
+        handleEditCell(newCell, oldCell);
+      }
+    if (newCell["2"])
+      if (newCell["2"] !== oldCell["2"]) {
+        delete newCell["3"];
+        handleEditCell(newCell, oldCell);
+      }
+    if (newCell["3"])
+      if (newCell["3"] !== oldCell["3"]) {
+        handleEditCell(newCell, oldCell);
+      }
+
+    return newCell;
+  };
+
   return (
     <Box
       sx={{
@@ -52,6 +79,10 @@ export const TableCustom = ({
     >
       <DataGrid
         loading={loading}
+        experimentalFeatures={{
+          newEditingApi: true,
+        }}
+        processRowUpdate={handleCellEdit}
         localeText={{
           toolbarExport: "Exportar",
           toolbarExportCSV: "Descargar CSV",

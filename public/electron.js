@@ -713,4 +713,70 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
         console.log(error);
     }
 }));
+electron_1.ipcMain.handle("SET_NOTA", (evet, data) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("set nota", data);
+    let notaDB = yield nota_1.Nota.findOne({
+        relations: ["materia", "alumno", "anio"],
+        where: {
+            materia: {
+                id: data.id,
+            },
+            alumno: {
+                id: data.alumnoId,
+            },
+            anio: {
+                id: data.anio.id,
+            },
+            momento: data.momento,
+        },
+    });
+    console.log("find", notaDB);
+    if (notaDB === null)
+        notaDB = new nota_1.Nota();
+    notaDB.nota = data.nota;
+    notaDB.momento = data.momento;
+    notaDB.materia = data.id;
+    notaDB.alumno = data.alumnoId;
+    notaDB.anio = data.anio;
+    try {
+        yield notaDB.save();
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Nota Registrada",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "No se pudo registrar la nota",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
+}));
+electron_1.ipcMain.handle("GET_NOTAS", (evet, data) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("get notas", data);
+    let notas;
+    try {
+        notas = yield nota_1.Nota.find({
+            where: {
+                alumno: data.alumnoId,
+                anio: data.anio,
+            },
+            relations: ["materia"],
+        });
+        console.log(notas);
+        return notas;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
 //# sourceMappingURL=electron.js.map

@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useContext } from "react";
 import {
   Button,
   FormControl,
@@ -30,21 +30,99 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const Alumno = (): JSX.Element => {
   const { id } = useParams();
-  const [anio, setAnio] = useState([{}]);
-  const [secciones, setSecciones] = useState({});
   const navigate = useNavigate();
   const { areas, alumno } = useContext(GlobalContext);
+  const getNotas = async (data) => {
+    // @ts-ignore
+    const resnotas = await window.API.getNotas(data);
+    console.log(resnotas);
+    const notasMap = {};
+    resnotas.forEach((nota) => {
+      notasMap[`${nota.materia.id}-${nota.momento}`] = nota;
+    });
+
+    console.log(notasMap);
+
+    return notasMap;
+  };
+
+  const handledSetNota = async (newCell) => {
+    console.log(newCell);
+    const data = newCell;
+    if (newCell["1"]) {
+      data.nota = newCell["1"];
+      data.momento = "1";
+    }
+    if (newCell["2"]) {
+      data.nota = newCell["2"];
+      data.momento = "2";
+    }
+    if (newCell["3"]) {
+      data.nota = newCell["3"];
+      data.momento = "3";
+    }
+
+    // @ts-ignore
+    data.alumnoId = alumno.alumnoId.id;
+
+    delete data.firstName;
+
+    console.log("data", data);
+
+    // @ts-ignore
+    const res = await window.API.setNota(data);
+    console.log(res);
+
+    await getData();
+
+    return newCell;
+  };
 
   const getData = async () => {
     // @ts-ignore
     const anio = await window.API.getAnio(id);
     console.log(anio);
-    setAnio(anio);
     // @ts-ignore
     const findSecciones = await getSecciones(anio.id);
     console.log(findSecciones);
     const findAreas = await getAreas(anio.id);
     console.log(findAreas);
+    const resNotas = await getNotas({
+      alumnoId: alumno.alumnoId.id,
+      añoId: anio.id,
+    });
+
+    console.log(resNotas);
+
+    if (areas.areas)
+      areas.setAreas(
+        areas.areas.map((area) => {
+          if (resNotas[`${area.id}-1`]) {
+            area["1"] = resNotas[`${area.id}-1`].nota;
+          }
+          if (resNotas[`${area.id}-2`]) {
+            area["2"] = resNotas[`${area.id}-2`].nota;
+          }
+          if (resNotas[`${area.id}-3`]) {
+            area["3"] = resNotas[`${area.id}-3`].nota;
+          }
+
+          let total = "0";
+
+          if (area["1"] && area["2"] && area["3"])
+            total = (
+              (Number(resNotas[`${area.id}-1`].nota) +
+                Number(resNotas[`${area.id}-2`].nota) +
+                Number(resNotas[`${area.id}-3`].nota)) /
+              3
+            ).toFixed(2);
+
+          // @ts-ignore
+          area["total"] = isNaN(Number(total)) ? 0 : total;
+
+          return area;
+        })
+      );
   };
 
   const getSecciones = async (id) => {
@@ -52,7 +130,6 @@ const Alumno = (): JSX.Element => {
     // @ts-ignore
     const findSecciones = await window.API.getSecciones(id);
     console.log(findSecciones);
-    setSecciones({ data: findSecciones, itemsCount: 0 });
     // @ts-ignore
     return { data: findSecciones, itemsCount: 0 };
   };
@@ -377,37 +454,53 @@ const Alumno = (): JSX.Element => {
               headerName: "Area",
               headerClassName: "backGround",
               width: 130,
-
               headerAlign: "center",
               flex: 1,
               align: "center",
             },
             {
-              field: "firstName",
+              field: "1",
               headerName: "Primer Momento",
               width: 130,
               headerClassName: "backGround",
               headerAlign: "center",
               flex: 1,
+              type: "number",
+
               align: "center",
+              editable: true,
             },
             {
-              field: "firstNamea",
+              field: "2",
               headerName: "Segundo Momento",
               width: 130,
               headerClassName: "backGround",
               headerAlign: "center",
               flex: 1,
+              type: "number",
               align: "center",
+              editable: true,
             },
             {
-              field: "firstNames",
+              field: "3",
               headerName: "Tercer Momento",
               width: 130,
               headerClassName: "backGround",
               headerAlign: "center",
               flex: 1,
               align: "center",
+              type: "number",
+              editable: true,
+            },
+            {
+              field: "total",
+              headerName: "Nota Final",
+              width: 130,
+              headerClassName: "backGround",
+              headerAlign: "center",
+              flex: 1,
+              align: "center",
+              type: "number",
             },
           ]}
           rows={areas.areas}
@@ -419,6 +512,7 @@ const Alumno = (): JSX.Element => {
             console.log("first");
           }}
           toolbar
+          handleEditCell={handledSetNota}
         />
       </Box>
     </Box>

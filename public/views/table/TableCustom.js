@@ -16,7 +16,24 @@ function CustomToolbar() {
             /*         background: "#1976d2", */
         } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { gap: "1rem", display: "flex" } }, { children: [(0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarColumnsButton, { sx: { color: "black" } }), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarFilterButton, { sx: { color: "black" } })] })), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarExport, { sx: { color: "black" } })] })));
 }
-const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, toolbar, }) => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, toolbar, handleEditCell = (params, oldCell) => {
+    console.log("edit", params);
+}, }) => {
+    const handleCellEdit = (newCell, oldCell) => {
+        console.log("new", newCell);
+        console.log("old", oldCell);
+        if (newCell["1"])
+            if (newCell["1"] !== oldCell["1"])
+                handleEditCell(newCell, oldCell);
+        if (newCell["2"])
+            if (newCell["2"] !== oldCell["2"])
+                handleEditCell(newCell, oldCell);
+        if (newCell["3"])
+            if (newCell["3"] !== oldCell["3"])
+                handleEditCell(newCell, oldCell);
+        return newCell;
+    };
     return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
             flex: 1,
             height: "100%",
@@ -27,7 +44,9 @@ const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, to
                 textAlign: "center",
                 width: "100%",
             },
-        } }, { children: (0, jsx_runtime_1.jsx)(x_data_grid_1.DataGrid, { loading: loading, localeText: {
+        } }, { children: (0, jsx_runtime_1.jsx)(x_data_grid_1.DataGrid, { loading: loading, experimentalFeatures: {
+                newEditingApi: true,
+            }, processRowUpdate: handleCellEdit, localeText: {
                 toolbarExport: "Exportar",
                 toolbarExportCSV: "Descargar CSV",
                 toolbarExportPrint: "Imprimir",
@@ -48,7 +67,7 @@ const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, to
                 columnsPanelTextFieldPlaceholder: "",
                 columnsPanelHideAllButton: "Ocultar todas",
                 columnsPanelShowAllButton: "Mostrar todas",
-            }, rows: rows, columns: columns, onRowClick: handleClick, onRowDoubleClick: handleDobleClick, pageSize: 5, autoHeight: true, rowsPerPageOptions: [5], components: toolbar && { Toolbar: CustomToolbar } }) })));
+            }, rows: rows, columns: columns, onRowClick: handleClick, onRowDoubleClick: handleDobleClick, pageSize: 6, autoHeight: true, rowsPerPageOptions: [6], components: toolbar && { Toolbar: CustomToolbar } }) })));
 };
 exports.TableCustom = TableCustom;
 //# sourceMappingURL=TableCustom.js.map

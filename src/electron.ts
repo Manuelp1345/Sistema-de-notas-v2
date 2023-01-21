@@ -715,3 +715,69 @@ ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
     console.log(error);
   }
 });
+
+ipcMain.handle("SET_NOTA", async (evet, data) => {
+  console.log("set nota", data);
+  let notaDB = await Nota.findOne({
+    relations: ["materia", "alumno", "anio"],
+    where: {
+      materia: {
+        id: data.id,
+      },
+      alumno: {
+        id: data.alumnoId,
+      },
+      anio: {
+        id: data.anio.id,
+      },
+      momento: data.momento,
+    },
+  });
+  console.log("find", notaDB);
+  if (notaDB === null) notaDB = new Nota();
+  notaDB.nota = data.nota;
+  notaDB.momento = data.momento;
+  notaDB.materia = data.id;
+  notaDB.alumno = data.alumnoId;
+  notaDB.anio = data.anio;
+
+  try {
+    await notaDB.save();
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Nota Registrada",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return true;
+  } catch (error) {
+    console.log(error);
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo registrar la nota",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
+});
+
+ipcMain.handle("GET_NOTAS", async (evet, data) => {
+  console.log("get notas", data);
+  let notas;
+  try {
+    notas = await Nota.find({
+      where: {
+        alumno: data.alumnoId,
+        anio: data.anio,
+      },
+      relations: ["materia"],
+    });
+    console.log(notas);
+    return notas;
+  } catch (error) {
+    console.log(error);
+  }
+});

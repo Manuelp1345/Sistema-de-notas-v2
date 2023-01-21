@@ -29,6 +29,45 @@ const Alumno = () => {
     const [secciones, setSecciones] = (0, react_1.useState)({});
     const navigate = (0, react_router_dom_1.useNavigate)();
     const { areas, alumno } = (0, react_1.useContext)(GlobalContext_1.GlobalContext);
+    const [notas, setNotas] = (0, react_1.useState)({});
+    const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
+        // @ts-ignore
+        const resnotas = yield window.API.getNotas(data);
+        console.log(resnotas);
+        const notasMap = {};
+        resnotas.forEach((nota) => {
+            notasMap[`${nota.materia.id}-${nota.momento}`] = nota;
+        });
+        console.log(notasMap);
+        setNotas(notasMap);
+        return notasMap;
+    });
+    const handledSetNota = (newCell, oldCell) => __awaiter(void 0, void 0, void 0, function* () {
+        if (newCell.cellMode === "view")
+            return;
+        console.log(newCell);
+        const data = newCell;
+        if (newCell["1"]) {
+            data.nota = newCell["1"];
+            data.momento = "1";
+        }
+        if (newCell["2"]) {
+            data.nota = newCell["2"];
+            data.momento = "2";
+        }
+        if (newCell["3"]) {
+            data.nota = newCell["3"];
+            data.momento = "3";
+        }
+        // @ts-ignore
+        data.alumnoId = alumno.alumnoId.id;
+        delete data.firstName;
+        console.log("data", data);
+        // @ts-ignore
+        const res = yield window.API.setNota(data);
+        console.log(res);
+        return newCell;
+    });
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const anio = yield window.API.getAnio(id);
@@ -39,6 +78,32 @@ const Alumno = () => {
         console.log(findSecciones);
         const findAreas = yield getAreas(anio.id);
         console.log(findAreas);
+        const resNotas = yield getNotas({
+            alumnoId: alumno.alumnoId.id,
+            añoId: anio.id,
+        });
+        console.log(resNotas);
+        if (areas.areas)
+            areas.setAreas(areas.areas.map((area) => {
+                if (resNotas[`${area.id}-1`]) {
+                    area["1"] = resNotas[`${area.id}-1`].nota;
+                }
+                if (resNotas[`${area.id}-2`]) {
+                    area["2"] = resNotas[`${area.id}-2`].nota;
+                }
+                if (resNotas[`${area.id}-3`]) {
+                    area["3"] = resNotas[`${area.id}-3`].nota;
+                }
+                let total = "0";
+                if (area["1"] && area["2"] && area["3"])
+                    total = ((Number(resNotas[`${area.id}-1`].nota) +
+                        Number(resNotas[`${area.id}-2`].nota) +
+                        Number(resNotas[`${area.id}-3`].nota)) /
+                        3).toFixed(2);
+                // @ts-ignore
+                area["total"] - isNaN(Number(total)) ? 0 : total;
+                return area;
+            }));
     });
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
@@ -195,37 +260,53 @@ const Alumno = () => {
                                 align: "center",
                             },
                             {
-                                field: "firstName",
+                                field: "1",
                                 headerName: "Primer Momento",
                                 width: 130,
                                 headerClassName: "backGround",
                                 headerAlign: "center",
                                 flex: 1,
+                                type: "number",
                                 align: "center",
+                                editable: true,
                             },
                             {
-                                field: "firstNamea",
+                                field: "2",
                                 headerName: "Segundo Momento",
                                 width: 130,
                                 headerClassName: "backGround",
                                 headerAlign: "center",
                                 flex: 1,
+                                type: "number",
                                 align: "center",
+                                editable: true,
                             },
                             {
-                                field: "firstNames",
+                                field: "3",
                                 headerName: "Tercer Momento",
                                 width: 130,
                                 headerClassName: "backGround",
                                 headerAlign: "center",
                                 flex: 1,
                                 align: "center",
+                                type: "number",
+                                editable: true,
+                            },
+                            {
+                                field: "total",
+                                headerName: "Nota Final",
+                                width: 130,
+                                headerClassName: "backGround",
+                                headerAlign: "center",
+                                flex: 1,
+                                align: "center",
+                                type: "number",
                             },
                         ], rows: areas.areas, loading: false, handleClick: () => {
                             console.log("first");
                         }, handleDobleClick: () => {
                             console.log("first");
-                        }, toolbar: true })] })] })));
+                        }, toolbar: true, handleEditCell: handledSetNota })] })] })));
 };
 exports.default = Alumno;
 //# sourceMappingURL=alumno.js.map

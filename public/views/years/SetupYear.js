@@ -64,6 +64,7 @@ const SetupYear = ({ idPeriodo }) => {
     const [value, setValue] = React.useState({
         yearOne: "",
         yearTwo: "",
+        anio: null,
     });
     const [openDeleteAnio, setOpenDeleteAnio] = React.useState(false);
     const handleClickOpenDeleteAnio = () => setOpenDeleteAnio(true);
@@ -72,6 +73,12 @@ const SetupYear = ({ idPeriodo }) => {
     const handleClickOpenAddPeriodo = () => setOpenAddPeriodo(true);
     const handleCloseAddPeriodo = () => {
         setOpenAddPeriodo(false);
+        console.log(value);
+    };
+    const [openAddAnio, setOpenAddAnio] = React.useState(false);
+    const handleClickOpenAddAnio = () => setOpenAddAnio(true);
+    const handleCloseAddAnio = () => {
+        setOpenAddAnio(false);
         console.log(value);
     };
     const navigate = (0, react_router_dom_1.useNavigate)();
@@ -146,30 +153,9 @@ const SetupYear = ({ idPeriodo }) => {
         }
     });
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
-        let periodos;
-        try {
-            periodos = yield getPeriodos({ pageIndex: 1, pageSize: 3 });
-            console.log("periodos", periodos);
-            // @ts-ignore
-            $("#periodo").jsGrid("loadData", periodos);
-            // @ts-ignore
-            $("#periodo").jsGrid("refresh");
-        }
-        catch (error) {
-            console.log(error);
-        }
-        let anios;
-        try {
-            anios = yield getAnios(periodos.data[0].id);
-            console.log("anios", anios);
-            // @ts-ignore
-            $("#jsGrid").jsGrid("loadData", anios);
-            // @ts-ignore
-            $("#jsGrid").jsGrid("refresh");
-        }
-        catch (error) {
-            console.log(error);
-        }
+        yield getPeriodos({ pageIndex: 1, pageSize: 3 });
+        // @ts-ignore
+        yield getAnios(periodo === null || periodo === void 0 ? void 0 : periodo.id);
     });
     const insertAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
         anio.periodoId = idPeriodo;
@@ -184,100 +170,11 @@ const SetupYear = ({ idPeriodo }) => {
                 timer: 1500,
             });
         }
+        setValue({ yearOne: "", yearTwo: "", anio: null });
+        // @ts-ignore
+        yield getAnios(periodo === null || periodo === void 0 ? void 0 : periodo.id);
     });
     React.useEffect(() => {
-        // @ts-ignore
-        $("#jsGrid").jsGrid({
-            width: "100%",
-            paging: true,
-            autoload: false,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: true,
-            loadIndication: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay años registrados",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            confirmDeleting: true,
-            deleteConfirm: (item) => {
-                return `seguro sea eliminar "${item.anio}"`;
-            },
-            onItemDeleting: (element) => __awaiter(void 0, void 0, void 0, function* () {
-                console.log("item delete", element);
-                let deleteAnio;
-                try {
-                    //@ts-ignore
-                    deleteAnio = yield window.API.deleteAnio(element.item.id);
-                }
-                catch (error) {
-                    sweetalert2_1.default.fire({
-                        title: `Error al borrar ${element.item.anio}`,
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });
-                }
-                console.log("delete response", deleteAnio);
-                if (deleteAnio === "error") {
-                    return sweetalert2_1.default.fire({
-                        title: `NO puedes borrar la sección. Sección en uso `,
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 2000,
-                    });
-                }
-                sweetalert2_1.default.fire({
-                    title: `${element.item.anio} Borrado`,
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 1500,
-                });
-                // @ts-ignore
-                $("#jsGrid").jsGrid("refresh");
-                // @ts-ignore
-                $("#jsGrid").jsGrid("reset");
-            }),
-            controller: {
-                loadData: () => {
-                    return getAnios(idPeriodo);
-                },
-                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio(item);
-                    // @ts-ignore
-                    $("#jsGrid").jsGrid("refresh");
-                }),
-            },
-            rowClick: function (args) {
-                navigate("/anio/" + args.item.id);
-            },
-            fields: [
-                {
-                    name: "anio",
-                    title: "Años",
-                    align: "center",
-                    type: "text",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                { type: "control", width: 10, editButton: false },
-            ],
-        });
-        // @ts-ignore
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
         }))();
@@ -339,9 +236,7 @@ const SetupYear = ({ idPeriodo }) => {
                                     width: "100%",
                                     display: "flex",
                                     flexDirection: "row-reverse",
-                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: () => {
-                                        console.log("first");
-                                    }, sx: {
+                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddAnio, sx: {
                                         fontWeight: "bold",
                                     }, variant: "outlined" }, { children: "Agregar A\u00F1o" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: anios, loading: anios.length === 0, toolbar: false, handleClick: () => {
                                     console.log("first");
@@ -400,7 +295,15 @@ const SetupYear = ({ idPeriodo }) => {
                                     setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
                                 }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
                                     setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) }))] })));
+                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertAnio({ anio: value.anio });
+                    handleCloseAddAnio();
+                }) }, { children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
+                        gap: 2,
+                        mt: 2,
+                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "A\u00F1o", variant: "outlined", value: value.anio, onChange: (e) => {
+                            setValue(Object.assign(Object.assign({}, value), { anio: e.target.value }));
+                        } }) })) }))] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map
