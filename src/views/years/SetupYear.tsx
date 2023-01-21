@@ -36,6 +36,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const [periodos, setPeriodos] = useState([]);
   const [periodo, setPeriodo] = useState();
   const [anios, setAnios] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [idAnioDelete, setIdAnioDelete] = useState({
     id: 0,
     anio: "",
@@ -149,6 +150,8 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
     await getPeriodos({ pageIndex: 1, pageSize: 3 });
     // @ts-ignore
     await getAnios(periodo?.id);
+
+    setLoading(false);
   };
 
   const insertAnio = async (anio: any) => {
@@ -225,7 +228,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           </Box>
           <TableCustom
             rows={periodos}
-            loading={periodos.length === 0}
+            loading={loading}
             toolbar={false}
             handleClick={async function (args: any) {
               console.log(args);
@@ -311,7 +314,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           </Box>
           <TableCustom
             rows={anios}
-            loading={anios.length === 0}
+            loading={loading}
             toolbar={false}
             handleClick={() => {
               console.log("first");

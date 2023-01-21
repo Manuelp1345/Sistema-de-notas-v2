@@ -104,6 +104,7 @@ export const TableCustom = ({
           columnsPanelTextFieldPlaceholder: "",
           columnsPanelHideAllButton: "Ocultar todas",
           columnsPanelShowAllButton: "Mostrar todas",
+          noRowsLabel: "No hay datos",
         }}
         rows={rows}
         columns={columns}

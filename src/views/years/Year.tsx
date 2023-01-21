@@ -34,6 +34,8 @@ const Year = (): JSX.Element => {
     area: null,
   });
 
+  const [loading, setLoading] = useState(true);
+
   const [openAddSeccion, setOpenAddSeccion] = React.useState(false);
   const handleClickOpenAddSeccion = () => setOpenAddSeccion(true);
   const handleCloseAddSeccion = () => {
@@ -58,6 +60,8 @@ const Year = (): JSX.Element => {
     console.log(findSecciones);
     const findAreas = await getAreas(anio.id);
     console.log(findAreas);
+
+    setLoading(false);
   };
 
   const getSecciones = async (id) => {
@@ -173,7 +177,7 @@ const Year = (): JSX.Element => {
           </Box>
           <TableCustom
             rows={secciones}
-            loading={secciones.length === 0}
+            loading={loading}
             toolbar={false}
             handleClick={async function () {
               console.log("params");
@@ -254,7 +258,7 @@ const Year = (): JSX.Element => {
           </Box>
           <TableCustom
             rows={areas.areas}
-            loading={areas?.areas?.length === 0}
+            loading={loading}
             toolbar={false}
             handleClick={() => {
               console.log("first");

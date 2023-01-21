@@ -28,13 +28,13 @@ const TableCustom_1 = require("../table/TableCustom");
 const customModal_1 = require("../modals/customModal");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Year = () => {
-    var _a;
     const { id } = (0, react_router_dom_1.useParams)();
     const [secciones, setSecciones] = (0, react_2.useState)([]);
     const [value, setValue] = react_1.default.useState({
         seccion: null,
         area: null,
     });
+    const [loading, setLoading] = (0, react_2.useState)(true);
     const [openAddSeccion, setOpenAddSeccion] = react_1.default.useState(false);
     const handleClickOpenAddSeccion = () => setOpenAddSeccion(true);
     const handleCloseAddSeccion = () => {
@@ -56,6 +56,7 @@ const Year = () => {
         console.log(findSecciones);
         const findAreas = yield getAreas(anio.id);
         console.log(findAreas);
+        setLoading(false);
     });
     const getSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("id anio", id);
@@ -126,7 +127,7 @@ const Year = () => {
                                     flexDirection: "row-reverse",
                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddSeccion, sx: {
                                         fontWeight: "bold",
-                                    }, variant: "outlined" }, { children: "Agregar Secci\u00F3n" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: secciones, loading: secciones.length === 0, toolbar: false, handleClick: function () {
+                                    }, variant: "outlined" }, { children: "Agregar Secci\u00F3n" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: secciones, loading: loading, toolbar: false, handleClick: function () {
                                     return __awaiter(this, void 0, void 0, function* () {
                                         console.log("params");
                                     });
@@ -166,7 +167,7 @@ const Year = () => {
                                     flexDirection: "row-reverse",
                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddArea, sx: {
                                         fontWeight: "bold",
-                                    }, variant: "outlined" }, { children: "Agregar Area" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: areas.areas, loading: ((_a = areas === null || areas === void 0 ? void 0 : areas.areas) === null || _a === void 0 ? void 0 : _a.length) === 0, toolbar: false, handleClick: () => {
+                                    }, variant: "outlined" }, { children: "Agregar Area" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: areas.areas, loading: loading, toolbar: false, handleClick: () => {
                                     console.log("first");
                                 }, handleDobleClick: () => {
                                     console.log("first");

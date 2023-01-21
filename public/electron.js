@@ -770,7 +770,7 @@ electron_1.ipcMain.handle("GET_NOTAS", (evet, data) => __awaiter(void 0, void 0,
                 alumno: data.alumnoId,
                 anio: data.anio,
             },
-            relations: ["materia"],
+            relations: ["materia", "recuperacion"],
         });
         console.log(notas);
         return notas;

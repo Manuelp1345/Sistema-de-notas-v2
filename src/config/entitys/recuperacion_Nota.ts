@@ -7,6 +7,7 @@ import {
   JoinColumn,
   OneToMany,
   ManyToOne,
+  JoinTable,
 } from "typeorm";
 import { Seccion } from "./secciones";
 import { Nota } from "./nota";
@@ -20,7 +21,7 @@ export class RecuperacionNota extends BaseEntity {
   @Column()
   recuperacionNota!: string;
 
-  @ManyToOne(() => Nota)
+  @OneToOne(() => Nota)
   @JoinColumn()
   nota!: Nota;
 }

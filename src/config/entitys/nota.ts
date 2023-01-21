@@ -7,6 +7,7 @@ import {
   JoinColumn,
   OneToMany,
   ManyToOne,
+  JoinTable,
 } from "typeorm";
 import { Seccion } from "./secciones";
 import { Alumno } from "./alumnos";
@@ -37,7 +38,7 @@ export class Nota extends BaseEntity {
   @JoinColumn()
   alumno!: Alumno;
 
-  @OneToMany(() => RecuperacionNota, (rp) => rp.id)
+  @OneToOne(() => RecuperacionNota, (rp) => rp.id)
   @JoinColumn()
   recuperacion!: RecuperacionNota[];
 }

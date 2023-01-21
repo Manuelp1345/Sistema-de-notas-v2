@@ -56,6 +56,7 @@ const SetupYear = ({ idPeriodo }) => {
     const [periodos, setPeriodos] = (0, react_1.useState)([]);
     const [periodo, setPeriodo] = (0, react_1.useState)();
     const [anios, setAnios] = (0, react_1.useState)([]);
+    const [loading, setLoading] = (0, react_1.useState)(true);
     const [idAnioDelete, setIdAnioDelete] = (0, react_1.useState)({
         id: 0,
         anio: "",
@@ -156,6 +157,7 @@ const SetupYear = ({ idPeriodo }) => {
         yield getPeriodos({ pageIndex: 1, pageSize: 3 });
         // @ts-ignore
         yield getAnios(periodo === null || periodo === void 0 ? void 0 : periodo.id);
+        setLoading(false);
     });
     const insertAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
         anio.periodoId = idPeriodo;
@@ -197,7 +199,7 @@ const SetupYear = ({ idPeriodo }) => {
                                     flexDirection: "row-reverse",
                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddPeriodo, sx: {
                                         fontWeight: "bold",
-                                    }, variant: "outlined" }, { children: "Agregar Periodo" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: periodos, loading: periodos.length === 0, toolbar: false, handleClick: function (args) {
+                                    }, variant: "outlined" }, { children: "Agregar Periodo" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: periodos, loading: loading, toolbar: false, handleClick: function (args) {
                                     return __awaiter(this, void 0, void 0, function* () {
                                         console.log(args);
                                         idPeriodo = args.id;
@@ -238,7 +240,7 @@ const SetupYear = ({ idPeriodo }) => {
                                     flexDirection: "row-reverse",
                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddAnio, sx: {
                                         fontWeight: "bold",
-                                    }, variant: "outlined" }, { children: "Agregar A\u00F1o" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: anios, loading: anios.length === 0, toolbar: false, handleClick: () => {
+                                    }, variant: "outlined" }, { children: "Agregar A\u00F1o" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: anios, loading: loading, toolbar: false, handleClick: () => {
                                     console.log("first");
                                 }, handleDobleClick: () => {
                                     console.log("first");

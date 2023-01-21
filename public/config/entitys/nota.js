@@ -45,7 +45,7 @@ __decorate([
     __metadata("design:type", alumnos_1.Alumno)
 ], Nota.prototype, "alumno", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => recuperacion_Nota_1.RecuperacionNota, (rp) => rp.id),
+    (0, typeorm_1.OneToOne)(() => recuperacion_Nota_1.RecuperacionNota, (rp) => rp.id),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", Array)
 ], Nota.prototype, "recuperacion", void 0);

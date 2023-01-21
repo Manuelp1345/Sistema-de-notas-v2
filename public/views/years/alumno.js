@@ -25,11 +25,8 @@ const TableCustom_1 = require("../table/TableCustom");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Alumno = () => {
     const { id } = (0, react_router_dom_1.useParams)();
-    const [anio, setAnio] = (0, react_1.useState)([{}]);
-    const [secciones, setSecciones] = (0, react_1.useState)({});
     const navigate = (0, react_router_dom_1.useNavigate)();
     const { areas, alumno } = (0, react_1.useContext)(GlobalContext_1.GlobalContext);
-    const [notas, setNotas] = (0, react_1.useState)({});
     const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const resnotas = yield window.API.getNotas(data);
@@ -39,12 +36,9 @@ const Alumno = () => {
             notasMap[`${nota.materia.id}-${nota.momento}`] = nota;
         });
         console.log(notasMap);
-        setNotas(notasMap);
         return notasMap;
     });
-    const handledSetNota = (newCell, oldCell) => __awaiter(void 0, void 0, void 0, function* () {
-        if (newCell.cellMode === "view")
-            return;
+    const handledSetNota = (newCell) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(newCell);
         const data = newCell;
         if (newCell["1"]) {
@@ -66,13 +60,13 @@ const Alumno = () => {
         // @ts-ignore
         const res = yield window.API.setNota(data);
         console.log(res);
+        yield getData();
         return newCell;
     });
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const anio = yield window.API.getAnio(id);
         console.log(anio);
-        setAnio(anio);
         // @ts-ignore
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
@@ -101,7 +95,7 @@ const Alumno = () => {
                         Number(resNotas[`${area.id}-3`].nota)) /
                         3).toFixed(2);
                 // @ts-ignore
-                area["total"] - isNaN(Number(total)) ? 0 : total;
+                area["total"] = isNaN(Number(total)) ? 0 : total;
                 return area;
             }));
     });
@@ -110,7 +104,6 @@ const Alumno = () => {
         // @ts-ignore
         const findSecciones = yield window.API.getSecciones(id);
         console.log(findSecciones);
-        setSecciones({ data: findSecciones, itemsCount: 0 });
         // @ts-ignore
         return { data: findSecciones, itemsCount: 0 };
     });
@@ -271,6 +264,17 @@ const Alumno = () => {
                                 editable: true,
                             },
                             {
+                                field: "1rp",
+                                headerName: "Ajuste Primer Momento",
+                                width: 130,
+                                headerClassName: "backGround",
+                                headerAlign: "center",
+                                flex: 1,
+                                type: "number",
+                                align: "center",
+                                editable: true,
+                            },
+                            {
                                 field: "2",
                                 headerName: "Segundo Momento",
                                 width: 130,
@@ -282,8 +286,30 @@ const Alumno = () => {
                                 editable: true,
                             },
                             {
+                                field: "2rp",
+                                headerName: "Ajuste Segundo Momento",
+                                width: 130,
+                                headerClassName: "backGround",
+                                headerAlign: "center",
+                                flex: 1,
+                                type: "number",
+                                align: "center",
+                                editable: true,
+                            },
+                            {
                                 field: "3",
                                 headerName: "Tercer Momento",
+                                width: 130,
+                                headerClassName: "backGround",
+                                headerAlign: "center",
+                                flex: 1,
+                                align: "center",
+                                type: "number",
+                                editable: true,
+                            },
+                            {
+                                field: "3rp",
+                                headerName: "Ajuste Tercer Momento",
                                 width: 130,
                                 headerClassName: "backGround",
                                 headerAlign: "center",

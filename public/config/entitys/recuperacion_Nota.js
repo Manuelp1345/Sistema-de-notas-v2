@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], RecuperacionNota.prototype, "recuperacionNota", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => nota_1.Nota),
+    (0, typeorm_1.OneToOne)(() => nota_1.Nota),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", nota_1.Nota)
 ], RecuperacionNota.prototype, "nota", void 0);

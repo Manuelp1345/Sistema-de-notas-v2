@@ -773,7 +773,7 @@ ipcMain.handle("GET_NOTAS", async (evet, data) => {
         alumno: data.alumnoId,
         anio: data.anio,
       },
-      relations: ["materia"],
+      relations: ["materia", "recuperacion"],
     });
     console.log(notas);
     return notas;

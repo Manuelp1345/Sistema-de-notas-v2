@@ -471,6 +471,18 @@ const Alumno = (): JSX.Element => {
               editable: true,
             },
             {
+              field: "1rp",
+              headerName: "Ajuste Primer Momento",
+              width: 130,
+              headerClassName: "backGround",
+              headerAlign: "center",
+              flex: 1,
+              type: "number",
+
+              align: "center",
+              editable: true,
+            },
+            {
               field: "2",
               headerName: "Segundo Momento",
               width: 130,
@@ -482,8 +494,32 @@ const Alumno = (): JSX.Element => {
               editable: true,
             },
             {
+              field: "2rp",
+              headerName: "Ajuste Segundo Momento",
+              width: 130,
+              headerClassName: "backGround",
+              headerAlign: "center",
+              flex: 1,
+              type: "number",
+
+              align: "center",
+              editable: true,
+            },
+
+            {
               field: "3",
               headerName: "Tercer Momento",
+              width: 130,
+              headerClassName: "backGround",
+              headerAlign: "center",
+              flex: 1,
+              align: "center",
+              type: "number",
+              editable: true,
+            },
+            {
+              field: "3rp",
+              headerName: "Ajuste Tercer Momento",
               width: 130,
               headerClassName: "backGround",
               headerAlign: "center",

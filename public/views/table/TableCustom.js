@@ -24,14 +24,20 @@ const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, to
         console.log("new", newCell);
         console.log("old", oldCell);
         if (newCell["1"])
-            if (newCell["1"] !== oldCell["1"])
+            if (newCell["1"] !== oldCell["1"]) {
+                delete newCell["2"];
+                delete newCell["3"];
                 handleEditCell(newCell, oldCell);
+            }
         if (newCell["2"])
-            if (newCell["2"] !== oldCell["2"])
+            if (newCell["2"] !== oldCell["2"]) {
+                delete newCell["3"];
                 handleEditCell(newCell, oldCell);
+            }
         if (newCell["3"])
-            if (newCell["3"] !== oldCell["3"])
+            if (newCell["3"] !== oldCell["3"]) {
                 handleEditCell(newCell, oldCell);
+            }
         return newCell;
     };
     return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
@@ -67,6 +73,7 @@ const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, to
                 columnsPanelTextFieldPlaceholder: "",
                 columnsPanelHideAllButton: "Ocultar todas",
                 columnsPanelShowAllButton: "Mostrar todas",
+                noRowsLabel: "No hay datos",
             }, rows: rows, columns: columns, onRowClick: handleClick, onRowDoubleClick: handleDobleClick, pageSize: 6, autoHeight: true, rowsPerPageOptions: [6], components: toolbar && { Toolbar: CustomToolbar } }) })));
 };
 exports.TableCustom = TableCustom;
