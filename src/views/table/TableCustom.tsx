@@ -27,6 +27,7 @@ function CustomToolbar() {
     </GridToolbarContainer>
   );
 }
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const TableCustom = ({
   rows,
   columns,
@@ -34,7 +35,7 @@ export const TableCustom = ({
   handleClick,
   handleDobleClick,
   toolbar,
-}) => {
+}): JSX.Element => {
   return (
     <Box
       sx={{
@@ -77,9 +78,9 @@ export const TableCustom = ({
         columns={columns}
         onRowClick={handleClick}
         onRowDoubleClick={handleDobleClick}
-        pageSize={5}
+        pageSize={6}
         autoHeight
-        rowsPerPageOptions={[5]}
+        rowsPerPageOptions={[6]}
         components={toolbar && { Toolbar: CustomToolbar }}
       />
     </Box>

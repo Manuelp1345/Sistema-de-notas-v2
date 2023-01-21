@@ -3,13 +3,11 @@ import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import {
-  Switch,
   Typography,
   Button,
   Tooltip,
   FormGroup,
   TextField,
-  Radio,
   Checkbox,
 } from "@mui/material";
 import Swal from "sweetalert2";
@@ -47,9 +45,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const [value, setValue] = React.useState<{
     yearOne: string | null;
     yearTwo: string | null;
+    anio: string | null;
   }>({
     yearOne: "",
     yearTwo: "",
+    anio: null,
   });
 
   const [openDeleteAnio, setOpenDeleteAnio] = React.useState(false);
@@ -60,6 +60,13 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const handleClickOpenAddPeriodo = () => setOpenAddPeriodo(true);
   const handleCloseAddPeriodo = () => {
     setOpenAddPeriodo(false);
+    console.log(value);
+  };
+
+  const [openAddAnio, setOpenAddAnio] = React.useState(false);
+  const handleClickOpenAddAnio = () => setOpenAddAnio(true);
+  const handleCloseAddAnio = () => {
+    setOpenAddAnio(false);
     console.log(value);
   };
 
@@ -139,30 +146,9 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   };
 
   const getData = async () => {
-    let periodos;
-    try {
-      periodos = await getPeriodos({ pageIndex: 1, pageSize: 3 });
-      console.log("periodos", periodos);
-
-      // @ts-ignore
-      $("#periodo").jsGrid("loadData", periodos);
-      // @ts-ignore
-      $("#periodo").jsGrid("refresh");
-    } catch (error) {
-      console.log(error);
-    }
-
-    let anios;
-    try {
-      anios = await getAnios(periodos.data[0].id);
-      console.log("anios", anios);
-      // @ts-ignore
-      $("#jsGrid").jsGrid("loadData", anios);
-      // @ts-ignore
-      $("#jsGrid").jsGrid("refresh");
-    } catch (error) {
-      console.log(error);
-    }
+    await getPeriodos({ pageIndex: 1, pageSize: 3 });
+    // @ts-ignore
+    await getAnios(periodo?.id);
   };
 
   const insertAnio = async (anio: any) => {
@@ -178,109 +164,12 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
         timer: 1500,
       });
     }
+    setValue({ yearOne: "", yearTwo: "", anio: null });
+    // @ts-ignore
+    await getAnios(periodo?.id);
   };
 
   React.useEffect(() => {
-    // @ts-ignore
-    $("#jsGrid").jsGrid({
-      width: "100%",
-
-      paging: true,
-      autoload: false,
-      pageLoading: true,
-      pageSize: 3,
-      pageIndex: 1,
-      heading: true,
-      inserting: true,
-      loadIndication: true,
-      loadMessage: "Por favor espere",
-      loadShading: true,
-      noDataContent: "No hay años registrados",
-      pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-      pagePrevText: "Anterior",
-      pageNextText: "Siguiente",
-      pageFirstText: "Primera",
-      pageLastText: "Ultima",
-      pageNavigatorNextText: "...",
-      pageNavigatorPrevText: "...",
-      invalidMessage: "Por favor ingreser un valor valido",
-
-      confirmDeleting: true,
-      deleteConfirm: (item) => {
-        return `seguro sea eliminar "${item.anio}"`;
-      },
-      onItemDeleting: async (element) => {
-        console.log("item delete", element);
-        let deleteAnio;
-        try {
-          //@ts-ignore
-          deleteAnio = await window.API.deleteAnio(element.item.id);
-        } catch (error) {
-          Swal.fire({
-            title: `Error al borrar ${element.item.anio}`,
-            icon: "error",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-        console.log("delete response", deleteAnio);
-        if (deleteAnio === "error") {
-          return Swal.fire({
-            title: `NO puedes borrar la sección. Sección en uso `,
-            icon: "error",
-            showConfirmButton: false,
-            timer: 2000,
-          });
-        }
-
-        Swal.fire({
-          title: `${element.item.anio} Borrado`,
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        // @ts-ignore
-
-        $("#jsGrid").jsGrid("refresh");
-        // @ts-ignore
-
-        $("#jsGrid").jsGrid("reset");
-      },
-
-      controller: {
-        loadData: () => {
-          return getAnios(idPeriodo);
-        },
-
-        insertItem: async (item: any) => {
-          await insertAnio(item);
-          // @ts-ignore
-          $("#jsGrid").jsGrid("refresh");
-        },
-      },
-
-      rowClick: function (args: any) {
-        navigate("/anio/" + args.item.id);
-      },
-      fields: [
-        {
-          name: "anio",
-          title: "Años",
-          align: "center",
-          type: "text",
-        },
-        {
-          name: "id",
-          title: "ids",
-          align: "center",
-          type: "text",
-          visible: false,
-        },
-        { type: "control", width: 10, editButton: false },
-      ],
-    });
-    // @ts-ignore
-
     (async () => {
       await getData();
     })();
@@ -411,9 +300,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
             }}
           >
             <Button
-              onClick={() => {
-                console.log("first");
-              }}
+              onClick={handleClickOpenAddAnio}
               sx={{
                 fontWeight: "bold",
               }}
@@ -558,6 +445,33 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
+        </FormGroup>
+      </CustomModal>
+      <CustomModal
+        btnText="Agregar"
+        color="Primary"
+        tittle={"Agregar Año"}
+        openDialog={openAddAnio}
+        handleCloseDialog={handleCloseAddAnio}
+        handledConfirm={async () => {
+          await insertAnio({ anio: value.anio });
+          handleCloseAddAnio();
+        }}
+      >
+        <FormGroup
+          sx={{
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          <TextField
+            label="Año"
+            variant="outlined"
+            value={value.anio}
+            onChange={(e) => {
+              setValue({ ...value, anio: e.target.value });
+            }}
+          />
         </FormGroup>
       </CustomModal>
     </Box>

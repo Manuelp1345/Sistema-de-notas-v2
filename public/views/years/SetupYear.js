@@ -325,12 +325,12 @@ const SetupYear = ({ idPeriodo }) => {
                                         flex: 1,
                                         align: "center",
                                         renderCell: (params) => {
-                                            return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                            return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                                                     display: "flex",
                                                     width: "100%",
                                                     justifyContent: "center",
                                                     alignItems: "center",
-                                                } }, { children: [params.formattedValue, " ", (0, jsx_runtime_1.jsx)(material_1.Checkbox, { checked: Boolean(params.row.estado) })] })));
+                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Periodo ${params.row.estado ? "Activo" : "Inactivo"} `, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [params.formattedValue, " ", (0, jsx_runtime_1.jsx)(material_1.Checkbox, { checked: Boolean(params.row.estado) })] }) })) })));
                                         },
                                     },
                                 ] })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
