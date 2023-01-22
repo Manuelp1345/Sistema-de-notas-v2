@@ -182,7 +182,7 @@ const SetupYear = ({ idPeriodo }) => {
                 timer: 1500,
             });
             idPeriodo += 1;
-            yield getData();
+            navigate("/logout");
         }
     });
     const insertAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {

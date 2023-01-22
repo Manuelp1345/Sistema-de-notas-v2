@@ -258,11 +258,10 @@ ipcMain.handle("LOGIN", async (event, user) => {
 });
 
 ipcMain.handle("GET_PERIODO", async (e, { pageIndex = 1, pageSize = 0 }) => {
-  const connect = await ConnectionDB();
   let periodoDB;
   const skip = pageIndex === 1 ? 0 : Math.abs(pageSize * (1 - pageIndex));
   try {
-    periodoDB = await connect.getRepository("periodo");
+    periodoDB = await appDataSource.getRepository("periodo");
   } catch (error) {
     console.log(error);
 
@@ -882,10 +881,17 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
       for (const alumno of alumnos) {
         let promedio = 0;
         let recuperacionCount = 0;
+        let materiaCount = 0;
         for (const materia of materias) {
           let notaCount = 0;
           let promedioMateria = 0;
 
+          const curseMateria = alumno.notas.find(
+            (nota) => nota.materia.id === materia.id
+          );
+
+          if (!curseMateria) continue;
+          materiaCount++;
           const notaMomentoOne = alumno.notas.find(
             (nota) => nota.materia.id === materia.id && nota.momento === "1"
           );
@@ -921,12 +927,15 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
             notaCount++;
           }
           const promedioFInal = promedioMateria / notaCount;
-          promedio += promedioFInal;
-          if (promedioFInal < 10) recuperacionCount++;
+
           console.log("promedio Materia", promedioFInal);
+
+          promedio += promedioFInal;
+
+          if (promedioFInal < 10) recuperacionCount++;
         }
         console.log("Promedio general", promedio);
-        promedio = promedio / materias.length;
+        promedio = promedio / materiaCount;
 
         const notaFinal = promedio;
         console.log("nota final", notaFinal);
@@ -957,11 +966,22 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           continue;
         }
 
-        const newSeccionAlumno = newAnioAlumno.secciones.find(
+        let newSeccionAlumno = newAnioAlumno.secciones.find(
           (seccion) => seccion.seccion === oldAnioAlumno.seccione.seccion
         );
 
-        if (!newSeccionAlumno) throw new Error("No se encontro la seccion");
+        if (!newSeccionAlumno) {
+          const newSeccion = await transaction.getRepository(Seccion).create({
+            seccion: oldAnioAlumno.seccione.seccion,
+            anio: newAnioAlumno,
+          });
+          await transaction.getRepository(Seccion).save(newSeccion);
+          newSeccionAlumno = newSeccion;
+
+          newAnios
+            .find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)
+            .secciones.push(newSeccion);
+        }
 
         const newEtapa = await transaction.getRepository(Etapas).create({
           anio: newAnioAlumno,

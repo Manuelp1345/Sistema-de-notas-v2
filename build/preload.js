@@ -77,6 +77,15 @@ const getAlumno = (filter) => __awaiter(void 0, void 0, void 0, function* () {
 const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSER_PERIODO", periodo);
 });
+const setNota = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("SET_NOTA", data);
+});
+const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_NOTAS", data);
+});
+const gradeAlumnos = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GRADE_ALUMNOS", data);
+});
 const API = {
     getCredentialsDB,
     createCredentialsDB,
@@ -97,6 +106,9 @@ const API = {
     login,
     imgLogin,
     background,
+    setNota,
+    getNotas,
+    gradeAlumnos,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

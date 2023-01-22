@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Periodo = void 0;
 const typeorm_1 = require("typeorm");
+const anios_1 = require("./anios");
 let Periodo = class Periodo extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -18,13 +19,17 @@ __decorate([
     __metadata("design:type", String)
 ], Periodo.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], Periodo.prototype, "periodo", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Periodo.prototype, "estado", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => anios_1.Anio, (anio) => anio.periodo),
+    __metadata("design:type", Array)
+], Periodo.prototype, "anio", void 0);
 Periodo = __decorate([
     (0, typeorm_1.Entity)()
 ], Periodo);

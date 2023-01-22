@@ -44,10 +44,52 @@ const material_1 = require("@mui/material");
 const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
+const TableCustom_1 = require("../table/TableCustom");
+const DialogContentText_1 = __importDefault(require("@mui/material/DialogContentText"));
+const RemoveCircle_1 = __importDefault(require("@mui/icons-material/RemoveCircle"));
+const customModal_1 = require("../modals/customModal");
+const DatePicker_1 = require("@mui/x-date-pickers/DatePicker");
+const AdapterMoment_1 = require("@mui/x-date-pickers/AdapterMoment");
+const x_date_pickers_1 = require("@mui/x-date-pickers");
+const Grade_1 = __importDefault(require("@mui/icons-material/Grade"));
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const SetupYear = ({ idPeriodo }) => {
-    const [periodos, setPeriodos] = (0, react_1.useState)({});
+    const [periodos, setPeriodos] = (0, react_1.useState)([]);
     const [periodo, setPeriodo] = (0, react_1.useState)();
+    const [anios, setAnios] = (0, react_1.useState)([]);
+    const [loading, setLoading] = (0, react_1.useState)(true);
+    const [idAnioDelete, setIdAnioDelete] = (0, react_1.useState)({
+        id: 0,
+        anio: "",
+        periodo: { id: 0 },
+    });
+    const [value, setValue] = React.useState({
+        yearOne: "",
+        yearTwo: "",
+        anio: null,
+        numberAnio: null,
+    });
+    const [openDeleteAnio, setOpenDeleteAnio] = React.useState(false);
+    const handleClickOpenDeleteAnio = () => setOpenDeleteAnio(true);
+    const handleCloseDeleteAnio = () => setOpenDeleteAnio(false);
+    const [openAddPeriodo, setOpenAddPeriodo] = React.useState(false);
+    const handleClickOpenAddPeriodo = () => setOpenAddPeriodo(true);
+    const handleCloseAddPeriodo = () => {
+        setOpenAddPeriodo(false);
+        console.log(value);
+    };
+    const [openAddPeriodoGrade, setOpenAddPeriodoGrade] = React.useState(false);
+    const handleClickOpenAddPeriodoGrade = () => setOpenAddPeriodoGrade(true);
+    const handleCloseAddPeriodoGrade = () => {
+        setOpenAddPeriodoGrade(false);
+        console.log(value);
+    };
+    const [openAddAnio, setOpenAddAnio] = React.useState(false);
+    const handleClickOpenAddAnio = () => setOpenAddAnio(true);
+    const handleCloseAddAnio = () => {
+        setOpenAddAnio(false);
+        console.log(value);
+    };
     const navigate = (0, react_router_dom_1.useNavigate)();
     const getPeriodos = (filter) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
@@ -57,20 +99,57 @@ const SetupYear = ({ idPeriodo }) => {
         if (pActive)
             setPeriodo(pActive.periodo);
         console.log(data);
-        setPeriodos({ data: data[0], itemsCount: data[1] });
-        return { data: data[0], itemsCount: data[1] };
+        setPeriodos(data[0]);
+        return data[0];
     });
     const getAnios = (periodoId) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const data = yield window.API.getAnios(periodoId);
-        if (data && data.length > 0) {
-            return { data: data, itemsCount: 0 };
+        if (data) {
+            setAnios(data);
+            return data;
         }
-        return { data: [], itemsCount: 0 };
+        return data;
+    });
+    const handledDeleteAnio = () => __awaiter(void 0, void 0, void 0, function* () {
+        handleCloseDeleteAnio();
+        let deleteAnio;
+        try {
+            //@ts-ignore
+            deleteAnio = yield window.API.deleteAnio(idAnioDelete.id);
+        }
+        catch (error) {
+            sweetalert2_1.default.fire({
+                title: `Error al borrar ${idAnioDelete.anio}`,
+                icon: "error",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        }
+        console.log("delete response", deleteAnio);
+        if (deleteAnio === "error") {
+            return sweetalert2_1.default.fire({
+                title: `NO puedes borrar el año. Año en uso `,
+                icon: "error",
+                showConfirmButton: false,
+                timer: 2000,
+            });
+        }
+        yield getAnios(idAnioDelete.periodo.id);
+        sweetalert2_1.default.fire({
+            title: `${idAnioDelete.anio} Borrado`,
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+        });
     });
     const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* () {
+        const dataPeriodo = {
+            periodo: periodo,
+            estado: true,
+        };
         // @ts-ignore
-        const data = yield window.API.insertPeriodo(periodo);
+        const data = yield window.API.insertPeriodo(dataPeriodo);
         if (data) {
             idPeriodo += 1;
             getData();
@@ -83,29 +162,27 @@ const SetupYear = ({ idPeriodo }) => {
         }
     });
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
-        let periodos;
-        try {
-            periodos = yield getPeriodos({ pageIndex: 1, pageSize: 3 });
-            console.log("periodos", periodos);
-            // @ts-ignore
-            $("#periodo").jsGrid("loadData", periodos);
-            // @ts-ignore
-            $("#periodo").jsGrid("refresh");
-        }
-        catch (error) {
-            console.log(error);
-        }
-        let anios;
-        try {
-            anios = yield getAnios(periodos.data[0].id);
-            console.log("anios", anios);
-            // @ts-ignore
-            $("#jsGrid").jsGrid("loadData", anios);
-            // @ts-ignore
-            $("#jsGrid").jsGrid("refresh");
-        }
-        catch (error) {
-            console.log(error);
+        yield getPeriodos({ pageIndex: 1, pageSize: 3 });
+        console.log("id idPeriodod", idPeriodo);
+        yield getAnios(idPeriodo);
+        setLoading(false);
+    });
+    const gradeAlumnos = (periodoId, newPeriodo) => __awaiter(void 0, void 0, void 0, function* () {
+        // @ts-ignore
+        const data = yield window.API.gradeAlumnos({
+            periodo: periodoId,
+            newPeriodo,
+        });
+        console.log(data);
+        if (data) {
+            sweetalert2_1.default.fire({
+                title: "Alumnos Grados",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+            idPeriodo += 1;
+            navigate("/logout");
         }
     });
     const insertAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
@@ -121,265 +198,11 @@ const SetupYear = ({ idPeriodo }) => {
                 timer: 1500,
             });
         }
+        setValue({ yearOne: "", yearTwo: "", anio: null, numberAnio: null });
+        // @ts-ignore
+        yield getAnios(idPeriodo);
     });
     React.useEffect(() => {
-        const MyDateField = function (config) {
-            // @ts-ignore
-            jsGrid.Field.call(this, config);
-        };
-        // @ts-ignore
-        MyDateField.prototype = new jsGrid.Field({
-            sorter: function (date1, date2) {
-                // @ts-ignore
-                return date1;
-            },
-            itemTemplate: function (value) {
-                console.log(value);
-                return value;
-            },
-            insertTemplate: function (value) {
-                // @ts-ignore
-                return (this._insertPicker = $("<input>"
-                // @ts-ignore
-                ).daterangepicker({
-                    showDropdowns: true,
-                    opens: "center",
-                    linkedCalendars: false,
-                    locale: {
-                        format: "YYYY",
-                    },
-                }, function (start, end, label) {
-                    console.log("A new date selection was made: " +
-                        start.format("YYYY-MM-DD") +
-                        " to " +
-                        end.format("YYYY-MM-DD"));
-                }));
-            },
-            editTemplate: function (value) {
-                // @ts-ignore
-                return (this._editPicker = $('input[name="daterange"]').daterangepicker({
-                    showDropdowns: true,
-                    opens: "center",
-                    linkedCalendars: false,
-                    locale: {
-                        format: "YYYY",
-                    },
-                }, function (start, end, label) {
-                    console.log("A new date selection was made: " +
-                        start.format("YYYY-MM-DD") +
-                        " to " +
-                        end.format("YYYY-MM-DD"));
-                }));
-            },
-            insertValue: function () {
-                return String(this._insertPicker[0].value);
-            },
-            editValue: function () {
-                return String(this._editPicker[0].value);
-            },
-        });
-        // @ts-ignore
-        jsGrid.fields.myDateField = MyDateField;
-        // @ts-ignore
-        $("#periodo").jsGrid({
-            width: "100%",
-            paging: true,
-            autoload: false,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: true,
-            loadIndication: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay periodos registrados",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            rowClick: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    idPeriodo = args.item.id;
-                    setPeriodo(args.item.periodo);
-                    const anios = yield getAnios(args.item.id);
-                    console.log("anios", anios);
-                    // @ts-ignore
-                    $("#jsGrid").jsGrid("loadData", anios);
-                    // @ts-ignore
-                });
-            },
-            controller: {
-                loadData: (filter) => __awaiter(void 0, void 0, void 0, function* () {
-                    try {
-                        // @ts-ignore
-                        $("#jsGrid").jsGrid("loadData", periodos);
-                        // @ts-ignore
-                        $("#jsGrid").jsGrid("refresh");
-                    }
-                    catch (error) {
-                        console.log(error);
-                    }
-                    return getPeriodos(filter);
-                }),
-                insertItem: function (item) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        yield insertPeriodo(item);
-                        // @ts-ignore
-                        $("#periodo").jsGrid("refresh");
-                    });
-                },
-            },
-            // @ts-ignore
-            invalidNotify: ({ item }) => {
-                console.log(item);
-                if (item.periodo === "") {
-                    sweetalert2_1.default.fire({
-                        title: "Error",
-                        text: "Ingrese un periodo",
-                        icon: "error",
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
-                    return;
-                }
-                if (item.estado === false) {
-                    sweetalert2_1.default.fire({
-                        title: "Error",
-                        text: "Ingrese el estado del periodo",
-                        icon: "error",
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
-                    return;
-                }
-            },
-            fields: [
-                {
-                    name: "periodo",
-                    title: "Periodos",
-                    align: "center",
-                    type: "myDateField",
-                    validate: "required",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                {
-                    name: "estado",
-                    title: "Actual",
-                    align: "center",
-                    type: "checkbox",
-                    validate: (e) => {
-                        if (e.estado === false) {
-                            return false;
-                        }
-                        return true;
-                    },
-                },
-                { type: "control", editButton: false, deleteButton: false },
-            ],
-        });
-        // @ts-ignore
-        $("#jsGrid").jsGrid({
-            width: "100%",
-            paging: true,
-            autoload: false,
-            pageLoading: true,
-            pageSize: 3,
-            pageIndex: 1,
-            heading: true,
-            inserting: true,
-            loadIndication: true,
-            loadMessage: "Por favor espere",
-            loadShading: true,
-            noDataContent: "No hay años registrados",
-            pagerFormat: "{prev} {pages} {next} {pageIndex} de {pageCount}",
-            pagePrevText: "Anterior",
-            pageNextText: "Siguiente",
-            pageFirstText: "Primera",
-            pageLastText: "Ultima",
-            pageNavigatorNextText: "...",
-            pageNavigatorPrevText: "...",
-            invalidMessage: "Por favor ingreser un valor valido",
-            confirmDeleting: true,
-            deleteConfirm: (item) => {
-                return `seguro sea eliminar "${item.anio}"`;
-            },
-            onItemDeleting: (element) => __awaiter(void 0, void 0, void 0, function* () {
-                console.log("item delete", element);
-                let deleteAnio;
-                try {
-                    //@ts-ignore
-                    deleteAnio = yield window.API.deleteAnio(element.item.id);
-                }
-                catch (error) {
-                    sweetalert2_1.default.fire({
-                        title: `Error al borrar ${element.item.anio}`,
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });
-                }
-                console.log("delete response", deleteAnio);
-                if (deleteAnio === "error") {
-                    return sweetalert2_1.default.fire({
-                        title: `NO puedes borrar la sección. Sección en uso `,
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 2000,
-                    });
-                }
-                sweetalert2_1.default.fire({
-                    title: `${element.item.anio} Borrado`,
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 1500,
-                });
-                // @ts-ignore
-                $("#jsGrid").jsGrid("refresh");
-                // @ts-ignore
-                $("#jsGrid").jsGrid("reset");
-            }),
-            controller: {
-                loadData: () => {
-                    return getAnios(idPeriodo);
-                },
-                insertItem: (item) => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio(item);
-                    // @ts-ignore
-                    $("#jsGrid").jsGrid("refresh");
-                }),
-            },
-            rowClick: function (args) {
-                navigate("/anio/" + args.item.id);
-            },
-            fields: [
-                {
-                    name: "anio",
-                    title: "Años",
-                    align: "center",
-                    type: "text",
-                },
-                {
-                    name: "id",
-                    title: "ids",
-                    align: "center",
-                    type: "text",
-                    visible: false,
-                },
-                { type: "control", width: 10, editButton: false },
-            ],
-        });
-        // @ts-ignore
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
         }))();
@@ -390,7 +213,136 @@ const SetupYear = ({ idPeriodo }) => {
             alignItems: "center",
             display: "flex",
             flexDirection: "column",
-        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Box_1.default, { children: (0, jsx_runtime_1.jsx)(Box_1.default, { id: "periodo", component: "div" }) }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: ["Lista de A\u00F1os (", periodo, ")"] })), (0, jsx_runtime_1.jsx)(Box_1.default, { id: "jsGrid", component: "div" })] })] })));
+        } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: handleClickOpenAddPeriodoGrade }, { children: [(0, jsx_runtime_1.jsx)(Grade_1.default, { sx: { mr: 1 } }), "Graduar Alumnos"] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: { xs: "column", md: "row" },
+                } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            width: "100%",
+                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "Lista de Periodos" })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                    width: "100%",
+                                    display: "flex",
+                                    flexDirection: "row-reverse",
+                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddPeriodo, sx: {
+                                        fontWeight: "bold",
+                                    }, variant: "outlined" }, { children: "Agregar Periodo" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: periodos, loading: loading, toolbar: false, handleClick: function (args) {
+                                    return __awaiter(this, void 0, void 0, function* () {
+                                        console.log(args);
+                                        idPeriodo = args.id;
+                                        setPeriodo(args.row.periodo);
+                                        yield getAnios(args.id);
+                                    });
+                                }, handleDobleClick: () => {
+                                    console.log("first");
+                                }, columns: [
+                                    {
+                                        field: "id",
+                                        headerName: "ID",
+                                        disableExport: true,
+                                        hide: true,
+                                    },
+                                    {
+                                        field: "periodo",
+                                        headerName: "Periodos",
+                                        headerClassName: "backGround",
+                                        width: 130,
+                                        headerAlign: "center",
+                                        flex: 1,
+                                        align: "center",
+                                        renderCell: (params) => {
+                                            return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                                    display: "flex",
+                                                    width: "100%",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Periodo ${params.row.estado ? "Activo" : "Inactivo"} `, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [params.formattedValue, " ", (0, jsx_runtime_1.jsx)(material_1.Checkbox, { checked: Boolean(params.row.estado) })] }) })) })));
+                                        },
+                                    },
+                                ] })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            width: "100%",
+                        } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: ["Lista de A\u00F1os (", periodo, ")"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                    width: "100%",
+                                    display: "flex",
+                                    flexDirection: "row-reverse",
+                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleClickOpenAddAnio, sx: {
+                                        fontWeight: "bold",
+                                    }, variant: "outlined" }, { children: "Agregar A\u00F1o" })) })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { rows: anios, loading: loading, toolbar: false, handleClick: () => {
+                                    console.log("first");
+                                }, handleDobleClick: () => {
+                                    console.log("first");
+                                }, columns: [
+                                    {
+                                        field: "id",
+                                        headerName: "ID",
+                                        disableExport: true,
+                                        hide: true,
+                                    },
+                                    {
+                                        field: "anio",
+                                        headerName: "Años",
+                                        headerClassName: "backGround",
+                                        headerAlign: "center",
+                                        flex: 1,
+                                        align: "center",
+                                        renderCell: (params) => {
+                                            return ((0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ sx: {
+                                                    display: "flex",
+                                                    width: "100%",
+                                                    justifyContent: "center",
+                                                }, onClick: () => {
+                                                    navigate("/anio/" + params.id);
+                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Click para ver las secciones de ${params.formattedValue}`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(material_1.Typography, { children: params.formattedValue }) })) })));
+                                        },
+                                    },
+                                    {
+                                        field: "estado",
+                                        headerName: "Opciones",
+                                        width: 150,
+                                        headerClassName: "backGround",
+                                        headerAlign: "center",
+                                        align: "center",
+                                        renderCell: (params) => {
+                                            return ((0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ sx: {
+                                                    display: "flex",
+                                                    width: "100%",
+                                                    justifyContent: "center",
+                                                }, onClick: () => {
+                                                    handleClickOpenDeleteAnio();
+                                                    setIdAnioDelete(params.row);
+                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Borrar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(RemoveCircle_1.default, { sx: { color: "red" } }) })) })));
+                                        },
+                                    },
+                                ] })] }))] })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Eliminar", color: "red", tittle: "Alerta", openDialog: openDeleteAnio, handleCloseDialog: handleCloseDeleteAnio, handledConfirm: handledDeleteAnio }, { children: (0, jsx_runtime_1.jsxs)(DialogContentText_1.default, { children: ["Confirma que desea eliminar ", idAnioDelete.anio] }) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "green", tittle: "Agregar Periodo", openDialog: openAddPeriodo, handleCloseDialog: handleCloseAddPeriodo, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertPeriodo(`${value.yearOne} - ${value.yearTwo}`);
+                    handleCloseAddPeriodo();
+                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                        gap: 2,
+                        mt: 2,
+                    } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
+                                    setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
+                                    setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
+                    handleCloseAddAnio();
+                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                        gap: 2,
+                        mt: 2,
+                    } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { label: "A\u00F1o (Primer A\u00F1o)", variant: "outlined", value: value.anio, onChange: (e) => {
+                                setValue(Object.assign(Object.assign({}, value), { anio: e.target.value }));
+                            } }), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "number", placeholder: "Valor Numerico (1)", value: value.numberAnio, onChange: (e) => {
+                                setValue(Object.assign(Object.assign({}, value), { numberAnio: Number(e.target.value) }));
+                            } })] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "green", tittle: "Agrega el nuevo periodo", openDialog: openAddPeriodoGrade, handleCloseDialog: handleCloseAddPeriodoGrade, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                    yield gradeAlumnos(idPeriodo, `${value.yearOne} - ${value.yearTwo}`);
+                    handleCloseAddPeriodoGrade();
+                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                        gap: 2,
+                        mt: 2,
+                    } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
+                                    setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
+                                    setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) }))] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

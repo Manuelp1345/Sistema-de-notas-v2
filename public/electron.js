@@ -269,11 +269,10 @@ electron_1.ipcMain.handle("LOGIN", (event, user) => __awaiter(void 0, void 0, vo
     return false;
 }));
 electron_1.ipcMain.handle("GET_PERIODO", (e, { pageIndex = 1, pageSize = 0 }) => __awaiter(void 0, void 0, void 0, function* () {
-    const connect = yield (0, database_1.ConnectionDB)();
     let periodoDB;
     const skip = pageIndex === 1 ? 0 : Math.abs(pageSize * (1 - pageIndex));
     try {
-        periodoDB = yield connect.getRepository("periodo");
+        periodoDB = yield appDataSource.getRepository("periodo");
     }
     catch (error) {
         console.log(error);
@@ -870,9 +869,14 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
             for (const alumno of alumnos) {
                 let promedio = 0;
                 let recuperacionCount = 0;
+                let materiaCount = 0;
                 for (const materia of materias) {
                     let notaCount = 0;
                     let promedioMateria = 0;
+                    const curseMateria = alumno.notas.find((nota) => nota.materia.id === materia.id);
+                    if (!curseMateria)
+                        continue;
+                    materiaCount++;
                     const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === materia.id && nota.momento === "1");
                     if (notaMomentoOne) {
                         if (notaMomentoOne.recuperacion.length > 0) {
@@ -904,13 +908,13 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                         notaCount++;
                     }
                     const promedioFInal = promedioMateria / notaCount;
+                    console.log("promedio Materia", promedioFInal);
                     promedio += promedioFInal;
                     if (promedioFInal < 10)
                         recuperacionCount++;
-                    console.log("promedio Materia", promedioFInal);
                 }
                 console.log("Promedio general", promedio);
-                promedio = promedio / materias.length;
+                promedio = promedio / materiaCount;
                 const notaFinal = promedio;
                 console.log("nota final", notaFinal);
                 const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
@@ -932,9 +936,18 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     continue;
                 }
-                const newSeccionAlumno = newAnioAlumno.secciones.find((seccion) => seccion.seccion === oldAnioAlumno.seccione.seccion);
-                if (!newSeccionAlumno)
-                    throw new Error("No se encontro la seccion");
+                let newSeccionAlumno = newAnioAlumno.secciones.find((seccion) => seccion.seccion === oldAnioAlumno.seccione.seccion);
+                if (!newSeccionAlumno) {
+                    const newSeccion = yield transaction.getRepository(secciones_1.Seccion).create({
+                        seccion: oldAnioAlumno.seccione.seccion,
+                        anio: newAnioAlumno,
+                    });
+                    yield transaction.getRepository(secciones_1.Seccion).save(newSeccion);
+                    newSeccionAlumno = newSeccion;
+                    newAnios
+                        .find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)
+                        .secciones.push(newSeccion);
+                }
                 const newEtapa = yield transaction.getRepository(etapas_1.Etapas).create({
                     anio: newAnioAlumno,
                     seccione: newSeccionAlumno,
