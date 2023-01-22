@@ -26,19 +26,17 @@ export class Nota extends BaseEntity {
   @Column()
   momento!: string;
 
-  @ManyToOne(() => Anio)
+  @ManyToOne(() => Anio, (anio) => anio.anio)
   @JoinColumn()
   anio!: Anio;
 
-  @ManyToOne(() => Materia)
+  @ManyToOne(() => Materia, (materia) => materia.nota)
   @JoinColumn()
   materia!: Materia;
 
-  @ManyToOne(() => Alumno)
-  @JoinColumn()
+  @ManyToOne(() => Alumno, (alumno) => alumno.notas)
   alumno!: Alumno;
 
-  @OneToOne(() => RecuperacionNota, (rp) => rp.id)
-  @JoinColumn()
+  @OneToMany(() => RecuperacionNota, (rp) => rp.nota)
   recuperacion!: RecuperacionNota[];
 }

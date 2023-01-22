@@ -33,8 +33,7 @@ __decorate([
     __metadata("design:type", String)
 ], Alumno.prototype, "grupoEstable", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => nota_1.Nota, (notas) => notas.id),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.OneToMany)(() => nota_1.Nota, (notas) => notas.alumno),
     __metadata("design:type", Array)
 ], Alumno.prototype, "notas", void 0);
 __decorate([
@@ -43,8 +42,7 @@ __decorate([
     __metadata("design:type", basicData_1.BasicData)
 ], Alumno.prototype, "DatosPersonales", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => etapas_1.Etapas, (etapas) => etapas.id),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.OneToMany)(() => etapas_1.Etapas, (etapas) => etapas.alumno),
     __metadata("design:type", Array)
 ], Alumno.prototype, "Etapas", void 0);
 Alumno = __decorate([

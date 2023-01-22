@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Materia = void 0;
 const anios_1 = require("./anios");
+const nota_1 = require("./nota");
 const typeorm_1 = require("typeorm");
 let Materia = class Materia extends typeorm_1.BaseEntity {
 };
@@ -27,6 +28,10 @@ __decorate([
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", anios_1.Anio)
 ], Materia.prototype, "anio", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => nota_1.Nota, (nota) => nota.materia),
+    __metadata("design:type", Array)
+], Materia.prototype, "nota", void 0);
 Materia = __decorate([
     (0, typeorm_1.Entity)()
 ], Materia);

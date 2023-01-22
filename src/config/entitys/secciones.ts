@@ -17,7 +17,7 @@ export class Seccion extends BaseEntity {
   @Column()
   seccion!: string;
 
-  @ManyToOne(() => Anio, { onDelete: "CASCADE" })
+  @ManyToOne(() => Anio, (anio) => anio.secciones, { onDelete: "CASCADE" })
   @JoinColumn()
   anio!: Anio;
 }

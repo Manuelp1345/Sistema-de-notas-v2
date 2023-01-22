@@ -83,6 +83,9 @@ const setNota = (data) => __awaiter(void 0, void 0, void 0, function* () {
 const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_NOTAS", data);
 });
+const gradeAlumnos = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GRADE_ALUMNOS", data);
+});
 const API = {
     getCredentialsDB,
     createCredentialsDB,
@@ -105,6 +108,7 @@ const API = {
     background,
     setNota,
     getNotas,
+    gradeAlumnos,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

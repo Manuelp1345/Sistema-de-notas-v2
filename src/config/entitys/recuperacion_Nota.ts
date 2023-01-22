@@ -3,15 +3,9 @@ import {
   Column,
   PrimaryGeneratedColumn,
   BaseEntity,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
   ManyToOne,
-  JoinTable,
 } from "typeorm";
-import { Seccion } from "./secciones";
 import { Nota } from "./nota";
-import { Alumno } from "./alumnos";
 
 @Entity()
 export class RecuperacionNota extends BaseEntity {
@@ -19,9 +13,8 @@ export class RecuperacionNota extends BaseEntity {
   id!: string;
 
   @Column()
-  recuperacionNota!: string;
+  Nota!: string;
 
-  @OneToOne(() => Nota)
-  @JoinColumn()
+  @ManyToOne(() => Nota, (nota) => nota.recuperacion)
   nota!: Nota;
 }

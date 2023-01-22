@@ -25,13 +25,16 @@ __decorate([
     __metadata("design:type", String)
 ], Anio.prototype, "anio", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo, { onDelete: "CASCADE" }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Anio.prototype, "numberAnio", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => periodo_1.Periodo, (periodo) => periodo.anio, { onDelete: "RESTRICT" }),
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", periodo_1.Periodo)
 ], Anio.prototype, "periodo", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => secciones_1.Seccion, (sec) => sec.id),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.OneToMany)(() => secciones_1.Seccion, (sec) => sec.anio),
     __metadata("design:type", Array)
 ], Anio.prototype, "secciones", void 0);
 Anio = __decorate([

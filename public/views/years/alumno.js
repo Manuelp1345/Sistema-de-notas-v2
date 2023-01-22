@@ -22,6 +22,7 @@ const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const TableCustom_1 = require("../table/TableCustom");
+const material_2 = require("@mui/material");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Alumno = () => {
     const { id } = (0, react_router_dom_1.useParams)();
@@ -262,6 +263,15 @@ const Alumno = () => {
                                 type: "number",
                                 align: "center",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "1rp",
@@ -273,6 +283,15 @@ const Alumno = () => {
                                 type: "number",
                                 align: "center",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "2",
@@ -284,6 +303,15 @@ const Alumno = () => {
                                 type: "number",
                                 align: "center",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "2rp",
@@ -295,6 +323,15 @@ const Alumno = () => {
                                 type: "number",
                                 align: "center",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "3",
@@ -306,6 +343,15 @@ const Alumno = () => {
                                 align: "center",
                                 type: "number",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "3rp",
@@ -317,6 +363,15 @@ const Alumno = () => {
                                 align: "center",
                                 type: "number",
                                 editable: true,
+                                renderCell: (params) => {
+                                    return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                            display: "flex",
+                                            width: "1rem",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            padding: "0.5rem",
+                                        } }, { children: (0, jsx_runtime_1.jsx)(material_2.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue, "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                                },
                             },
                             {
                                 field: "total",

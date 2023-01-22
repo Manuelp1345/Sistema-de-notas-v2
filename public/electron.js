@@ -55,6 +55,7 @@ const documents_1 = require("./config/entitys/documents");
 const representante_1 = require("./config/entitys/representante");
 const recuperacion_Nota_1 = require("./config/entitys/recuperacion_Nota");
 const etapas_1 = require("./config/entitys/etapas");
+let appDataSource;
 function createWindow() {
     // Create the browser window.
     const win = new electron_1.BrowserWindow({
@@ -118,6 +119,7 @@ electron_1.ipcMain.handle("VALIDATE_CREDENTIALS", () => __awaiter(void 0, void 0
         const connect = yield (0, database_1.ConnectionDB)();
         console.log("File:electron.ts VALIDATE_CREDENTIALS connect", connect.isInitialized);
         if (connect.isInitialized) {
+            appDataSource = connect;
             return true;
         }
     }
@@ -131,6 +133,7 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
         const connect = yield (0, database_1.ConnectionDB)(credentials);
         console.log("File:electron.ts create credentials connect", connect.isInitialized);
         if (connect.isInitialized) {
+            appDataSource = connect;
             yield connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
             const credentialsDB = {
                 host: credentials.host,
@@ -182,6 +185,7 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
                 },
             });
             yield connectTwo.initialize();
+            appDataSource = connectTwo;
         }
         catch (error) {
             console.log(error);
@@ -396,6 +400,7 @@ electron_1.ipcMain.handle("INSERT_AÑOS", (event, anioFron) => __awaiter(void 0,
     });
     const anio = new anios_1.Anio();
     anio.anio = anioFron.anio;
+    anio.numberAnio = anioFron.numberAnio;
     anio.periodo = periodo;
     try {
         yield anio.save();
@@ -774,6 +779,171 @@ electron_1.ipcMain.handle("GET_NOTAS", (evet, data) => __awaiter(void 0, void 0,
         });
         console.log(notas);
         return notas;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield appDataSource.transaction((transaction) => __awaiter(void 0, void 0, void 0, function* () {
+            const oldPeriodo = yield transaction.getRepository(periodo_1.Periodo).findOne({
+                where: {
+                    id: data.periodo,
+                },
+            });
+            oldPeriodo.estado = false;
+            yield transaction.getRepository(periodo_1.Periodo).save(oldPeriodo);
+            const newPeriodo = yield transaction.getRepository(periodo_1.Periodo).create({
+                estado: true,
+                periodo: data.newPeriodo,
+            });
+            yield transaction.getRepository(periodo_1.Periodo).save(newPeriodo);
+            const oldAnios = yield transaction.getRepository(anios_1.Anio).find({
+                where: {
+                    periodo: {
+                        id: data.periodo,
+                    },
+                },
+                relations: {
+                    secciones: true,
+                },
+            });
+            for (const anio of oldAnios) {
+                const newAnio = yield transaction.getRepository(anios_1.Anio).create({
+                    anio: anio.anio,
+                    periodo: newPeriodo,
+                    numberAnio: anio.numberAnio,
+                });
+                yield transaction.getRepository(anios_1.Anio).save(newAnio);
+                for (const seccion of anio.secciones) {
+                    const newSeccion = yield transaction.getRepository(secciones_1.Seccion).create({
+                        seccion: seccion.seccion,
+                        anio: newAnio,
+                    });
+                    yield transaction.getRepository(secciones_1.Seccion).save(newSeccion);
+                }
+            }
+            const newAnios = yield transaction.getRepository(anios_1.Anio).find({
+                where: {
+                    periodo: {
+                        id: newPeriodo.id,
+                    },
+                },
+                relations: {
+                    secciones: true,
+                },
+            });
+            const materias = yield transaction.getRepository(materias_1.Materia).find({
+                where: {
+                    anio: {
+                        periodo: {
+                            id: data.periodo,
+                        },
+                    },
+                },
+            });
+            const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
+                where: {
+                    Etapas: {
+                        anio: {
+                            periodo: {
+                                id: data.periodo,
+                            },
+                        },
+                    },
+                },
+                relations: {
+                    notas: {
+                        materia: true,
+                        recuperacion: true,
+                    },
+                    Etapas: {
+                        anio: {
+                            periodo: true,
+                        },
+                        seccione: true,
+                    },
+                },
+            });
+            console.log("ALUMNOS", alumnos);
+            for (const alumno of alumnos) {
+                let promedio = 0;
+                let recuperacionCount = 0;
+                for (const materia of materias) {
+                    let notaCount = 0;
+                    let promedioMateria = 0;
+                    const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === materia.id && nota.momento === "1");
+                    if (notaMomentoOne) {
+                        if (notaMomentoOne.recuperacion.length > 0) {
+                            promedioMateria += Number(notaMomentoOne.recuperacion[0].Nota);
+                        }
+                        else {
+                            promedioMateria += Number(notaMomentoOne.nota);
+                        }
+                        notaCount++;
+                    }
+                    const notaMomentoTwo = alumno.notas.find((nota) => nota.materia.id === materia.id && nota.momento === "2");
+                    if (notaMomentoTwo) {
+                        if (notaMomentoTwo.recuperacion.length > 0) {
+                            promedioMateria += Number(notaMomentoTwo.recuperacion[0].Nota);
+                        }
+                        else {
+                            promedioMateria += Number(notaMomentoTwo.nota);
+                        }
+                        notaCount++;
+                    }
+                    const notaMomentoThree = alumno.notas.find((nota) => nota.materia.id === materia.id && nota.momento === "3");
+                    if (notaMomentoThree) {
+                        if (notaMomentoThree.recuperacion.length > 0) {
+                            promedioMateria += Number(notaMomentoThree.recuperacion[0].Nota);
+                        }
+                        else {
+                            promedioMateria += Number(notaMomentoThree.nota);
+                        }
+                        notaCount++;
+                    }
+                    const promedioFInal = promedioMateria / notaCount;
+                    promedio += promedioFInal;
+                    if (promedioFInal < 10)
+                        recuperacionCount++;
+                    console.log("promedio Materia", promedioFInal);
+                }
+                console.log("Promedio general", promedio);
+                promedio = promedio / materias.length;
+                const notaFinal = promedio;
+                console.log("nota final", notaFinal);
+                const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
+                delete alumno.Etapas;
+                let newAnioAlumno;
+                if (notaFinal > 9 && recuperacionCount < 2) {
+                    alumno.condicion = "Regular";
+                    yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
+                    const newAnio = oldAnioAlumno.anio.numberAnio + 1;
+                    newAnioAlumno = newAnios.find((anio) => anio.numberAnio === newAnio);
+                }
+                else {
+                    alumno.condicion = "Repitiente";
+                    yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
+                    newAnioAlumno = newAnios.find((anio) => anio.numberAnio === oldAnioAlumno.anio.numberAnio);
+                }
+                if (!newAnioAlumno) {
+                    alumno.condicion = "Graduado";
+                    yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
+                    continue;
+                }
+                const newSeccionAlumno = newAnioAlumno.secciones.find((seccion) => seccion.seccion === oldAnioAlumno.seccione.seccion);
+                if (!newSeccionAlumno)
+                    throw new Error("No se encontro la seccion");
+                const newEtapa = yield transaction.getRepository(etapas_1.Etapas).create({
+                    anio: newAnioAlumno,
+                    seccione: newSeccionAlumno,
+                    alumno: alumno.id,
+                });
+                yield transaction.getRepository(etapas_1.Etapas).save(newEtapa);
+            }
+            return true;
+        }));
     }
     catch (error) {
         console.log(error);

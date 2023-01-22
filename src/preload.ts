@@ -90,6 +90,10 @@ const getNotas = async (data) => {
   return await ipcRenderer.invoke("GET_NOTAS", data);
 };
 
+const gradeAlumnos = async (data) => {
+  return await ipcRenderer.invoke("GRADE_ALUMNOS", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -112,6 +116,7 @@ const API = {
   background,
   setNota,
   getNotas,
+  gradeAlumnos,
 };
 
 contextBridge.exposeInMainWorld("API", API);

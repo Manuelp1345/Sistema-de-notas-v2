@@ -30,15 +30,13 @@ export class Alumno extends BaseEntity {
   @Column()
   grupoEstable!: string;
 
-  @OneToMany(() => Nota, (notas) => notas.id)
-  @JoinColumn()
+  @OneToMany(() => Nota, (notas) => notas.alumno)
   notas!: Nota[];
 
   @OneToOne(() => BasicData)
   @JoinColumn()
   DatosPersonales!: BasicData;
 
-  @OneToMany(() => Etapas, (etapas) => etapas.id)
-  @JoinColumn()
+  @OneToMany(() => Etapas, (etapas) => etapas.alumno)
   Etapas!: Etapas[];
 }

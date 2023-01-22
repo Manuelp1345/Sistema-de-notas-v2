@@ -14,15 +14,16 @@ export class Etapas extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @ManyToOne(() => Alumno)
-  @JoinColumn()
+  @ManyToOne(() => Alumno, (alumno) => alumno.Etapas, {
+    nullable: false,
+  })
   alumno!: Alumno;
 
-  @ManyToOne(() => Anio)
+  @ManyToOne(() => Anio, (anio) => anio.anio)
   @JoinColumn()
   anio!: Anio;
 
-  @ManyToOne(() => Seccion)
+  @ManyToOne(() => Seccion, (seccion) => seccion.seccion)
   @JoinColumn()
   seccione!: Seccion;
 }

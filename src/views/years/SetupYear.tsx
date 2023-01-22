@@ -9,6 +9,7 @@ import {
   FormGroup,
   TextField,
   Checkbox,
+  Input,
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { useState } from "react";
@@ -21,6 +22,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { Moment } from "moment";
+import GradeIcon from "@mui/icons-material/Grade";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -47,10 +49,12 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
     yearOne: string | null;
     yearTwo: string | null;
     anio: string | null;
+    numberAnio: number | null;
   }>({
     yearOne: "",
     yearTwo: "",
     anio: null,
+    numberAnio: null,
   });
 
   const [openDeleteAnio, setOpenDeleteAnio] = React.useState(false);
@@ -61,6 +65,13 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   const handleClickOpenAddPeriodo = () => setOpenAddPeriodo(true);
   const handleCloseAddPeriodo = () => {
     setOpenAddPeriodo(false);
+    console.log(value);
+  };
+
+  const [openAddPeriodoGrade, setOpenAddPeriodoGrade] = React.useState(false);
+  const handleClickOpenAddPeriodoGrade = () => setOpenAddPeriodoGrade(true);
+  const handleCloseAddPeriodoGrade = () => {
+    setOpenAddPeriodoGrade(false);
     console.log(value);
   };
 
@@ -148,14 +159,36 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
 
   const getData = async () => {
     await getPeriodos({ pageIndex: 1, pageSize: 3 });
-    // @ts-ignore
-    await getAnios(periodo?.id);
+
+    console.log("id idPeriodod", idPeriodo);
+
+    await getAnios(idPeriodo);
 
     setLoading(false);
   };
 
+  const gradeAlumnos = async (periodoId, newPeriodo) => {
+    // @ts-ignore
+    const data = await window.API.gradeAlumnos({
+      periodo: periodoId,
+      newPeriodo,
+    });
+    console.log(data);
+    if (data) {
+      Swal.fire({
+        title: "Alumnos Grados",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      idPeriodo += 1;
+      navigate("/logout");
+    }
+  };
+
   const insertAnio = async (anio: any) => {
     anio.periodoId = idPeriodo;
+
     anio.anio = anio.anio.toUpperCase();
     // @ts-ignore
     const data = await window.API.createAnio(anio);
@@ -167,9 +200,9 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
         timer: 1500,
       });
     }
-    setValue({ yearOne: "", yearTwo: "", anio: null });
+    setValue({ yearOne: "", yearTwo: "", anio: null, numberAnio: null });
     // @ts-ignore
-    await getAnios(periodo?.id);
+    await getAnios(idPeriodo);
   };
 
   React.useEffect(() => {
@@ -191,6 +224,10 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
       }}
     >
       <DrawerHeader />
+      <Button onClick={handleClickOpenAddPeriodoGrade}>
+        <GradeIcon sx={{ mr: 1 }} />
+        Graduar Alumnos
+      </Button>
       <Box
         sx={{
           width: "100%",
@@ -337,7 +374,6 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
                 flex: 1,
                 align: "center",
                 renderCell: (params) => {
-                  console.log("params", params);
                   return (
                     <Button
                       sx={{
@@ -457,7 +493,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
         openDialog={openAddAnio}
         handleCloseDialog={handleCloseAddAnio}
         handledConfirm={async () => {
-          await insertAnio({ anio: value.anio });
+          await insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
           handleCloseAddAnio();
         }}
       >
@@ -468,13 +504,68 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           }}
         >
           <TextField
-            label="Año"
+            label="Año (Primer Año)"
             variant="outlined"
             value={value.anio}
             onChange={(e) => {
               setValue({ ...value, anio: e.target.value });
             }}
           />
+          <Input
+            type="number"
+            placeholder="Valor Numerico (1)"
+            value={value.numberAnio}
+            onChange={(e) => {
+              setValue({ ...value, numberAnio: Number(e.target.value) });
+            }}
+          />
+        </FormGroup>
+      </CustomModal>
+      <CustomModal
+        btnText="Agregar"
+        color="green"
+        tittle={"Agrega el nuevo periodo"}
+        openDialog={openAddPeriodoGrade}
+        handleCloseDialog={handleCloseAddPeriodoGrade}
+        handledConfirm={async () => {
+          await gradeAlumnos(idPeriodo, `${value.yearOne} - ${value.yearTwo}`);
+          handleCloseAddPeriodoGrade();
+        }}
+      >
+        <FormGroup
+          sx={{
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker
+              views={["year"]}
+              label="Desde"
+              value={value?.yearOne}
+              onChange={(newValue: Moment | null) => {
+                setValue({
+                  ...value,
+                  yearOne: newValue?.format("YYYY") as string,
+                });
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker
+              views={["year"]}
+              label="Hasta"
+              value={value?.yearTwo}
+              onChange={(newValue: Moment | null) => {
+                setValue({
+                  ...value,
+                  yearTwo: newValue?.format("YYYY") as string,
+                });
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
         </FormGroup>
       </CustomModal>
     </Box>

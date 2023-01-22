@@ -17,6 +17,7 @@ import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import { TableCustom } from "../table/TableCustom";
+import { Tooltip } from "@mui/material";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -469,6 +470,30 @@ const Alumno = (): JSX.Element => {
 
               align: "center",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
             {
               field: "1rp",
@@ -481,6 +506,30 @@ const Alumno = (): JSX.Element => {
 
               align: "center",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
             {
               field: "2",
@@ -492,6 +541,30 @@ const Alumno = (): JSX.Element => {
               type: "number",
               align: "center",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
             {
               field: "2rp",
@@ -504,6 +577,30 @@ const Alumno = (): JSX.Element => {
 
               align: "center",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
 
             {
@@ -516,6 +613,30 @@ const Alumno = (): JSX.Element => {
               align: "center",
               type: "number",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
             {
               field: "3rp",
@@ -527,6 +648,30 @@ const Alumno = (): JSX.Element => {
               align: "center",
               type: "number",
               editable: true,
+              renderCell: (params) => {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      width: "1rem",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "0.5rem",
+                    }}
+                  >
+                    <Tooltip
+                      title="Doble click para editar"
+                      arrow
+                      placement="right"
+                    >
+                      <Box>
+                        &nbsp;&nbsp;&nbsp;&nbsp;{params.formattedValue}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                );
+              },
             },
             {
               field: "total",
