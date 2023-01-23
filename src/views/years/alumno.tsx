@@ -40,6 +40,12 @@ const Alumno = (): JSX.Element => {
     const notasMap = {};
     resnotas.forEach((nota) => {
       notasMap[`${nota.materia.id}-${nota.momento}`] = nota;
+      if (nota.recuperacion.length > 0) {
+        notasMap[`${nota.materia.id}-${nota.momento}rp`] = {
+          ...nota,
+          nota: nota.recuperacion[0].Nota,
+        };
+      }
     });
 
     console.log(notasMap);
@@ -53,14 +59,32 @@ const Alumno = (): JSX.Element => {
     if (newCell["1"]) {
       data.nota = newCell["1"];
       data.momento = "1";
+      data.rp = false;
     }
     if (newCell["2"]) {
       data.nota = newCell["2"];
       data.momento = "2";
+      data.rp = false;
     }
     if (newCell["3"]) {
       data.nota = newCell["3"];
       data.momento = "3";
+      data.rp = false;
+    }
+    if (newCell["1rp"]) {
+      data.nota = newCell["1rp"];
+      data.momento = "1";
+      data.rp = true;
+    }
+    if (newCell["2rp"]) {
+      data.nota = newCell["2rp"];
+      data.momento = "2";
+      data.rp = true;
+    }
+    if (newCell["3rp"]) {
+      data.nota = newCell["3rp"];
+      data.momento = "3";
+      data.rp = true;
     }
 
     // @ts-ignore
@@ -98,23 +122,39 @@ const Alumno = (): JSX.Element => {
     if (areas.areas)
       areas.setAreas(
         areas.areas.map((area) => {
+          let momentoOne = 0;
+          let momentoTwo = 0;
+          let momentoThree = 0;
           if (resNotas[`${area.id}-1`]) {
             area["1"] = resNotas[`${area.id}-1`].nota;
+            momentoOne = Number(resNotas[`${area.id}-1`].nota);
+            if (resNotas[`${area.id}-1rp`]) {
+              area["1rp"] = resNotas[`${area.id}-1rp`].nota;
+              momentoOne = Number(resNotas[`${area.id}-1rp`].nota);
+            }
           }
           if (resNotas[`${area.id}-2`]) {
             area["2"] = resNotas[`${area.id}-2`].nota;
+            momentoTwo = Number(resNotas[`${area.id}-2`].nota);
+            if (resNotas[`${area.id}-2rp`]) {
+              area["2rp"] = resNotas[`${area.id}-2rp`].nota;
+              momentoTwo = Number(resNotas[`${area.id}-2rp`].nota);
+            }
           }
           if (resNotas[`${area.id}-3`]) {
             area["3"] = resNotas[`${area.id}-3`].nota;
+            momentoThree = Number(resNotas[`${area.id}-3`].nota);
+            if (resNotas[`${area.id}-3rp`]) {
+              area["3rp"] = resNotas[`${area.id}-3rp`].nota;
+              momentoThree = Number(resNotas[`${area.id}-3rp`].nota);
+            }
           }
 
           let total = "0";
 
           if (area["1"] && area["2"] && area["3"])
             total = (
-              (Number(resNotas[`${area.id}-1`].nota) +
-                Number(resNotas[`${area.id}-2`].nota) +
-                Number(resNotas[`${area.id}-3`].nota)) /
+              (Number(momentoOne) + Number(momentoTwo) + Number(momentoThree)) /
               3
             ).toFixed(2);
 
@@ -161,6 +201,19 @@ const Alumno = (): JSX.Element => {
       <Button
         onClick={() => {
           navigate(-1);
+          if (areas.areas)
+            areas.setAreas(
+              areas.areas.map((area) => {
+                delete area["1"];
+                delete area["2"];
+                delete area["3"];
+                delete area["1rp"];
+                delete area["2rp"];
+                delete area["3rp"];
+
+                return area;
+              })
+            );
         }}
       >
         <ArrowBack sx={{ mr: 1 }} />

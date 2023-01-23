@@ -720,7 +720,7 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
 electron_1.ipcMain.handle("SET_NOTA", (evet, data) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("set nota", data);
     let notaDB = yield nota_1.Nota.findOne({
-        relations: ["materia", "alumno", "anio"],
+        relations: ["recuperacion"],
         where: {
             materia: {
                 id: data.id,
@@ -734,8 +734,39 @@ electron_1.ipcMain.handle("SET_NOTA", (evet, data) => __awaiter(void 0, void 0, 
             momento: data.momento,
         },
     });
-    console.log("find", notaDB);
-    if (notaDB === null)
+    if (data.rp && (notaDB === null || notaDB === void 0 ? void 0 : notaDB.recuperacion)) {
+        if (notaDB.recuperacion.length > 0) {
+            notaDB.recuperacion[0].nota = data.nota;
+        }
+        else {
+            const notaRP = new recuperacion_Nota_1.RecuperacionNota();
+            notaRP.nota = notaDB;
+            notaRP.Nota = data.nota;
+            try {
+                notaRP.save();
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Nota Registrada",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "No se pudo registrar la nota",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return false;
+            }
+        }
+    }
+    else if (notaDB === null)
         notaDB = new nota_1.Nota();
     notaDB.nota = data.nota;
     notaDB.momento = data.momento;

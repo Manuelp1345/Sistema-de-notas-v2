@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, Notification } from "electron";
 import electronIsDev from "electron-is-dev";
-import { DataSource, getManager } from "typeorm";
+import { DataSource } from "typeorm";
 import fs from "fs";
 import * as path from "path";
 import { ConnectionDB } from "./config/database";
@@ -724,7 +724,7 @@ ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
 ipcMain.handle("SET_NOTA", async (evet, data) => {
   console.log("set nota", data);
   let notaDB = await Nota.findOne({
-    relations: ["materia", "alumno", "anio"],
+    relations: ["recuperacion"],
     where: {
       materia: {
         id: data.id,
@@ -738,8 +738,37 @@ ipcMain.handle("SET_NOTA", async (evet, data) => {
       momento: data.momento,
     },
   });
-  console.log("find", notaDB);
-  if (notaDB === null) notaDB = new Nota();
+
+  if (data.rp && notaDB?.recuperacion) {
+    if (notaDB.recuperacion.length > 0) {
+      notaDB.recuperacion[0].nota = data.nota;
+    } else {
+      const notaRP = new RecuperacionNota();
+      notaRP.nota = notaDB;
+      notaRP.Nota = data.nota;
+      try {
+        notaRP.save();
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "Nota Registrada",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return true;
+      } catch (error) {
+        console.log(error);
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "No se pudo registrar la nota",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return false;
+      }
+    }
+  } else if (notaDB === null) notaDB = new Nota();
   notaDB.nota = data.nota;
   notaDB.momento = data.momento;
   notaDB.materia = data.id;

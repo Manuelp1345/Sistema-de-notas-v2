@@ -45,14 +45,32 @@ const Alumno = () => {
         if (newCell["1"]) {
             data.nota = newCell["1"];
             data.momento = "1";
+            data.rp = false;
         }
         if (newCell["2"]) {
             data.nota = newCell["2"];
             data.momento = "2";
+            data.rp = false;
         }
         if (newCell["3"]) {
             data.nota = newCell["3"];
             data.momento = "3";
+            data.rp = false;
+        }
+        if (newCell["1rp"]) {
+            data.nota = newCell["1rp"];
+            data.momento = "1";
+            data.rp = true;
+        }
+        if (newCell["2rp"]) {
+            data.nota = newCell["2rp"];
+            data.momento = "2";
+            data.rp = true;
+        }
+        if (newCell["3rp"]) {
+            data.nota = newCell["3rp"];
+            data.momento = "3";
+            data.rp = true;
         }
         // @ts-ignore
         data.alumnoId = alumno.alumnoId.id;
