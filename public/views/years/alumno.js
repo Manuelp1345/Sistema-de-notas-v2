@@ -13,21 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsx_runtime_1 = require("react/jsx-runtime");
+const react_1 = __importDefault(require("react"));
 const Box_1 = __importDefault(require("@mui/material/Box"));
 const Typography_1 = __importDefault(require("@mui/material/Typography"));
 const styles_1 = require("@mui/material/styles");
 const react_router_dom_1 = require("react-router-dom");
-const react_1 = require("react");
+const react_2 = require("react");
 const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const TableCustom_1 = require("../table/TableCustom");
 const material_2 = require("@mui/material");
+const customModal_1 = require("../modals/customModal");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Alumno = () => {
     const { id } = (0, react_router_dom_1.useParams)();
     const navigate = (0, react_router_dom_1.useNavigate)();
-    const { areas, alumno } = (0, react_1.useContext)(GlobalContext_1.GlobalContext);
+    const [openDatosAlumno, setOpenDatosAlumno] = react_1.default.useState(false);
+    const handleClickOpenDatosAlumno = () => setOpenDatosAlumno(true);
+    const handleCloseDatosAlumno = () => {
+        setOpenDatosAlumno(false);
+    };
+    const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const resnotas = yield window.API.getNotas(data);
@@ -153,7 +160,7 @@ const Alumno = () => {
         // @ts-ignore
         return { data: findAreas, itemsCount: 0 };
     });
-    (0, react_1.useEffect)(() => {
+    (0, react_2.useEffect)(() => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
             console.log("id", id);
@@ -176,115 +183,12 @@ const Alumno = () => {
                     flexWrap: "nowrap",
                     alignItems: "center",
                     justifyContent: "center",
-                } }, { children: (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", component: "h1", gutterBottom: true }, { children: ["Datos del Alumno ", (0, jsx_runtime_1.jsx)("br", {})] })) })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                    mt: 2.5,
+                } }, { children: (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", component: "h1", gutterBottom: true }, { children: ["Informacion del Alumno ", (0, jsx_runtime_1.jsx)("br", {})] })) })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                    gap: "1rem",
                     display: "flex",
-                    gap: 2,
-                    flexWrap: "wrap",
                     justifyContent: "center",
-                } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: 2,
-                            flexWrap: "wrap",
-                            width: "100%",
-                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.firstName, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.secondName, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.Surname, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.secondSurname, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Segundo Apellido", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: alumno.alumnoId.condicion, label: "Condicion", disabled: true }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" }))] }))] })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: 2,
-                            flexWrap: "wrap",
-                            width: "100%",
-                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.dni, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Cedula /Pasaporte /Cedula Escolar", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Sexo" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: "M", label: "Condicion", disabled: true }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "F" }, { children: "Femenino" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "M" }, { children: "Masculino" }))] }))] }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Fecha de nacimiento" })), (0, jsx_runtime_1.jsx)(material_1.Input, { value: alumno.alumnoId.DateOfBirth, type: "Date" })] }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.email, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Correo", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.grupoEstable, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Grupo estable", variant: "standard" })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: 2,
-                            flexWrap: "wrap",
-                            width: "100%",
-                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.Phone, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.address, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.municipality, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.state, 
-                                /*           onChange={(e) =>
-                                setDatosAlumno({
-                                  ...datosAlumno,
-                                  firsName: e.target.value,
-                                })
-                              } */
-                                label: "Estado", variant: "standard" })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(material_1.TextField, { sx: { flex: 1 }, value: alumno.alumnoId.observacion, 
-                        /*           onChange={(e) =>
-                          setDatosAlumno({
-                            ...datosAlumno,
-                            firsName: e.target.value,
-                          })
-                        } */
-                        label: "Nota", variant: "standard" })] })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "\u00C1reas" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
+                    flexWrap: "wrap",
+                } }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", component: "h2", gutterBottom: true }, { children: [alumno.alumnoId.alumno.DatosPersonales.firstName, " ", alumno.alumnoId.alumno.DatosPersonales.secondName, " ", alumno.alumnoId.alumno.DatosPersonales.Surname, " ", alumno.alumnoId.alumno.DatosPersonales.secondSurname, " ", alumno.alumnoId.anio.anio, " ", alumno.alumnoId.seccione.seccion, (0, jsx_runtime_1.jsx)("br", {})] })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Datos Del Alumno" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Datos Del Representante" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Cambiar Seccion / A\u00F1o" }))] })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "\u00C1reas" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
                             {
                                 field: "id",
                                 headerName: "ID",
@@ -434,7 +338,115 @@ const Alumno = () => {
                             console.log("first");
                         }, handleDobleClick: () => {
                             console.log("first");
-                        }, toolbar: true, handleEditCell: handledSetNota })] })] })));
+                        }, toolbar: true, handleEditCell: handledSetNota })] }), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Cerrar", color: "Primary", tittle: "Datos del alumno", openDialog: openDatosAlumno, handleCloseDialog: handleCloseDatosAlumno, handledConfirm: handleCloseDatosAlumno }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                        mt: 2.5,
+                        display: "flex",
+                        gap: 2,
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                    } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: 2,
+                                flexWrap: "wrap",
+                                width: "100%",
+                            } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.firstName, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.secondName, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.Surname, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.secondSurname, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Segundo Apellido", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: alumno.alumnoId.alumno.condicion, label: "Condicion", disabled: true }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" }))] }))] })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: 2,
+                                flexWrap: "wrap",
+                                width: "100%",
+                            } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.dni, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Cedula /Pasaporte /Cedula Escolar", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Sexo" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: "M", label: "Condicion", disabled: true }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "F" }, { children: "Femenino" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "M" }, { children: "Masculino" }))] }))] }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Fecha de nacimiento" })), (0, jsx_runtime_1.jsx)(material_1.Input, { value: alumno.alumnoId.alumno.DatosPersonales.DateOfBirth, type: "Date" })] }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.email, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Correo", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.grupoEstable, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Grupo estable", variant: "standard" })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: 2,
+                                flexWrap: "wrap",
+                                width: "100%",
+                            } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.Phone, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.address, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.municipality, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: alumno.alumnoId.alumno.DatosPersonales.state, 
+                                    /*           onChange={(e) =>
+                                  setDatosAlumno({
+                                    ...datosAlumno,
+                                    firsName: e.target.value,
+                                  })
+                                } */
+                                    label: "Estado", variant: "standard" })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(material_1.TextField, { sx: { flex: 1 }, value: alumno.alumnoId.alumno.observacion, 
+                            /*           onChange={(e) =>
+                            setDatosAlumno({
+                              ...datosAlumno,
+                              firsName: e.target.value,
+                            })
+                          } */
+                            label: "Nota", variant: "standard" })] })) }))] })));
 };
 exports.default = Alumno;
 //# sourceMappingURL=alumno.js.map

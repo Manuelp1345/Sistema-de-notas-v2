@@ -50,7 +50,7 @@ const Seccion = () => {
     const [secciones, setSecciones] = (0, react_2.useState)({ seccion: "loading", id: 0 });
     const [activeStep, setActiveStep] = react_1.default.useState(0);
     const [skipped, setSkipped] = (0, react_2.useState)(new Set());
-    const [alumnos, setAlumnos] = (0, react_2.useState)([{ id: 0 }]);
+    const [alumnos, setAlumnos] = (0, react_2.useState)([{}]);
     const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const [datosAlumno, setDatosAlumno] = (0, react_2.useState)({
         firsName: "",
@@ -165,24 +165,9 @@ const Seccion = () => {
         console.log("id seccion", id);
         // @ts-ignore
         const findSecciones = yield window.API.getAlumno(id);
-        const alumnos = findSecciones.map((data) => {
-            data.alumno.DatosPersonales.firstName =
-                `${data.alumno.DatosPersonales.firstName}`.toUpperCase();
-            data.alumno.DatosPersonales.secondName =
-                `${data.alumno.DatosPersonales.secondName}`.toUpperCase();
-            data.alumno.DatosPersonales.Surname =
-                `${data.alumno.DatosPersonales.Surname}`.toUpperCase();
-            data.alumno.DatosPersonales.secondSurname =
-                `${data.alumno.DatosPersonales.secondSurname}`.toUpperCase();
-            data.alumno.idDatos = data.alumno.DatosPersonales.id;
-            delete data.alumno.DatosPersonales.id;
-            data.alumno = Object.assign(Object.assign({}, data.alumno), data.alumno.DatosPersonales);
-            delete data.alumno.DatosPersonales;
-            return data.alumno;
-        });
-        setAlumnos(alumnos);
+        setAlumnos(findSecciones);
         // @ts-ignore
-        return alumnos;
+        return findSecciones;
     });
     const handleClickRow = (param) => {
         console.log(param);
@@ -199,7 +184,7 @@ const Seccion = () => {
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones({ seccion: "loading", id: 0 });
-                    setAlumnos([{ id: 0 }]);
+                    setAlumnos([{}]);
                     navigate(-1);
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",

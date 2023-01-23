@@ -703,7 +703,13 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
     let Alumnos;
     try {
         Alumnos = yield etapas_1.Etapas.find({
-            relations: ["alumno", "alumno.DatosPersonales"],
+            relations: {
+                alumno: {
+                    DatosPersonales: true,
+                },
+                anio: true,
+                seccione: true,
+            },
             where: {
                 seccione: {
                     id: id,

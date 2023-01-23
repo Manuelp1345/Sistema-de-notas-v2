@@ -707,7 +707,13 @@ ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
   let Alumnos;
   try {
     Alumnos = await Etapas.find({
-      relations: ["alumno", "alumno.DatosPersonales"],
+      relations: {
+        alumno: {
+          DatosPersonales: true,
+        },
+        anio: true,
+        seccione: true,
+      },
       where: {
         seccione: {
           id: id,

@@ -26,7 +26,7 @@ import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import { TableCustom } from "../table/TableCustom";
 import { GlobalContext } from "../../config/context/GlobalContext";
-import { Alumno } from "../../config/types";
+import { Etapas } from "../../config/entitys/etapas";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -63,7 +63,8 @@ const Seccion = () => {
   const [secciones, setSecciones] = useState({ seccion: "loading", id: 0 });
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = useState(new Set());
-  const [alumnos, setAlumnos] = useState([{ id: 0 } as Alumno]);
+  //  @ts-ignore
+  const [alumnos, setAlumnos] = useState([{ id: 0 } as Etapas]);
   const { areas, alumno } = useContext(GlobalContext);
 
   const [datosAlumno, setDatosAlumno] = useState({
@@ -205,34 +206,29 @@ const Seccion = () => {
     // @ts-ignore
     const findSecciones = await window.API.getAlumno(id);
 
-    const alumnos = findSecciones.map((data) => {
-      data.alumno.DatosPersonales.firstName =
-        `${data.alumno.DatosPersonales.firstName}`.toUpperCase();
-      data.alumno.DatosPersonales.secondName =
-        `${data.alumno.DatosPersonales.secondName}`.toUpperCase();
-      data.alumno.DatosPersonales.Surname =
-        `${data.alumno.DatosPersonales.Surname}`.toUpperCase();
-      data.alumno.DatosPersonales.secondSurname =
-        `${data.alumno.DatosPersonales.secondSurname}`.toUpperCase();
-      data.alumno.idDatos = data.alumno.DatosPersonales.id;
-      delete data.alumno.DatosPersonales.id;
-
-      data.alumno = { ...data.alumno, ...data.alumno.DatosPersonales };
-      delete data.alumno.DatosPersonales;
-
-      return data.alumno;
-    });
-
-    setAlumnos(alumnos);
+    setAlumnos(
+      findSecciones.map((alumno) => {
+        alumno.firstName =
+          `${alumno.alumno.DatosPersonales.firstName}`.toLocaleUpperCase();
+        alumno.secondName =
+          `${alumno.alumno.DatosPersonales.secondName}`.toLocaleUpperCase();
+        alumno.Surname =
+          `${alumno.alumno.DatosPersonales.Surname}`.toLocaleUpperCase();
+        alumno.secondSurname =
+          `${alumno.alumno.DatosPersonales.secondSurname}`.toLocaleUpperCase();
+        alumno.dni = alumno.alumno.DatosPersonales.dni;
+        return alumno;
+      })
+    );
 
     // @ts-ignore
-    return alumnos;
+    return findSecciones;
   };
 
   const handleClickRow = (param) => {
     console.log(param);
     alumno.setAlumnoId(
-      alumnos.find((datos) => datos.id === param.id) as Alumno
+      alumnos.find((datos) => datos.id === param.id) as Etapas
     );
     navigate("/alumno");
   };
@@ -256,7 +252,8 @@ const Seccion = () => {
       <Button
         onClick={() => {
           setSecciones({ seccion: "loading", id: 0 });
-          setAlumnos([{ id: 0 } as Alumno]);
+          // @ts-ignore
+          setAlumnos([{ id: 0 } as Etapas]);
 
           navigate(-1);
         }}

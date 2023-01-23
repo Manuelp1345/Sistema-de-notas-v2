@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import { TableCustom } from "../table/TableCustom";
 import { Tooltip } from "@mui/material";
+import { CustomModal } from "../modals/customModal";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -32,6 +33,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 const Alumno = (): JSX.Element => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [openDatosAlumno, setOpenDatosAlumno] = React.useState(false);
+  const handleClickOpenDatosAlumno = () => setOpenDatosAlumno(true);
+  const handleCloseDatosAlumno = () => {
+    setOpenDatosAlumno(false);
+  };
   const { areas, alumno } = useContext(GlobalContext);
   const getNotas = async (data) => {
     // @ts-ignore
@@ -234,257 +240,42 @@ const Alumno = (): JSX.Element => {
           component="h1"
           gutterBottom
         >
-          Datos del Alumno <br />
+          Informacion del Alumno <br />
         </Typography>
       </Box>
 
       <Box
         sx={{
-          mt: 2.5,
+          gap: "1rem",
           display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
           justifyContent: "center",
+          flexWrap: "wrap",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-
-            gap: 2,
-            flexWrap: "wrap",
-            width: "100%",
-          }}
+        <Typography
+          width="100%"
+          textAlign="center"
+          variant="h5"
+          component="h2"
+          gutterBottom
         >
-          <TextField
-            value={alumno.alumnoId.firstName}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Primer Nombre"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.secondName}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Segundo Nombre"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.Surname}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Primer Apellido"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.secondSurname}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Segundo Apellido"
-            variant="standard"
-          />
-          <FormControl>
-            <InputLabel id="demo-simple-select-label">Condicion</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={alumno.alumnoId.condicion}
-              label="Condicion"
-              disabled
-              /*           onChange={handleChange} */
-            >
-              <MenuItem value={"Nuevo Ingreso"}>Nuevo Ingreso</MenuItem>
-              <MenuItem value={"Regular"}>Regular</MenuItem>
-              <MenuItem value={"Repitiente"}>Repitiente</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-        <br />
+          {alumno.alumnoId.alumno.DatosPersonales.firstName.toUpperCase()}{" "}
+          {alumno.alumnoId.alumno.DatosPersonales.secondName.toUpperCase()}{" "}
+          {alumno.alumnoId.alumno.DatosPersonales.Surname.toUpperCase()}{" "}
+          {alumno.alumnoId.alumno.DatosPersonales.secondSurname.toUpperCase()} |{" "}
+          {alumno.alumnoId.anio.anio} "{alumno.alumnoId.seccione.seccion}"
+          <br />
+        </Typography>
+        <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
+          Datos Del Alumno
+        </Button>
+        <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
+          Datos Del Representante
+        </Button>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-
-            gap: 2,
-            flexWrap: "wrap",
-            width: "100%",
-          }}
-        >
-          <TextField
-            value={alumno.alumnoId.dni}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Cedula /Pasaporte /Cedula Escolar"
-            variant="standard"
-          />
-          <FormControl>
-            <InputLabel id="demo-simple-select-label">Sexo</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={"M"}
-              label="Condicion"
-              disabled
-              /*           onChange={handleChange} */
-            >
-              <MenuItem value={"F"}>Femenino</MenuItem>
-              <MenuItem value={"M"}>Masculino</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl>
-            <InputLabel id="demo-simple-select-label">
-              Fecha de nacimiento
-            </InputLabel>
-            <Input
-              value={alumno.alumnoId.DateOfBirth}
-              type="Date"
-              /*                             onBlur={(e) => {
-                              //@ts-ignore
-
-                              console.log(e.target.value);
-                              setDatosAlumno({
-                                ...datosAlumno,
-                                //@ts-ignore
-                                fechaNacimiento:
-                                  //@ts-ignore
-                                  e.target.value,
-                              });
-                              console.log(datosAlumno);
-                            }}
-                            onChangeCapture={(e) => {
-                              //@ts-ignore
-
-                              console.log(e.target.value);
-                              setDatosAlumno({
-                                ...datosAlumno,
-                                //@ts-ignore
-                                fechaNacimiento:
-                                  //@ts-ignore
-                                  e.target.value,
-                              });
-                              console.log(datosAlumno);
-                            }} */
-            />
-          </FormControl>
-
-          <TextField
-            value={alumno.alumnoId.email}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Correo"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.grupoEstable}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Grupo estable"
-            variant="standard"
-          />
-        </Box>
-        <br />
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-
-            gap: 2,
-            flexWrap: "wrap",
-            width: "100%",
-          }}
-        >
-          <TextField
-            value={alumno.alumnoId.Phone}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Telefono"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.address}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Direccion"
-            variant="standard"
-          />
-
-          <TextField
-            value={alumno.alumnoId.municipality}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Municipio"
-            variant="standard"
-          />
-          <TextField
-            value={alumno.alumnoId.state}
-            /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-            label="Estado"
-            variant="standard"
-          />
-        </Box>
-        <br />
-
-        <TextField
-          sx={{ flex: 1 }}
-          value={alumno.alumnoId.observacion}
-          /*           onChange={(e) =>
-            setDatosAlumno({
-              ...datosAlumno,
-              firsName: e.target.value,
-            })
-          } */
-          label="Nota"
-          variant="standard"
-        />
+        <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
+          Cambiar Seccion / Año
+        </Button>
       </Box>
 
       <Box sx={{ marginTop: "2.5rem" }} id="Secciones" component="div"></Box>
@@ -749,6 +540,264 @@ const Alumno = (): JSX.Element => {
           handleEditCell={handledSetNota}
         />
       </Box>
+      <CustomModal
+        btnText="Cerrar"
+        color="Primary"
+        tittle={"Datos del alumno"}
+        openDialog={openDatosAlumno}
+        handleCloseDialog={handleCloseDatosAlumno}
+        handledConfirm={handleCloseDatosAlumno}
+      >
+        <Box
+          sx={{
+            mt: 2.5,
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+
+              gap: 2,
+              flexWrap: "wrap",
+              width: "100%",
+            }}
+          >
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.firstName}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Primer Nombre"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.secondName}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Segundo Nombre"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.Surname}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Primer Apellido"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.secondSurname}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Segundo Apellido"
+              variant="standard"
+            />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Condicion</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={alumno.alumnoId.alumno.condicion}
+                label="Condicion"
+                disabled
+                /*           onChange={handleChange} */
+              >
+                <MenuItem value={"Nuevo Ingreso"}>Nuevo Ingreso</MenuItem>
+                <MenuItem value={"Regular"}>Regular</MenuItem>
+                <MenuItem value={"Repitiente"}>Repitiente</MenuItem>
+                <MenuItem value={"Graduado"}>Graduado</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <br />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+
+              gap: 2,
+              flexWrap: "wrap",
+              width: "100%",
+            }}
+          >
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.dni}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Cedula /Pasaporte /Cedula Escolar"
+              variant="standard"
+            />
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">Sexo</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={"M"}
+                label="Condicion"
+                disabled
+                /*           onChange={handleChange} */
+              >
+                <MenuItem value={"F"}>Femenino</MenuItem>
+                <MenuItem value={"M"}>Masculino</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="demo-simple-select-label">
+                Fecha de nacimiento
+              </InputLabel>
+              <Input
+                value={alumno.alumnoId.alumno.DatosPersonales.DateOfBirth}
+                type="Date"
+                /*                             onBlur={(e) => {
+                              //@ts-ignore
+
+                              console.log(e.target.value);
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                fechaNacimiento:
+                                  //@ts-ignore
+                                  e.target.value,
+                              });
+                              console.log(datosAlumno);
+                            }}
+                            onChangeCapture={(e) => {
+                              //@ts-ignore
+
+                              console.log(e.target.value);
+                              setDatosAlumno({
+                                ...datosAlumno,
+                                //@ts-ignore
+                                fechaNacimiento:
+                                  //@ts-ignore
+                                  e.target.value,
+                              });
+                              console.log(datosAlumno);
+                            }} */
+              />
+            </FormControl>
+
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.email}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Correo"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.grupoEstable}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Grupo estable"
+              variant="standard"
+            />
+          </Box>
+          <br />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+
+              gap: 2,
+              flexWrap: "wrap",
+              width: "100%",
+            }}
+          >
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.Phone}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Telefono"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.address}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Direccion"
+              variant="standard"
+            />
+
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.municipality}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Municipio"
+              variant="standard"
+            />
+            <TextField
+              value={alumno.alumnoId.alumno.DatosPersonales.state}
+              /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+              label="Estado"
+              variant="standard"
+            />
+          </Box>
+          <br />
+
+          <TextField
+            sx={{ flex: 1 }}
+            value={alumno.alumnoId.alumno.observacion}
+            /*           onChange={(e) =>
+            setDatosAlumno({
+              ...datosAlumno,
+              firsName: e.target.value,
+            })
+          } */
+            label="Nota"
+            variant="standard"
+          />
+        </Box>
+      </CustomModal>
     </Box>
   );
 };

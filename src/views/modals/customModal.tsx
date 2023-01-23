@@ -17,13 +17,14 @@ export const CustomModal = ({
       onClose={handleCloseDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      maxWidth={false}
     >
       <DialogTitle
         sx={{ textAlign: "center", color: color, fontWeight: "bold" }}
       >
         {tittle}
       </DialogTitle>
-      <DialogContent>{children}</DialogContent>
+      <DialogContent sx={{}}>{children}</DialogContent>
       <DialogActions>
         <Button onClick={handleCloseDialog}>Cancelar</Button>
         <Button sx={{ color: color }} onClick={handledConfirm} autoFocus>
