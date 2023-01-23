@@ -35,6 +35,9 @@ const Alumno = () => {
         const notasMap = {};
         resnotas.forEach((nota) => {
             notasMap[`${nota.materia.id}-${nota.momento}`] = nota;
+            if (nota.recuperacion.length > 0) {
+                notasMap[`${nota.materia.id}-${nota.momento}rp`] = Object.assign(Object.assign({}, nota), { nota: nota.recuperacion[0].Nota });
+            }
         });
         console.log(notasMap);
         return notasMap;
@@ -98,20 +101,36 @@ const Alumno = () => {
         console.log(resNotas);
         if (areas.areas)
             areas.setAreas(areas.areas.map((area) => {
+                let momentoOne = 0;
+                let momentoTwo = 0;
+                let momentoThree = 0;
                 if (resNotas[`${area.id}-1`]) {
                     area["1"] = resNotas[`${area.id}-1`].nota;
+                    momentoOne = Number(resNotas[`${area.id}-1`].nota);
+                    if (resNotas[`${area.id}-1rp`]) {
+                        area["1rp"] = resNotas[`${area.id}-1rp`].nota;
+                        momentoOne = Number(resNotas[`${area.id}-1rp`].nota);
+                    }
                 }
                 if (resNotas[`${area.id}-2`]) {
                     area["2"] = resNotas[`${area.id}-2`].nota;
+                    momentoTwo = Number(resNotas[`${area.id}-2`].nota);
+                    if (resNotas[`${area.id}-2rp`]) {
+                        area["2rp"] = resNotas[`${area.id}-2rp`].nota;
+                        momentoTwo = Number(resNotas[`${area.id}-2rp`].nota);
+                    }
                 }
                 if (resNotas[`${area.id}-3`]) {
                     area["3"] = resNotas[`${area.id}-3`].nota;
+                    momentoThree = Number(resNotas[`${area.id}-3`].nota);
+                    if (resNotas[`${area.id}-3rp`]) {
+                        area["3rp"] = resNotas[`${area.id}-3rp`].nota;
+                        momentoThree = Number(resNotas[`${area.id}-3rp`].nota);
+                    }
                 }
                 let total = "0";
                 if (area["1"] && area["2"] && area["3"])
-                    total = ((Number(resNotas[`${area.id}-1`].nota) +
-                        Number(resNotas[`${area.id}-2`].nota) +
-                        Number(resNotas[`${area.id}-3`].nota)) /
+                    total = ((Number(momentoOne) + Number(momentoTwo) + Number(momentoThree)) /
                         3).toFixed(2);
                 // @ts-ignore
                 area["total"] = isNaN(Number(total)) ? 0 : total;
@@ -142,6 +161,16 @@ const Alumno = () => {
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     navigate(-1);
+                    if (areas.areas)
+                        areas.setAreas(areas.areas.map((area) => {
+                            delete area["1"];
+                            delete area["2"];
+                            delete area["3"];
+                            delete area["1rp"];
+                            delete area["2rp"];
+                            delete area["3rp"];
+                            return area;
+                        }));
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     flexWrap: "nowrap",

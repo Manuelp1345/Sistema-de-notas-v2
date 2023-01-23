@@ -1,5 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
+import Swal from "sweetalert2";
 import {
   DataGrid,
   GridEventListener,
@@ -44,7 +45,18 @@ export const TableCustom = ({
     console.log("new", newCell);
     console.log("old", oldCell);
 
-    if (newCell["1"])
+    const alert = () => {
+      return Swal.fire({
+        title: "Nota Invalida ( 1 - 20 )",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    };
+
+    if (newCell["1"]) {
+      if (Number(newCell["1"]) > 20 || Number(newCell["1"]) <= 0)
+        return alert();
       if (newCell["1"] !== oldCell["1"]) {
         delete newCell["2"];
         delete newCell["3"];
@@ -53,7 +65,10 @@ export const TableCustom = ({
         delete newCell["3rp"];
         handleEditCell(newCell, oldCell);
       }
-    if (newCell["2"])
+    }
+    if (newCell["2"]) {
+      if (Number(newCell["2"]) > 20 || Number(newCell["2"]) < 1) return alert();
+
       if (newCell["2"] !== oldCell["2"]) {
         delete newCell["3"];
         delete newCell["3rp"];
@@ -62,7 +77,9 @@ export const TableCustom = ({
         delete newCell["1"];
         handleEditCell(newCell, oldCell);
       }
-    if (newCell["3"])
+    }
+    if (newCell["3"]) {
+      if (Number(newCell["3"]) > 20 || Number(newCell["3"]) < 1) return alert();
       if (newCell["3"] !== oldCell["3"]) {
         delete newCell["1"];
         delete newCell["1rp"];
@@ -71,8 +88,11 @@ export const TableCustom = ({
         delete newCell["3rp"];
         handleEditCell(newCell, oldCell);
       }
+    }
 
-    if (newCell["1rp"])
+    if (newCell["1rp"]) {
+      if (Number(newCell["1rp"]) > 20 || Number(newCell["1rp"]) < 1)
+        return alert();
       if (newCell["1rp"] !== oldCell["1rp"]) {
         delete newCell["2"];
         delete newCell["3"];
@@ -81,7 +101,10 @@ export const TableCustom = ({
         delete newCell["2rp"];
         handleEditCell(newCell, oldCell);
       }
-    if (newCell["2rp"])
+    }
+    if (newCell["2rp"]) {
+      if (Number(newCell["2rp"]) > 20 || Number(newCell["2rp"]) < 1)
+        return alert();
       if (newCell["2rp"] !== oldCell["2rp"]) {
         delete newCell["2"];
         delete newCell["3"];
@@ -90,7 +113,10 @@ export const TableCustom = ({
         delete newCell["1rp"];
         handleEditCell(newCell, oldCell);
       }
-    if (newCell["3rp"])
+    }
+    if (newCell["3rp"]) {
+      if (Number(newCell["3rp"]) > 20 || Number(newCell["3rp"]) < 1)
+        return alert();
       if (newCell["3rp"] !== oldCell["3rp"]) {
         delete newCell["2"];
         delete newCell["2rp"];
@@ -99,6 +125,7 @@ export const TableCustom = ({
         delete newCell["1rp"];
         handleEditCell(newCell, oldCell);
       }
+    }
 
     return newCell;
   };

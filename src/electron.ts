@@ -740,33 +740,39 @@ ipcMain.handle("SET_NOTA", async (evet, data) => {
   });
 
   if (data.rp && notaDB?.recuperacion) {
+    let notaRP;
     if (notaDB.recuperacion.length > 0) {
-      notaDB.recuperacion[0].nota = data.nota;
+      notaRP = await RecuperacionNota.findOne({
+        where: {
+          id: notaDB.recuperacion[0].id,
+        },
+      });
+      notaRP.Nota = data.nota;
     } else {
-      const notaRP = new RecuperacionNota();
+      notaRP = new RecuperacionNota();
       notaRP.nota = notaDB;
       notaRP.Nota = data.nota;
-      try {
-        notaRP.save();
+    }
+    try {
+      await notaRP.save();
+      //@ts-ignore
+      new Notification({
+        title: "Sistema De Notas",
+        body: "Nota Registrada",
+        icon: path.join(__dirname, "./img/logo.png"),
         //@ts-ignore
-        new Notification({
-          title: "Sistema De Notas",
-          body: "Nota Registrada",
-          icon: path.join(__dirname, "./img/logo.png"),
-          //@ts-ignore
-        }).show();
-        return true;
-      } catch (error) {
-        console.log(error);
+      }).show();
+      return true;
+    } catch (error) {
+      console.log(error);
+      //@ts-ignore
+      new Notification({
+        title: "Sistema De Notas",
+        body: "No se pudo registrar la nota",
+        icon: path.join(__dirname, "./img/logo.png"),
         //@ts-ignore
-        new Notification({
-          title: "Sistema De Notas",
-          body: "No se pudo registrar la nota",
-          icon: path.join(__dirname, "./img/logo.png"),
-          //@ts-ignore
-        }).show();
-        return false;
-      }
+      }).show();
+      return false;
     }
   } else if (notaDB === null) notaDB = new Nota();
   notaDB.nota = data.nota;
