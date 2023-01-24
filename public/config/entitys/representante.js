@@ -29,10 +29,9 @@ __decorate([
     __metadata("design:type", basicData_1.BasicData)
 ], Representante.prototype, "DatosPersonales", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => alumnos_1.Alumno, (alumno) => alumno.id),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.OneToMany)(() => alumnos_1.Alumno, (alumno) => alumno.representante),
     __metadata("design:type", Array)
-], Representante.prototype, "Alumno", void 0);
+], Representante.prototype, "alumno", void 0);
 Representante = __decorate([
     (0, typeorm_1.Entity)()
 ], Representante);

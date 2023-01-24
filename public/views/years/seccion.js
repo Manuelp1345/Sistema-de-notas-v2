@@ -50,7 +50,8 @@ const Seccion = () => {
     const [secciones, setSecciones] = (0, react_2.useState)({ seccion: "loading", id: 0 });
     const [activeStep, setActiveStep] = react_1.default.useState(0);
     const [skipped, setSkipped] = (0, react_2.useState)(new Set());
-    const [alumnos, setAlumnos] = (0, react_2.useState)([{}]);
+    //  @ts-ignore
+    const [alumnos, setAlumnos] = (0, react_2.useState)([{ id: 0 }]);
     const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const [datosAlumno, setDatosAlumno] = (0, react_2.useState)({
         firsName: "",
@@ -165,7 +166,18 @@ const Seccion = () => {
         console.log("id seccion", id);
         // @ts-ignore
         const findSecciones = yield window.API.getAlumno(id);
-        setAlumnos(findSecciones);
+        setAlumnos(findSecciones.map((alumno) => {
+            alumno.firstName =
+                `${alumno.alumno.DatosPersonales.firstName}`.toLocaleUpperCase();
+            alumno.secondName =
+                `${alumno.alumno.DatosPersonales.secondName}`.toLocaleUpperCase();
+            alumno.Surname =
+                `${alumno.alumno.DatosPersonales.Surname}`.toLocaleUpperCase();
+            alumno.secondSurname =
+                `${alumno.alumno.DatosPersonales.secondSurname}`.toLocaleUpperCase();
+            alumno.dni = alumno.alumno.DatosPersonales.dni;
+            return alumno;
+        }));
         // @ts-ignore
         return findSecciones;
     });
@@ -184,7 +196,8 @@ const Seccion = () => {
     }, []);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones({ seccion: "loading", id: 0 });
-                    setAlumnos([{}]);
+                    // @ts-ignore
+                    setAlumnos([{ id: 0 }]);
                     navigate(-1);
                 } }, { children: [(0, jsx_runtime_1.jsx)(icons_material_1.ArrowBack, { sx: { mr: 1 } }), "Volver"] })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",

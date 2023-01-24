@@ -703,7 +703,13 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
     let Alumnos;
     try {
         Alumnos = yield etapas_1.Etapas.find({
-            relations: ["alumno", "alumno.DatosPersonales"],
+            relations: {
+                alumno: {
+                    DatosPersonales: true,
+                },
+                anio: true,
+                seccione: true,
+            },
             where: {
                 seccione: {
                     id: id,
@@ -735,35 +741,41 @@ electron_1.ipcMain.handle("SET_NOTA", (evet, data) => __awaiter(void 0, void 0, 
         },
     });
     if (data.rp && (notaDB === null || notaDB === void 0 ? void 0 : notaDB.recuperacion)) {
+        let notaRP;
         if (notaDB.recuperacion.length > 0) {
-            notaDB.recuperacion[0].nota = data.nota;
+            notaRP = yield recuperacion_Nota_1.RecuperacionNota.findOne({
+                where: {
+                    id: notaDB.recuperacion[0].id,
+                },
+            });
+            notaRP.Nota = data.nota;
         }
         else {
-            const notaRP = new recuperacion_Nota_1.RecuperacionNota();
+            notaRP = new recuperacion_Nota_1.RecuperacionNota();
             notaRP.nota = notaDB;
             notaRP.Nota = data.nota;
-            try {
-                notaRP.save();
+        }
+        try {
+            yield notaRP.save();
+            //@ts-ignore
+            new electron_1.Notification({
+                title: "Sistema De Notas",
+                body: "Nota Registrada",
+                icon: path.join(__dirname, "./img/logo.png"),
                 //@ts-ignore
-                new electron_1.Notification({
-                    title: "Sistema De Notas",
-                    body: "Nota Registrada",
-                    icon: path.join(__dirname, "./img/logo.png"),
-                    //@ts-ignore
-                }).show();
-                return true;
-            }
-            catch (error) {
-                console.log(error);
+            }).show();
+            return true;
+        }
+        catch (error) {
+            console.log(error);
+            //@ts-ignore
+            new electron_1.Notification({
+                title: "Sistema De Notas",
+                body: "No se pudo registrar la nota",
+                icon: path.join(__dirname, "./img/logo.png"),
                 //@ts-ignore
-                new electron_1.Notification({
-                    title: "Sistema De Notas",
-                    body: "No se pudo registrar la nota",
-                    icon: path.join(__dirname, "./img/logo.png"),
-                    //@ts-ignore
-                }).show();
-                return false;
-            }
+            }).show();
+            return false;
         }
     }
     else if (notaDB === null)

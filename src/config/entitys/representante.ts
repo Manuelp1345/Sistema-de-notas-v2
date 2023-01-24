@@ -8,6 +8,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  TreeChildren,
 } from "typeorm";
 
 @Entity()
@@ -22,7 +23,6 @@ export class Representante extends BaseEntity {
   @JoinColumn()
   DatosPersonales!: BasicData;
 
-  @OneToMany(() => Alumno, (alumno) => alumno.id)
-  @JoinColumn()
-  Alumno!: Alumno[];
+  @OneToMany(() => Alumno, (alumno) => alumno.representante)
+  alumno!: Alumno[];
 }

@@ -6,7 +6,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   Input,
   InputLabel,
   MenuItem,
@@ -17,7 +19,7 @@ import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import { TableCustom } from "../table/TableCustom";
-import { Tooltip } from "@mui/material";
+import { Tooltip, FormGroup } from "@mui/material";
 import { CustomModal } from "../modals/customModal";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -38,7 +40,19 @@ const Alumno = (): JSX.Element => {
   const handleCloseDatosAlumno = () => {
     setOpenDatosAlumno(false);
   };
+
+  const [openDatosRepresentante, setOpenDatosRepresentante] =
+    React.useState(false);
+  const handleClickOpenDatosRepresentante = () =>
+    setOpenDatosRepresentante(true);
+  const handleCloseDatosRepresentante = () => {
+    setOpenDatosRepresentante(false);
+  };
+
   const { areas, alumno } = useContext(GlobalContext);
+  const { alumno: alumnoDb } = alumno.alumnoId;
+  const { representante } = alumnoDb;
+
   const getNotas = async (data) => {
     // @ts-ignore
     const resnotas = await window.API.getNotas(data);
@@ -269,7 +283,7 @@ const Alumno = (): JSX.Element => {
         <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
           Datos Del Alumno
         </Button>
-        <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
+        <Button variant="contained" onClick={handleClickOpenDatosRepresentante}>
           Datos Del Representante
         </Button>
 
@@ -796,6 +810,161 @@ const Alumno = (): JSX.Element => {
             label="Nota"
             variant="standard"
           />
+        </Box>
+      </CustomModal>
+      <CustomModal
+        btnText="Cerrar"
+        color="Primary"
+        tittle={"Datos del representante"}
+        openDialog={openDatosRepresentante}
+        handleCloseDialog={handleCloseDatosRepresentante}
+        handledConfirm={handleCloseDatosRepresentante}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem",
+            flexWrap: "wrap",
+            rowGap: "3rem",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
+            }}
+          >
+            <TextField
+              value={representante.DatosPersonales.firstName}
+              /*                onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                firstName: e.target.value,
+                              })
+                            } */
+              label="Primer Nombre"
+              variant="standard"
+            />
+            <TextField
+              value={representante.DatosPersonales.secondName}
+              /*            onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                secondName: e.target.value,
+                              })
+                            } */
+              label="Segundo Nombre"
+              variant="standard"
+            />
+            <TextField
+              value={representante.DatosPersonales.Surname}
+              /*                onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                surname: e.target.value,
+                              })
+                            } */
+              label="Primer Apellido"
+              variant="standard"
+            />
+            <TextField
+              value={representante.DatosPersonales.secondSurname}
+              /*                      onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                secondSurname: e.target.value,
+                              })
+                            } */
+              label="Segundo Apellido"
+              variant="standard"
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
+              width: "100%",
+            }}
+          >
+            <TextField
+              value={representante.parentesco}
+              /*                    onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                filiacion: e.target.value,
+                              })
+                            } */
+              label="Filiación"
+              variant="standard"
+            />
+            <TextField
+              value={representante.DatosPersonales.dni}
+              /*                             onChange={(e) =>
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                dni: e.target.value,
+                              })
+                            } */
+              label="Cedula / Pasaporte"
+              variant="standard"
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            <>
+              <TextField
+                value={representante.DatosPersonales.address}
+                /*                 onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    address: e.target.value,
+                                  })
+                                } */
+                label="Direccion"
+                variant="standard"
+              />
+              <TextField
+                value={representante.DatosPersonales.municipality}
+                /*                        onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    municipality: e.target.value,
+                                  })
+                                } */
+                label="Municipio"
+                variant="standard"
+              />
+              <TextField
+                value={representante.DatosPersonales.state}
+                /*                               onChange={(e) =>
+                                  setDatosRepresetante({
+                                    ...datosRepresetante,
+                                    //@ts-ignore
+                                    state: e.target.value,
+                                  })
+                                } */
+                label="Estado"
+                variant="standard"
+              />
+            </>
+          </Box>
         </Box>
       </CustomModal>
     </Box>

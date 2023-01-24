@@ -13,6 +13,7 @@ exports.Alumno = void 0;
 const basicData_1 = require("./basicData");
 const nota_1 = require("./nota");
 const etapas_1 = require("./etapas");
+const representante_1 = require("./representante");
 const typeorm_1 = require("typeorm");
 let Alumno = class Alumno extends typeorm_1.BaseEntity {
 };
@@ -45,6 +46,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => etapas_1.Etapas, (etapas) => etapas.alumno),
     __metadata("design:type", Array)
 ], Alumno.prototype, "Etapas", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => representante_1.Representante, (representante) => representante.alumno),
+    __metadata("design:type", representante_1.Representante)
+], Alumno.prototype, "representante", void 0);
 Alumno = __decorate([
     (0, typeorm_1.Entity)()
 ], Alumno);

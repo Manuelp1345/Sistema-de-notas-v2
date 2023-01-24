@@ -16,10 +16,10 @@ import { CredentialDB } from "./config/types";
 import { BasicData } from "./config/entitys/basicData";
 import { Nota } from "./config/entitys/nota";
 import { Documents } from "./config/entitys/documents";
-import { Representante } from "./config/entitys/representante";
 import { RecuperacionNota } from "./config/entitys/recuperacion_Nota";
 import { Etapas } from "./config/entitys/etapas";
-let appDataSource;
+import { Representante } from "./config/entitys/representante";
+let appDataSource: DataSource;
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -542,162 +542,136 @@ ipcMain.handle("INSERT_AREA", async (event, area) => {
 });
 
 ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
-  const seccion = await Seccion.findOne({
-    relations: ["anio"],
-    where: {
-      id: data.seccion,
-    },
-  });
-  const documentsDB = new Documents();
-  documentsDB.cedula = Boolean(data.alumno.cedula);
-  documentsDB.pasaporte = Boolean(data.alumno.pasaporte);
-  documentsDB.partida_nacimiento = Boolean(data.alumno.partidaDeNacimiento);
-  documentsDB.fotos_carnet = Boolean(data.alumno.fotos);
-  documentsDB.notas_escuela = Boolean(data.alumno.notasEscolares);
-
-  let documentsId;
   try {
-    documentsId = await documentsDB.save();
-    //@ts-ignore
+    await appDataSource.transaction(async (manager) => {
+      const seccion = await manager.getRepository(Seccion).findOne({
+        relations: ["anio"],
+        where: {
+          id: data.seccion,
+        },
+      });
+
+      const documentsDB = manager.getRepository(Documents).create();
+      documentsDB.cedula = Boolean(data.alumno.cedula);
+      documentsDB.pasaporte = Boolean(data.alumno.pasaporte);
+      documentsDB.partida_nacimiento = Boolean(data.alumno.partidaDeNacimiento);
+      documentsDB.fotos_carnet = Boolean(data.alumno.fotos);
+      documentsDB.notas_escuela = Boolean(data.alumno.notasEscolares);
+
+      let documentsId;
+      try {
+        documentsId = await manager.getRepository(Documents).save(documentsDB);
+        //@ts-ignore
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+
+      console.log("insert area", seccion);
+      const basicDataDB = manager.getRepository(BasicData).create();
+      basicDataDB.firstName = data.alumno.firsName;
+      basicDataDB.secondName = data.alumno.SecondName;
+      basicDataDB.Surname = data.alumno.surname;
+      basicDataDB.secondSurname = data.alumno.secondSurname;
+      basicDataDB.email = data.alumno.email;
+      basicDataDB.sexo = data.alumno.sexo;
+      basicDataDB.dni = data.alumno.dni;
+      basicDataDB.Phone = data.alumno.phone;
+      basicDataDB.address = data.alumno.address;
+      basicDataDB.state = data.alumno.state;
+      basicDataDB.municipality = data.alumno.municipality;
+      basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
+      basicDataDB.Documents = documentsId;
+
+      let basicDataId;
+      try {
+        basicDataId = await manager.getRepository(BasicData).save(basicDataDB);
+        //@ts-ignore
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+
+      const alumnoDB = manager.getRepository(Alumno).create();
+      alumnoDB.observacion = data.alumno.observacion;
+      alumnoDB.condicion = data.alumno.condicion;
+      alumnoDB.grupoEstable = data.alumno.grupoEstable;
+      alumnoDB.DatosPersonales = basicDataId;
+
+      try {
+        await manager.getRepository(Alumno).save(alumnoDB);
+        //@ts-ignore
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+
+      const etapasDB = manager.getRepository(Etapas).create();
+      etapasDB.alumno = alumnoDB;
+      etapasDB.anio = seccion?.anio as Anio;
+      etapasDB.seccione = seccion as Seccion;
+
+      try {
+        await manager.getRepository(Etapas).save(etapasDB);
+        //@ts-ignore
+      } catch (error) {
+        console.log(error);
+
+        throw new Error("No se pudo registrar el alumno");
+      }
+
+      const basicDataTwoDB = manager.getRepository(BasicData).create();
+      basicDataTwoDB.firstName = data.representante.firsName;
+      basicDataTwoDB.secondName = data.representante.secondName;
+      basicDataTwoDB.Surname = data.representante.surname;
+      basicDataTwoDB.secondSurname = data.representante.secondSurname;
+      basicDataTwoDB.email = data.representante.email;
+      basicDataTwoDB.dni = data.representante.dni;
+      basicDataTwoDB.Phone = data.representante.phone;
+      basicDataTwoDB.address = data.representante.address;
+      basicDataTwoDB.state = data.representante.state;
+      basicDataTwoDB.municipality = data.representante.municipality;
+
+      try {
+        basicDataId = await manager
+          .getRepository(BasicData)
+          .save(basicDataTwoDB);
+        //@ts-ignore
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+
+      const representanteDB = manager.getRepository(Representante).create();
+      representanteDB.DatosPersonales = basicDataId;
+      representanteDB.alumno = [alumnoDB];
+      representanteDB.parentesco = data.representante.filiacion;
+
+      try {
+        await manager.getRepository(Representante).save(representanteDB);
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "Alumno Registrado",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return true;
+      } catch (error) {
+        console.log(error);
+
+        throw new Error("No se pudo registrar el alumno");
+      }
+    });
   } catch (error) {
     console.log(error);
-    //@ts-ignore
     new Notification({
       title: "Sistema De Notas",
       body: "No se pudo registrar el alumno",
       icon: path.join(__dirname, "./img/logo.png"),
       //@ts-ignore
     }).show();
-    return false;
-  }
-
-  console.log("insert area", seccion);
-  const basicDataDB = new BasicData();
-  basicDataDB.firstName = data.alumno.firsName;
-  basicDataDB.secondName = data.alumno.SecondName;
-  basicDataDB.Surname = data.alumno.surname;
-  basicDataDB.secondSurname = data.alumno.secondSurname;
-  basicDataDB.email = data.alumno.email;
-  basicDataDB.sexo = data.alumno.sexo;
-  basicDataDB.dni = data.alumno.dni;
-  basicDataDB.Phone = data.alumno.phone;
-  basicDataDB.address = data.alumno.address;
-  basicDataDB.state = data.alumno.state;
-  basicDataDB.municipality = data.alumno.municipality;
-  basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
-  basicDataDB.Documents = documentsId;
-
-  let basicDataId;
-  try {
-    basicDataId = await basicDataDB.save();
-    //@ts-ignore
-  } catch (error) {
-    console.log(error);
-    //@ts-ignore
-    new Notification({
-      title: "Sistema De Notas",
-      body: "No se pudo registrar el alumno",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return false;
-  }
-
-  const alumnoDB = new Alumno();
-  alumnoDB.observacion = data.alumno.observacion;
-  alumnoDB.condicion = data.alumno.condicion;
-  alumnoDB.grupoEstable = data.alumno.grupoEstable;
-  alumnoDB.DatosPersonales = basicDataId;
-
-  let alumnoId;
-  try {
-    alumnoId = await alumnoDB.save();
-    //@ts-ignore
-  } catch (error) {
-    console.log(error);
-    //@ts-ignore
-    new Notification({
-      title: "Sistema De Notas",
-      body: "No se pudo registrar el alumno",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return false;
-  }
-
-  const etapasDB = new Etapas();
-  etapasDB.alumno = alumnoId;
-  etapasDB.anio = seccion?.anio as Anio;
-  etapasDB.seccione = seccion as Seccion;
-
-  try {
-    await etapasDB.save();
-    //@ts-ignore
-  } catch (error) {
-    console.log(error);
-    //@ts-ignore
-    new Notification({
-      title: "Sistema De Notas",
-      body: "No se pudo registrar el alumno",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return false;
-  }
-
-  const basicDataTwoDB = new BasicData();
-  basicDataTwoDB.firstName = data.representante.firsName;
-  basicDataTwoDB.secondName = data.representante.secondName;
-  basicDataTwoDB.Surname = data.representante.surname;
-  basicDataTwoDB.secondSurname = data.representante.secondSurname;
-  basicDataTwoDB.email = data.representante.email;
-  basicDataTwoDB.dni = data.representante.dni;
-  basicDataTwoDB.Phone = data.representante.phone;
-  basicDataTwoDB.address = data.representante.address;
-  basicDataTwoDB.state = data.representante.state;
-  basicDataTwoDB.municipality = data.representante.municipality;
-
-  try {
-    basicDataId = await basicDataTwoDB.save();
-    //@ts-ignore
-  } catch (error) {
-    console.log(error);
-    //@ts-ignore
-    new Notification({
-      title: "Sistema De Notas",
-      body: "No se pudo registrar el alumno",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return false;
-  }
-
-  const representanteDB = new Representante();
-  representanteDB.DatosPersonales = basicDataId;
-  representanteDB.Alumno = alumnoId;
-  representanteDB.parentesco = data.representante.filiacion;
-
-  try {
-    await representanteDB.save();
-    //@ts-ignore
-    new Notification({
-      title: "Sistema De Notas",
-      body: "Alumno Registrado",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return true;
-  } catch (error) {
-    console.log(error);
-    //@ts-ignore
-
-    new Notification({
-      title: "Sistema De Notas",
-      body: "No se pudo registrar el alumno",
-      icon: path.join(__dirname, "./img/logo.png"),
-      //@ts-ignore
-    }).show();
-    return false;
+    throw new Error("No se pudo registrar el alumno");
   }
 });
 
@@ -710,6 +684,9 @@ ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
       relations: {
         alumno: {
           DatosPersonales: true,
+          representante: {
+            DatosPersonales: true,
+          },
         },
         anio: true,
         seccione: true,
@@ -816,8 +793,12 @@ ipcMain.handle("GET_NOTAS", async (evet, data) => {
   try {
     notas = await Nota.find({
       where: {
-        alumno: data.alumnoId,
-        anio: data.anio,
+        alumno: {
+          id: data.alumnoId,
+        },
+        anio: {
+          id: data.anio,
+        },
       },
       relations: ["materia", "recuperacion"],
     });
@@ -836,6 +817,8 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           id: data.periodo,
         },
       });
+
+      if (!oldPeriodo) throw new Error("No se encontro el periodo");
 
       oldPeriodo.estado = false;
       await transaction.getRepository(Periodo).save(oldPeriodo);
@@ -984,6 +967,10 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           (etapa) => etapa.anio.periodo.id === data.periodo
         );
 
+        if (!oldAnioAlumno)
+          throw new Error("No se encontro el anio del alumno");
+
+        // @ts-ignore
         delete alumno.Etapas;
 
         let newAnioAlumno;
@@ -1020,14 +1007,14 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           newSeccionAlumno = newSeccion;
 
           newAnios
-            .find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)
-            .secciones.push(newSeccion);
+            ?.find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)
+            ?.secciones.push(newSeccion);
         }
 
-        const newEtapa = await transaction.getRepository(Etapas).create({
+        const newEtapa = transaction.getRepository(Etapas).create({
           anio: newAnioAlumno,
           seccione: newSeccionAlumno,
-          alumno: alumno.id,
+          alumno: alumno,
         });
         await transaction.getRepository(Etapas).save(newEtapa);
       }

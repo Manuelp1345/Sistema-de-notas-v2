@@ -3,9 +3,9 @@ import { Anio } from "./anios";
 
 import { Seccion } from "./secciones";
 import { BasicData } from "./basicData";
-import { Representante } from "./representante";
 import { Nota } from "./nota";
 import { Etapas } from "./etapas";
+import { Representante } from "./representante";
 import {
   Entity,
   Column,
@@ -14,6 +14,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from "typeorm";
 
 @Entity()
@@ -39,4 +40,7 @@ export class Alumno extends BaseEntity {
 
   @OneToMany(() => Etapas, (etapas) => etapas.alumno)
   Etapas!: Etapas[];
+
+  @ManyToOne(() => Representante, (representante) => representante.alumno)
+  representante!: Representante;
 }
