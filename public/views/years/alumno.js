@@ -21,6 +21,7 @@ const react_router_dom_1 = require("react-router-dom");
 const react_2 = require("react");
 const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const TableCustom_1 = require("../table/TableCustom");
 const material_2 = require("@mui/material");
@@ -39,6 +40,7 @@ const Alumno = () => {
     const handleCloseDatosRepresentante = () => {
         setOpenDatosRepresentante(false);
     };
+    const [currentYear, setCurrentYear] = react_1.default.useState(0);
     const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const { alumno: alumnoDb } = alumno.alumnoId;
     const { representante } = alumnoDb;
@@ -103,6 +105,7 @@ const Alumno = () => {
         // @ts-ignore
         const anio = yield window.API.getAnio(id);
         console.log(anio);
+        setCurrentYear(anio.id);
         // @ts-ignore
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
@@ -167,6 +170,22 @@ const Alumno = () => {
         // @ts-ignore
         return { data: findAreas, itemsCount: 0 };
     });
+    const generarBoletin = () => __awaiter(void 0, void 0, void 0, function* () {
+        // @ts-ignore
+        const res = yield window.API.generarBoletin({
+            alumnoId: alumno.alumnoId.alumno.id,
+            anioId: currentYear,
+        });
+        console.log(res);
+        if (res) {
+            sweetalert2_1.default.fire({
+                title: "Boletin generado",
+                text: "El boletin se ha generado correctamente",
+                icon: "success",
+                confirmButtonText: "Aceptar",
+            });
+        }
+    });
     (0, react_2.useEffect)(() => {
         (() => __awaiter(void 0, void 0, void 0, function* () {
             yield getData();
@@ -195,7 +214,7 @@ const Alumno = () => {
                     display: "flex",
                     justifyContent: "center",
                     flexWrap: "wrap",
-                } }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", component: "h2", gutterBottom: true }, { children: [alumno.alumnoId.alumno.DatosPersonales.firstName.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.secondName.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.Surname.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.secondSurname.toUpperCase(), " |", " ", alumno.alumnoId.anio.anio, " \"", alumno.alumnoId.seccione.seccion, "\"", (0, jsx_runtime_1.jsx)("br", {})] })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Datos Del Alumno" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosRepresentante }, { children: "Datos Del Representante" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Cambiar Seccion / A\u00F1o" }))] })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "\u00C1reas" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
+                } }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", component: "h2", gutterBottom: true }, { children: [alumno.alumnoId.alumno.DatosPersonales.firstName.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.secondName.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.Surname.toUpperCase(), " ", alumno.alumnoId.alumno.DatosPersonales.secondSurname.toUpperCase(), " |", " ", alumno.alumnoId.anio.anio, " \"", alumno.alumnoId.seccione.seccion, "\"", (0, jsx_runtime_1.jsx)("br", {})] })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Datos Del Alumno" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosRepresentante }, { children: "Datos Del Representante" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: handleClickOpenDatosAlumno }, { children: "Cambiar Seccion / A\u00F1o" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", onClick: generarBoletin }, { children: "Generar Boletin" }))] })), (0, jsx_runtime_1.jsx)(Box_1.default, { sx: { marginTop: "2.5rem" }, id: "Secciones", component: "div" }), (0, jsx_runtime_1.jsxs)(Box_1.default, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center" } }, { children: "\u00C1reas" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: [
                             {
                                 field: "id",
                                 headerName: "ID",

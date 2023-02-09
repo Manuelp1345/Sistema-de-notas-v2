@@ -21,10 +21,13 @@ const react_router_dom_1 = require("react-router-dom");
 const react_2 = require("react");
 const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const material_2 = require("@mui/material");
 const moment_1 = __importDefault(require("moment"));
 const TableCustom_1 = require("../table/TableCustom");
 const GlobalContext_1 = require("../../config/context/GlobalContext");
+const CheckCircleOutline_1 = __importDefault(require("@mui/icons-material/CheckCircleOutline"));
+const ErrorOutline_1 = __importDefault(require("@mui/icons-material/ErrorOutline"));
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const style = {
     position: "absolute",
@@ -38,6 +41,7 @@ const style = {
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
+    zIndex: 1,
 };
 const steps = [
     "Datos del Alumno",
@@ -49,6 +53,37 @@ const Seccion = () => {
     const [anio, setAnio] = (0, react_2.useState)({});
     const [secciones, setSecciones] = (0, react_2.useState)({ seccion: "loading", id: 0 });
     const [activeStep, setActiveStep] = react_1.default.useState(0);
+    const [existAlumno, setExistAlumno] = (0, react_2.useState)(false);
+    const [inserAlumno, setInserAlumno] = (0, react_2.useState)(false);
+    const [errorDataAlumno, setErrorDataAlumno] = (0, react_2.useState)({
+        dni: false,
+        firstName: false,
+        SecondName: false,
+        surname: false,
+        secondSurname: false,
+        address: false,
+        municipality: false,
+        state: false,
+        phone: false,
+        email: false,
+        sexo: false,
+        fechaNacimiento: false,
+        grupoEstable: false,
+        condicion: false,
+    });
+    const [errorDataRepresentante, setErrorDataRepresentante] = (0, react_2.useState)({
+        dni: false,
+        firstName: false,
+        SecondName: false,
+        surname: false,
+        secondSurname: false,
+        address: false,
+        municipality: false,
+        state: false,
+        phone: false,
+        email: false,
+        filiacion: false,
+    });
     const [skipped, setSkipped] = (0, react_2.useState)(new Set());
     //  @ts-ignore
     const [alumnos, setAlumnos] = (0, react_2.useState)([{ id: 0 }]);
@@ -70,9 +105,9 @@ const Seccion = () => {
         observacion: "",
         condicion: "",
         grupoEstable: "",
-        fechaNacimiento: new Date(),
-        phone: 0,
-        sexo: "",
+        fechaNacimiento: null,
+        phone: Number(0),
+        sexo: "select",
         email: "",
     });
     const [datosRepresetante, setDatosRepresetante] = (0, react_2.useState)({
@@ -99,6 +134,38 @@ const Seccion = () => {
             //@ts-ignore
             condicion: event.target.value }));
     };
+    const handleChangeSexo = (event) => {
+        setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
+            //@ts-ignore
+            sexo: event.target.value }));
+        setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { sexo: false }));
+    };
+    const validateDniAlumno = (dni) => __awaiter(void 0, void 0, void 0, function* () {
+        //@ts-ignore
+        const response = yield window.API.getAlumnoByDni(dni);
+        setExistAlumno(response);
+        return response;
+    });
+    const validateRepresentanteDNI = (dni) => __awaiter(void 0, void 0, void 0, function* () {
+        //@ts-ignore
+        const response = yield window.API.getRepresentanteByDni(dni);
+        if (response) {
+            sweetalert2_1.default.fire({
+                title: "El Rrepresentante ya existe",
+                text: "Desea cargar los datos del representante?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { address: response.DatosPersonales.address, email: response.DatosPersonales.email, firstName: response.DatosPersonales.firstName, municipality: response.DatosPersonales.municipality, phone: response.DatosPersonales.Phone, surname: response.DatosPersonales.Surname, secondName: response.DatosPersonales.secondName, secondSurname: response.DatosPersonales.secondSurname, state: response.DatosPersonales.state, filiacion: response.parentesco }));
+                }
+            });
+        }
+        console.log(response);
+    });
     const isStepSkipped = (step) => {
         return skipped.has(step);
     };
@@ -113,8 +180,133 @@ const Seccion = () => {
         setloading(false);
         const findAlumnos = yield getAlumno(secciones.id);
         console.log(findAlumnos);
+        console.log("response inser alumno", response);
+        if (response === true) {
+            setInserAlumno(response);
+        }
+        else {
+            setInserAlumno(false);
+        }
         return response;
     });
+    const validateFirstStep = () => {
+        if (activeStep === 0) {
+            console.log(errorDataAlumno);
+            if (datosAlumno.firsName === "") {
+                console.log(errorDataAlumno);
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { firstName: true }));
+                return false;
+            }
+            if (datosAlumno.SecondName === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { SecondName: true }));
+                return false;
+            }
+            if (datosAlumno.surname === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { surname: true }));
+                return false;
+            }
+            if (datosAlumno.dni === "" || existAlumno) {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: true }));
+                return false;
+            }
+            if (datosAlumno.address === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { address: true }));
+                return false;
+            }
+            if (datosAlumno.municipality === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { municipality: true }));
+                return false;
+            }
+            if (datosAlumno.state === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { state: true }));
+                return false;
+            }
+            if (datosAlumno.phone === 0 || datosAlumno.phone.toString().length < 10) {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { phone: true }));
+                return false;
+            }
+            if (datosAlumno.sexo === "select") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { sexo: true }));
+                return false;
+            }
+            if (datosAlumno.email === "" ||
+                !datosAlumno.email.includes("@") ||
+                !datosAlumno.email.includes(".com")) {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { email: true }));
+                return false;
+            }
+            if (datosAlumno.fechaNacimiento === null ||
+                (0, moment_1.default)(datosAlumno.fechaNacimiento).toDate() === (0, moment_1.default)().toDate()) {
+                console.log(datosAlumno.fechaNacimiento);
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { fechaNacimiento: true }));
+                return false;
+            }
+            return true;
+        }
+        if (activeStep === 1) {
+            console.log(errorDataRepresentante);
+            if (datosRepresetante.dni === "") {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { dni: true }));
+                return false;
+            }
+            if (datosRepresetante.firstName === "") {
+                console.log(errorDataAlumno);
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { firstName: true }));
+                return false;
+            }
+            if (datosRepresetante.secondName === "") {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { SecondName: true }));
+                return false;
+            }
+            if (datosRepresetante.surname === "") {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { surname: true }));
+                return false;
+            }
+            if (datosRepresetante.filiacion === "") {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { filiacion: true }));
+                return false;
+            }
+            if (datosRepresetante.phone === 0 ||
+                datosRepresetante.phone.toString().length < 10) {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { phone: true }));
+                return false;
+            }
+            if (datosRepresetante.email === "" ||
+                !datosRepresetante.email.includes("@") ||
+                !datosRepresetante.email.includes(".com")) {
+                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: true }));
+                return false;
+            }
+            if (!datosRepresetante.alumnoAddress) {
+                if (datosRepresetante.address === "") {
+                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { address: true }));
+                    return false;
+                }
+                if (datosRepresetante.municipality === "") {
+                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { municipality: true }));
+                    return false;
+                }
+                if (datosRepresetante.state === "") {
+                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { state: true }));
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (activeStep === 2) {
+            console.log(errorDataAlumno);
+            if (datosAlumno.grupoEstable === "") {
+                console.log(errorDataAlumno);
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { grupoEstable: true }));
+                return false;
+            }
+            if (datosAlumno.condicion === "") {
+                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { condicion: true }));
+                return false;
+            }
+            return true;
+        }
+    };
     const handleNext = () => __awaiter(void 0, void 0, void 0, function* () {
         let newSkipped = skipped;
         const newActive = activeStep;
@@ -126,8 +318,6 @@ const Seccion = () => {
         setSkipped(newSkipped);
         if (newActive === 2) {
             if (datosRepresetante.alumnoAddress === true) {
-                console.log("misma dirrecion");
-                setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { address: datosAlumno.address, municipality: datosAlumno.municipality, state: datosAlumno.state }));
                 setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { fechaNacimiento: (0, moment_1.default)(datosAlumno.fechaNacimiento).toDate() }));
             }
             yield insertAlumno();
@@ -280,7 +470,7 @@ const Seccion = () => {
                                     }
                                     if (index === 2) {
                                         //@ts-ignore
-                                        labelProps.optional = ((0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "caption" }, { children: "Paso Tre" })));
+                                        labelProps.optional = ((0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "caption" }, { children: "Paso Tres" })));
                                     }
                                     if (isStepSkipped(index)) {
                                         //@ts-ignore
@@ -291,7 +481,20 @@ const Seccion = () => {
                                         width: "100%",
                                         display: "flex",
                                         justifyContent: "center",
-                                    } }, { children: (0, jsx_runtime_1.jsx)(material_2.CircularProgress, { sx: { my: "5rem" } }) }))) : ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { mt: 2, mb: 1 } }, { children: "All steps completed - you're finished" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { display: "flex", flexDirection: "row", pt: 2 } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, { sx: { flex: "1 1 auto" } }), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleReset }, { children: "Ingresar Otro Alumno" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: () => {
+                                    } }, { children: (0, jsx_runtime_1.jsx)(material_2.CircularProgress, { sx: { my: "5rem" } }) }))) : ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                                                width: "100%",
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                            } }, { children: inserAlumno ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(CheckCircleOutline_1.default, { sx: {
+                                                            fontSize: "5rem",
+                                                            color: "#4caf50",
+                                                            my: "5rem",
+                                                        } }), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { mt: 2, mb: 1 } }, { children: "Alumno Ingresado Correctamente" }))] })) : ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(ErrorOutline_1.default, { sx: {
+                                                            fontSize: "5rem",
+                                                            color: "#f44336",
+                                                            my: "5rem",
+                                                        } }), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { mt: 2, mb: 1 } }, { children: "Error al Ingresar Alumno" }))] })) })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { display: "flex", flexDirection: "row", pt: 2 } }, { children: [(0, jsx_runtime_1.jsx)(Box_1.default, { sx: { flex: "1 1 auto" } }), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleReset }, { children: "Ingresar Otro Alumno" })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: () => {
                                                         handleClose();
                                                         handleReset();
                                                     } }, { children: "Cerrar" }))] }))] })) })) : ((0, jsx_runtime_1.jsxs)(react_1.default.Fragment, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { mt: 2, mb: 1 } }, { children: [activeStep === 0 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Datos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
@@ -304,33 +507,74 @@ const Seccion = () => {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.firsName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { firsName: e.target.value })), label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.SecondName, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { SecondName: e.target.value })), label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.surname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { surname: e.target.value })), label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.secondSurname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.firsName, onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { firsName: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { firstName: false }));
+                                                                        }, label: "Primer Nombre", variant: "standard", error: errorDataAlumno.firstName, helperText: errorDataAlumno.firstName &&
+                                                                            'El campo "Primer Nombre" es obligatorio' }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.SecondName, error: errorDataAlumno.SecondName, helperText: errorDataAlumno.SecondName &&
+                                                                            'El campo "Segundo Nombre" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { SecondName: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { SecondName: false }));
+                                                                        }, label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.surname, error: errorDataAlumno.surname, helperText: errorDataAlumno.surname &&
+                                                                            'El campo "Primer Apellido" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { surname: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { surname: false }));
+                                                                        }, label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.secondSurname, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.dni, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { dni: e.target.value })), label: "Cedula /Pasaporte /Cedula Escolar", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.address, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { address: e.target.value })), label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.municipality, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { municipality: e.target.value })), label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.state, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { state: e.target.value })), label: "Estado", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.dni, error: errorDataAlumno.dni, helperText: errorDataAlumno.dni &&
+                                                                            "El Numero ya existe / no es valido", onChange: (e) => __awaiter(void 0, void 0, void 0, function* () {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { dni: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: false }));
+                                                                        }), onKeyUp: () => __awaiter(void 0, void 0, void 0, function* () {
+                                                                            const response = yield validateDniAlumno(datosAlumno.dni);
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: response }));
+                                                                        }), label: "Cedula /Pasaporte /Cedula Escolar", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.address, error: errorDataAlumno.address, helperText: errorDataAlumno.address &&
+                                                                            'El campo "Direccion" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { address: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { address: false }));
+                                                                        }, label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.municipality, error: errorDataAlumno.municipality, helperText: errorDataAlumno.municipality &&
+                                                                            'El campo "Municipio" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { municipality: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { municipality: false }));
+                                                                        }, label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.state, error: errorDataAlumno.state, helperText: errorDataAlumno.state &&
+                                                                            'El campo "Estado" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { state: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { state: false }));
+                                                                        }, label: "Estado", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.email, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { email: e.target.value })), label: "Correo", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.phone, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { phone: parseInt(e.target.value) })), label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "Date", onBlur: (e) => {
-                                                                            //@ts-ignore
-                                                                            console.log(e.target.value);
-                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
-                                                                                //@ts-ignore
-                                                                                fechaNacimiento: 
-                                                                                //@ts-ignore
-                                                                                e.target.value }));
-                                                                            console.log(datosAlumno);
-                                                                        }, onChangeCapture: (e) => {
-                                                                            //@ts-ignore
-                                                                            console.log(e.target.value);
-                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
-                                                                                //@ts-ignore
-                                                                                fechaNacimiento: 
-                                                                                //@ts-ignore
-                                                                                e.target.value }));
-                                                                            console.log(datosAlumno);
-                                                                        } }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Sexo" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: "M", label: "Condicion" }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "F" }, { children: "Femenino" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "M" }, { children: "Masculino" }))] }))] })] }))] }))] })), activeStep === 1 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Datos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.email, error: errorDataAlumno.email, helperText: errorDataAlumno.email &&
+                                                                            'El campo "Correo" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { email: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { email: false }));
+                                                                        }, label: "Correo", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: Number(datosAlumno.phone), error: errorDataAlumno.phone, helperText: errorDataAlumno.phone &&
+                                                                            'El campo "Telefono" es obligatorio', onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { phone: Number(e.target.value) }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { phone: false }));
+                                                                        }, label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { color: "gray" } }, { children: "Fechan de nacimiento" })), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "Date", error: errorDataAlumno.fechaNacimiento, onBlur: (e) => {
+                                                                                    //@ts-ignore
+                                                                                    console.log(e.target.value);
+                                                                                    setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
+                                                                                        //@ts-ignore
+                                                                                        fechaNacimiento: 
+                                                                                        //@ts-ignore
+                                                                                        e.target.value }));
+                                                                                    setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { fechaNacimiento: false }));
+                                                                                    console.log(datosAlumno);
+                                                                                }, onChangeCapture: (e) => {
+                                                                                    //@ts-ignore
+                                                                                    console.log(e.target.value);
+                                                                                    setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
+                                                                                        //@ts-ignore
+                                                                                        fechaNacimiento: 
+                                                                                        //@ts-ignore
+                                                                                        e.target.value }));
+                                                                                    setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { fechaNacimiento: false }));
+                                                                                    console.log(datosAlumno);
+                                                                                } }), errorDataAlumno.fechaNacimiento && ((0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { color: "red", fontSize: ".9rem" } }, { children: ['El campo "Fechan de nacimiento"', " ", (0, jsx_runtime_1.jsx)("br", {}), " ", " es obligatorio"] })))] }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Sexo" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: datosAlumno.sexo, label: "Condicion", onChange: handleChangeSexo }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ disabled: true, value: "select" }, { children: "Sexo" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "F" }, { children: "Femenino" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "M" }, { children: "Masculino" }))] })), errorDataAlumno.sexo && ((0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { color: "red", fontSize: ".9rem" } }, { children: ['El campo "Sexo"', " ", (0, jsx_runtime_1.jsx)("br", {}), " ", " es obligatorio"] })))] })] }))] }))] })), activeStep === 1 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Datos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                             display: "flex",
                                                             justifyContent: "center",
                                                             gap: "1rem",
@@ -340,24 +584,61 @@ const Seccion = () => {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.firstName, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                            //@ts-ignore
-                                                                            firstName: e.target.value })), label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.secondName, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                            //@ts-ignore
-                                                                            secondName: e.target.value })), label: "Segundo Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.surname, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                            //@ts-ignore
-                                                                            surname: e.target.value })), label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.secondSurname, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                            //@ts-ignore
-                                                                            secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.dni, error: errorDataRepresentante.dni, helperText: errorDataRepresentante.dni &&
+                                                                            'El campo "Cedula / Pasaporte" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                dni: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { dni: false }));
+                                                                        }, onKeyUp: () => validateRepresentanteDNI(datosRepresetante.dni), label: "Cedula / Pasaporte", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.firstName, error: errorDataRepresentante.firstName, helperText: errorDataRepresentante.firstName &&
+                                                                            'El campo "Primer Nombre" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                firstName: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { firstName: false }));
+                                                                        }, label: "Primer Nombre", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.secondName, error: errorDataRepresentante.SecondName, helperText: errorDataRepresentante.SecondName &&
+                                                                            'El campo "Segundo Nombre" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                secondName: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { SecondName: false }));
+                                                                        }, label: "Segundo Nombre", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
                                                                     width: "100%",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.filiacion, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.surname, error: errorDataRepresentante.surname, helperText: errorDataRepresentante.surname &&
+                                                                            'El campo "Primer Apellido" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                surname: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { surname: false }));
+                                                                        }, label: "Primer Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.secondSurname, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
                                                                             //@ts-ignore
-                                                                            filiacion: e.target.value })), label: "Filiaci\u00F3n", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.dni, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                            //@ts-ignore
-                                                                            dni: e.target.value })), label: "Cedula / Pasaporte", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                            secondSurname: e.target.value })), label: "Segundo Apellido", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.filiacion, error: errorDataRepresentante.filiacion, helperText: errorDataRepresentante.filiacion &&
+                                                                            'El campo "Filiación" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                filiacion: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { filiacion: false }));
+                                                                        }, label: "Filiaci\u00F3n", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                    display: "flex",
+                                                                    justifyContent: "center",
+                                                                    gap: "1rem",
+                                                                    width: "100%",
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.phone, error: errorDataRepresentante.phone, helperText: errorDataRepresentante.phone &&
+                                                                            'El campo "Telefono" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                phone: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { phone: false }));
+                                                                        }, label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.email, error: errorDataRepresentante.email, helperText: errorDataRepresentante.email &&
+                                                                            'El campo "Email" es obligatorio', onChange: (e) => {
+                                                                            setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                //@ts-ignore
+                                                                                email: e.target.value }));
+                                                                            setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: false }));
+                                                                        }, label: "Email", variant: "standard" })] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     flexWrap: "wrap",
@@ -371,13 +652,25 @@ const Seccion = () => {
                                                                                 justifyContent: "center",
                                                                             }, control: (0, jsx_runtime_1.jsx)(material_1.Checkbox, {}), label: "\u00BFEl estudiante vive con el represetante?", value: datosRepresetante.alumnoAddress, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
                                                                                 //@ts-ignore
-                                                                                alumnoAddress: e.target.checked })) }) })), !datosRepresetante.alumnoAddress && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.address, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                                    //@ts-ignore
-                                                                                    address: e.target.value })), label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.municipality, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                                    //@ts-ignore
-                                                                                    municipality: e.target.value })), label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.state, onChange: (e) => setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
-                                                                                    //@ts-ignore
-                                                                                    state: e.target.value })), label: "Estado", variant: "standard" })] }))] }))] }))] })), activeStep === 2 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Informaci\u00F3n acad\u00E9mica" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                                alumnoAddress: e.target.checked, address: datosAlumno.address, municipality: datosAlumno.municipality, state: datosAlumno.state })) }) })), !datosRepresetante.alumnoAddress && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.address, error: errorDataRepresentante.address, helperText: errorDataRepresentante.address &&
+                                                                                    'El campo "Direccion" es obligatorio', onChange: (e) => {
+                                                                                    setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                        //@ts-ignore
+                                                                                        address: e.target.value }));
+                                                                                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { address: false }));
+                                                                                }, label: "Direccion", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.municipality, error: errorDataRepresentante.municipality, helperText: errorDataRepresentante.municipality &&
+                                                                                    'El campo "Municipio" es obligatorio', onChange: (e) => {
+                                                                                    setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                        //@ts-ignore
+                                                                                        municipality: e.target.value }));
+                                                                                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { municipality: false }));
+                                                                                }, label: "Municipio", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.state, error: errorDataRepresentante.state, helperText: errorDataRepresentante.state &&
+                                                                                    'El campo "Estado" es obligatorio', onChange: (e) => {
+                                                                                    setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
+                                                                                        //@ts-ignore
+                                                                                        state: e.target.value }));
+                                                                                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { state: false }));
+                                                                                }, label: "Estado", variant: "standard" })] }))] }))] }))] })), activeStep === 2 && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [" ", (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Informaci\u00F3n acad\u00E9mica" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                             display: "flex",
                                                             justifyContent: "center",
                                                             gap: "1rem",
@@ -389,9 +682,13 @@ const Seccion = () => {
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
                                                                     width: "80%",
-                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { sx: { width: "100%" }, label: "Grupo Estable", variant: "standard", value: datosAlumno.grupoEstable, onChange: (e) => setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
-                                                                            //@ts-ignore
-                                                                            grupoEstable: e.target.value })) }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { width: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: datosAlumno.condicion, label: "Condicion", onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" }))] }))] }))] })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Documentos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { sx: { width: "100%" }, label: "Grupo Estable", variant: "standard", error: errorDataAlumno.grupoEstable, helperText: errorDataAlumno.grupoEstable &&
+                                                                            'El campo "Grupo Estable" es obligatorio', value: datosAlumno.grupoEstable, onChange: (e) => {
+                                                                            setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { 
+                                                                                //@ts-ignore
+                                                                                grupoEstable: e.target.value }));
+                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { grupoEstable: false }));
+                                                                        } }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { width: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ error: errorDataAlumno.condicion, labelId: "demo-simple-select-label", id: "demo-simple-select", value: datosAlumno.condicion, label: "Condicion", onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" }))] }))] }))] })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Documentos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",
@@ -418,7 +715,12 @@ const Seccion = () => {
                                                     display: "flex",
                                                     flex: "1 1 auto",
                                                     justifyContent: "center",
-                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ color: "inherit", onClick: handleClose, sx: { mr: 1 } }, { children: "Cerrar" })) })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: handleNext }, { children: activeStep === steps.length - 1
+                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ color: "inherit", onClick: handleClose, sx: { mr: 1 } }, { children: "Cerrar" })) })), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ onClick: () => {
+                                                    const FirstStep = validateFirstStep();
+                                                    console.log("FirstStep", FirstStep);
+                                                    if (FirstStep)
+                                                        handleNext();
+                                                } }, { children: activeStep === steps.length - 1
                                                     ? "Registrar Datos"
                                                     : "Siguiente" }))] }))] }))] })) })) }))] })));
 };

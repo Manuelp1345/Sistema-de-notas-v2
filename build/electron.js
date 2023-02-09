@@ -52,9 +52,11 @@ const alumnos_1 = require("./config/entitys/alumnos");
 const basicData_1 = require("./config/entitys/basicData");
 const nota_1 = require("./config/entitys/nota");
 const documents_1 = require("./config/entitys/documents");
-const representante_1 = require("./config/entitys/representante");
 const recuperacion_Nota_1 = require("./config/entitys/recuperacion_Nota");
 const etapas_1 = require("./config/entitys/etapas");
+const representante_1 = require("./config/entitys/representante");
+const exceljs_1 = __importDefault(require("exceljs"));
+const moment_1 = __importDefault(require("moment"));
 let appDataSource;
 function createWindow() {
     // Create the browser window.
@@ -546,156 +548,166 @@ electron_1.ipcMain.handle("INSERT_AREA", (event, area) => __awaiter(void 0, void
     }
 }));
 electron_1.ipcMain.handle("INSERT_ALUMNO", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
-    const seccion = yield secciones_1.Seccion.findOne({
-        relations: ["anio"],
-        where: {
-            id: data.seccion,
-        },
-    });
-    const documentsDB = new documents_1.Documents();
-    documentsDB.cedula = Boolean(data.alumno.cedula);
-    documentsDB.pasaporte = Boolean(data.alumno.pasaporte);
-    documentsDB.partida_nacimiento = Boolean(data.alumno.partidaDeNacimiento);
-    documentsDB.fotos_carnet = Boolean(data.alumno.fotos);
-    documentsDB.notas_escuela = Boolean(data.alumno.notasEscolares);
-    let documentsId;
     try {
-        documentsId = yield documentsDB.save();
-        //@ts-ignore
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            const seccion = yield manager.getRepository(secciones_1.Seccion).findOne({
+                relations: ["anio"],
+                where: {
+                    id: data.seccion,
+                },
+            });
+            let basicDataId;
+            //insert or update representante
+            let existRepresentanteDB = yield manager
+                .getRepository(representante_1.Representante)
+                .findOne({
+                where: {
+                    DatosPersonales: {
+                        dni: data.representante.dni,
+                    },
+                },
+                relations: {
+                    DatosPersonales: true,
+                },
+            });
+            if (existRepresentanteDB) {
+                try {
+                    yield manager.getRepository(basicData_1.BasicData).update({ id: existRepresentanteDB.DatosPersonales.id }, {
+                        dni: data.representante.dni,
+                        firstName: data.representante.firstName,
+                        secondName: data.representante.secondName,
+                        Surname: data.representante.surname,
+                        secondSurname: data.representante.secondSurname,
+                        email: data.representante.email,
+                        Phone: data.representante.phone,
+                        address: data.representante.address,
+                        state: data.representante.state,
+                        municipality: data.representante.municipality,
+                    });
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+            }
+            else {
+                const basicDataTwoDB = manager.getRepository(basicData_1.BasicData).create();
+                basicDataTwoDB.firstName = data.representante.firsName;
+                basicDataTwoDB.secondName = data.representante.secondName;
+                basicDataTwoDB.Surname = data.representante.surname;
+                basicDataTwoDB.secondSurname = data.representante.secondSurname;
+                basicDataTwoDB.email = data.representante.email;
+                basicDataTwoDB.dni = data.representante.dni;
+                basicDataTwoDB.Phone = data.representante.phone;
+                basicDataTwoDB.address = data.representante.address;
+                basicDataTwoDB.state = data.representante.state;
+                basicDataTwoDB.municipality = data.representante.municipality;
+                try {
+                    basicDataId = yield manager
+                        .getRepository(basicData_1.BasicData)
+                        .save(basicDataTwoDB);
+                    //@ts-ignore
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+                const representanteDB = manager.getRepository(representante_1.Representante).create();
+                representanteDB.DatosPersonales = basicDataId;
+                representanteDB.parentesco = data.representante.filiacion;
+                try {
+                    existRepresentanteDB = yield manager
+                        .getRepository(representante_1.Representante)
+                        .save(representanteDB);
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+            }
+            console.log("representante", data.representante);
+            const documentsDB = manager.getRepository(documents_1.Documents).create();
+            documentsDB.cedula = Boolean(data.alumno.cedula);
+            documentsDB.pasaporte = Boolean(data.alumno.pasaporte);
+            documentsDB.partida_nacimiento = Boolean(data.alumno.partidaDeNacimiento);
+            documentsDB.fotos_carnet = Boolean(data.alumno.fotos);
+            documentsDB.notas_escuela = Boolean(data.alumno.notasEscolares);
+            let documentsId;
+            try {
+                documentsId = yield manager.getRepository(documents_1.Documents).save(documentsDB);
+                //@ts-ignore
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+            console.log("insert area", seccion);
+            const basicDataDB = manager.getRepository(basicData_1.BasicData).create();
+            basicDataDB.firstName = data.alumno.firsName;
+            basicDataDB.secondName = data.alumno.SecondName;
+            basicDataDB.Surname = data.alumno.surname;
+            basicDataDB.secondSurname = data.alumno.secondSurname;
+            basicDataDB.email = data.alumno.email;
+            basicDataDB.sexo = data.alumno.sexo;
+            basicDataDB.dni = data.alumno.dni;
+            basicDataDB.Phone = data.alumno.phone;
+            basicDataDB.address = data.alumno.address;
+            basicDataDB.state = data.alumno.state;
+            basicDataDB.municipality = data.alumno.municipality;
+            basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
+            basicDataDB.Documents = documentsId;
+            try {
+                basicDataId = yield manager.getRepository(basicData_1.BasicData).save(basicDataDB);
+                //@ts-ignore
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+            const alumnoDB = manager.getRepository(alumnos_1.Alumno).create();
+            alumnoDB.observacion = data.alumno.observacion;
+            alumnoDB.condicion = data.alumno.condicion;
+            alumnoDB.grupoEstable = data.alumno.grupoEstable;
+            alumnoDB.DatosPersonales = basicDataId;
+            alumnoDB.representante = existRepresentanteDB;
+            try {
+                yield manager.getRepository(alumnos_1.Alumno).save(alumnoDB);
+                //@ts-ignore
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+            const etapasDB = manager.getRepository(etapas_1.Etapas).create();
+            etapasDB.alumno = alumnoDB;
+            etapasDB.anio = seccion === null || seccion === void 0 ? void 0 : seccion.anio;
+            etapasDB.seccione = seccion;
+            try {
+                yield manager.getRepository(etapas_1.Etapas).save(etapasDB);
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Alumno Registrado",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+        }));
     }
     catch (error) {
         console.log(error);
-        //@ts-ignore
         new electron_1.Notification({
             title: "Sistema De Notas",
             body: "No se pudo registrar el alumno",
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
         }).show();
-        return false;
-    }
-    console.log("insert area", seccion);
-    const basicDataDB = new basicData_1.BasicData();
-    basicDataDB.firstName = data.alumno.firsName;
-    basicDataDB.secondName = data.alumno.SecondName;
-    basicDataDB.Surname = data.alumno.surname;
-    basicDataDB.secondSurname = data.alumno.secondSurname;
-    basicDataDB.email = data.alumno.email;
-    basicDataDB.sexo = data.alumno.sexo;
-    basicDataDB.dni = data.alumno.dni;
-    basicDataDB.Phone = data.alumno.phone;
-    basicDataDB.address = data.alumno.address;
-    basicDataDB.state = data.alumno.state;
-    basicDataDB.municipality = data.alumno.municipality;
-    basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
-    basicDataDB.Documents = documentsId;
-    let basicDataId;
-    try {
-        basicDataId = yield basicDataDB.save();
-        //@ts-ignore
-    }
-    catch (error) {
-        console.log(error);
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "No se pudo registrar el alumno",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return false;
-    }
-    const alumnoDB = new alumnos_1.Alumno();
-    alumnoDB.observacion = data.alumno.observacion;
-    alumnoDB.condicion = data.alumno.condicion;
-    alumnoDB.grupoEstable = data.alumno.grupoEstable;
-    alumnoDB.DatosPersonales = basicDataId;
-    let alumnoId;
-    try {
-        alumnoId = yield alumnoDB.save();
-        //@ts-ignore
-    }
-    catch (error) {
-        console.log(error);
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "No se pudo registrar el alumno",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return false;
-    }
-    const etapasDB = new etapas_1.Etapas();
-    etapasDB.alumno = alumnoId;
-    etapasDB.anio = seccion === null || seccion === void 0 ? void 0 : seccion.anio;
-    etapasDB.seccione = seccion;
-    try {
-        yield etapasDB.save();
-        //@ts-ignore
-    }
-    catch (error) {
-        console.log(error);
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "No se pudo registrar el alumno",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return false;
-    }
-    const basicDataTwoDB = new basicData_1.BasicData();
-    basicDataTwoDB.firstName = data.representante.firsName;
-    basicDataTwoDB.secondName = data.representante.secondName;
-    basicDataTwoDB.Surname = data.representante.surname;
-    basicDataTwoDB.secondSurname = data.representante.secondSurname;
-    basicDataTwoDB.email = data.representante.email;
-    basicDataTwoDB.dni = data.representante.dni;
-    basicDataTwoDB.Phone = data.representante.phone;
-    basicDataTwoDB.address = data.representante.address;
-    basicDataTwoDB.state = data.representante.state;
-    basicDataTwoDB.municipality = data.representante.municipality;
-    try {
-        basicDataId = yield basicDataTwoDB.save();
-        //@ts-ignore
-    }
-    catch (error) {
-        console.log(error);
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "No se pudo registrar el alumno",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return false;
-    }
-    const representanteDB = new representante_1.Representante();
-    representanteDB.DatosPersonales = basicDataId;
-    representanteDB.Alumno = alumnoId;
-    representanteDB.parentesco = data.representante.filiacion;
-    try {
-        yield representanteDB.save();
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "Alumno Registrado",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return true;
-    }
-    catch (error) {
-        console.log(error);
-        //@ts-ignore
-        new electron_1.Notification({
-            title: "Sistema De Notas",
-            body: "No se pudo registrar el alumno",
-            icon: path.join(__dirname, "./img/logo.png"),
-            //@ts-ignore
-        }).show();
-        return false;
+        throw new Error("No se pudo registrar el alumno");
     }
 }));
 electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -706,6 +718,9 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
             relations: {
                 alumno: {
                     DatosPersonales: true,
+                    representante: {
+                        DatosPersonales: true,
+                    },
                 },
                 anio: true,
                 seccione: true,
@@ -814,8 +829,12 @@ electron_1.ipcMain.handle("GET_NOTAS", (evet, data) => __awaiter(void 0, void 0,
     try {
         notas = yield nota_1.Nota.find({
             where: {
-                alumno: data.alumnoId,
-                anio: data.anio,
+                alumno: {
+                    id: data.alumnoId,
+                },
+                anio: {
+                    id: data.anio,
+                },
             },
             relations: ["materia", "recuperacion"],
         });
@@ -829,11 +848,14 @@ electron_1.ipcMain.handle("GET_NOTAS", (evet, data) => __awaiter(void 0, void 0,
 electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield appDataSource.transaction((transaction) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
             const oldPeriodo = yield transaction.getRepository(periodo_1.Periodo).findOne({
                 where: {
                     id: data.periodo,
                 },
             });
+            if (!oldPeriodo)
+                throw new Error("No se encontro el periodo");
             oldPeriodo.estado = false;
             yield transaction.getRepository(periodo_1.Periodo).save(oldPeriodo);
             const newPeriodo = yield transaction.getRepository(periodo_1.Periodo).create({
@@ -961,6 +983,9 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 const notaFinal = promedio;
                 console.log("nota final", notaFinal);
                 const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
+                if (!oldAnioAlumno)
+                    throw new Error("No se encontro el anio del alumno");
+                // @ts-ignore
                 delete alumno.Etapas;
                 let newAnioAlumno;
                 if (notaFinal > 9 && recuperacionCount < 2) {
@@ -987,14 +1012,12 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     });
                     yield transaction.getRepository(secciones_1.Seccion).save(newSeccion);
                     newSeccionAlumno = newSeccion;
-                    newAnios
-                        .find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)
-                        .secciones.push(newSeccion);
+                    (_a = newAnios === null || newAnios === void 0 ? void 0 : newAnios.find((anio) => anio.numberAnio === newAnioAlumno.numberAnio)) === null || _a === void 0 ? void 0 : _a.secciones.push(newSeccion);
                 }
-                const newEtapa = yield transaction.getRepository(etapas_1.Etapas).create({
+                const newEtapa = transaction.getRepository(etapas_1.Etapas).create({
                     anio: newAnioAlumno,
                     seccione: newSeccionAlumno,
-                    alumno: alumno.id,
+                    alumno: alumno,
                 });
                 yield transaction.getRepository(etapas_1.Etapas).save(newEtapa);
             }
@@ -1004,5 +1027,180 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
     catch (error) {
         console.log(error);
     }
+}));
+electron_1.ipcMain.handle("GET_ALUMNO_BY_DNI", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const alumno = yield alumnos_1.Alumno.findOne({
+            where: {
+                DatosPersonales: {
+                    dni: data,
+                },
+            },
+        });
+        if (!alumno)
+            return false;
+        return true;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("GET_REPRESENTANTE_BY_DNI", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const representante = yield representante_1.Representante.findOne({
+            where: {
+                DatosPersonales: {
+                    dni: data,
+                },
+            },
+            relations: {
+                DatosPersonales: true,
+            },
+        });
+        if (!representante)
+            return false;
+        return representante;
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
+electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b, _c, _d;
+    console.log(data);
+    const alumno = yield alumnos_1.Alumno.findOne({
+        where: {
+            id: data.alumnoId,
+        },
+        relations: {
+            DatosPersonales: true,
+            Etapas: {
+                anio: {
+                    periodo: true,
+                },
+                seccione: true,
+            },
+        },
+    });
+    const currentEtapa = alumno === null || alumno === void 0 ? void 0 : alumno.Etapas.find((etapa) => etapa.anio.id === data.anioId);
+    console.log("currentEtapa", currentEtapa);
+    const notas = yield nota_1.Nota.find({
+        where: {
+            alumno: {
+                id: data.alumnoId,
+            },
+        },
+        relations: {
+            materia: true,
+            recuperacion: true,
+        },
+    });
+    const materias = [];
+    notas.forEach((nota) => {
+        if (!materias.find((materia) => materia.id === nota.materia.id))
+            materias.push(nota.materia);
+    });
+    //ordernar materias alfabeticamente
+    materias.sort((a, b) => {
+        if (a.nombre < b.nombre) {
+            return -1;
+        }
+        if (a.nombre > b.nombre) {
+            return 1;
+        }
+        return 0;
+    });
+    let currentMomento = 1;
+    notas.forEach((nota) => {
+        if (currentMomento < Number(nota.momento))
+            currentMomento = Number(nota.momento);
+    });
+    console.log(materias);
+    const plantilla = path.join(__dirname, "./assets/boletin.xlsx");
+    const workbook = new exceljs_1.default.Workbook();
+    const document = yield workbook.xlsx.readFile(plantilla);
+    const sheet = document.getWorksheet("boletin");
+    sheet.getCell("K1").value = (0, moment_1.default)().format("DD/MM/YYYY");
+    sheet.getCell("A9").value = `AÑO Y SECCIÓN DE ESTUDIO: ${currentEtapa === null || currentEtapa === void 0 ? void 0 : currentEtapa.anio.anio}- ${currentEtapa === null || currentEtapa === void 0 ? void 0 : currentEtapa.seccione.seccion}`;
+    sheet.getCell("F9").value = `MOMENTO ESCOLAR: ${currentMomento}`;
+    sheet.getCell("K9").value = `AÑO ESCOLAR: ${currentEtapa === null || currentEtapa === void 0 ? void 0 : currentEtapa.anio.periodo.periodo}`;
+    sheet.getCell("A10").value = `CEDULA O IDENTIFICACION: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.dni}`;
+    sheet.getCell("F10").value =
+        `NOMBRES Y APELLIDOS: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}`.toLocaleUpperCase();
+    sheet.getCell("A11").value =
+        `LUGAR DE NACIMIENTO: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.address}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.municipality}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.state}`.toLocaleUpperCase();
+    sheet.getCell("L11").value = `FECHA DE NACIMIENTO: ${(0, moment_1.default)(alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.DateOfBirth).format("DD/MM/YYYY")}`;
+    let currentRow = 14;
+    let promedioMomentoOne = 0;
+    let promedioMomentoTwo = 0;
+    let promedioMomentoThree = 0;
+    for (const materia of materias) {
+        let notaRecuperacionOne = 0;
+        let notaRecuperacionTwo = 0;
+        let notaRecuperacionThree = 0;
+        sheet.getCell(`A${currentRow}`).value = `${materia.nombre}`;
+        const firsNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "1");
+        if ((firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion) &&
+            ((_b = firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion) === null || _b === void 0 ? void 0 : _b.length) > 0 &&
+            (firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion[0].Nota)) {
+            notaRecuperacionOne = Number(firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion[0].Nota);
+        }
+        sheet.getCell(`D${currentRow}`).value = Number(firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota);
+        sheet.getCell(`E${currentRow}`).value = Number(notaRecuperacionOne);
+        const secondNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "2");
+        if ((secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion) &&
+            ((_c = secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion) === null || _c === void 0 ? void 0 : _c.length) > 0 &&
+            (secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion[0].Nota)) {
+            notaRecuperacionTwo = Number(secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion[0].Nota);
+        }
+        sheet.getCell(`F${currentRow}`).value = Number(secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota);
+        sheet.getCell(`G${currentRow}`).value = Number(notaRecuperacionTwo);
+        const thirdNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "3");
+        if ((thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion) &&
+            ((_d = thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion) === null || _d === void 0 ? void 0 : _d.length) > 0 &&
+            (thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion[0].Nota)) {
+            notaRecuperacionThree = Number(thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion[0].Nota);
+        }
+        sheet.getCell(`H${currentRow}`).value = Number(thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota);
+        sheet.getCell(`I${currentRow}`).value = Number(notaRecuperacionThree);
+        const notaOne = 
+        //@ts-ignore
+        notaRecuperacionOne ? notaRecuperacionOne : firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota;
+        promedioMomentoOne += Number(notaOne);
+        const notaTwo = 
+        //@ts-ignore
+        notaRecuperacionTwo > 0 ? notaRecuperacionTwo : secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota;
+        promedioMomentoTwo += Number(notaTwo);
+        const notaThree = 
+        //@ts-ignore
+        notaRecuperacionThree > 0 ? notaRecuperacionThree : thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota;
+        promedioMomentoThree += Number(notaThree);
+        const promedio = ((Number(notaOne) + Number(notaTwo) + Number(notaThree)) /
+            3).toFixed(2);
+        sheet.getCell(`J${currentRow}`).value = Number(promedio);
+        currentRow++;
+    }
+    promedioMomentoOne = Number((promedioMomentoOne / materias.length).toFixed(2));
+    promedioMomentoTwo = Number((promedioMomentoTwo / materias.length).toFixed(2));
+    promedioMomentoThree = Number((promedioMomentoThree / materias.length).toFixed(2));
+    sheet.getCell(`L14`).value = promedioMomentoOne;
+    sheet.getCell(`L15`).value = promedioMomentoTwo;
+    sheet.getCell(`L16`).value = promedioMomentoThree;
+    const promedioFinal = Number(((promedioMomentoOne + promedioMomentoTwo + promedioMomentoThree) /
+        3).toFixed(2));
+    console.log(promedioFinal);
+    sheet.getCell(`L17`).value = promedioFinal;
+    const reponseDialog = yield electron_1.dialog.showSaveDialog({
+        title: "Guardar archivo",
+        //@ts-ignore
+        defaultPath: `${electron_1.app.getPath("documents")}/boletin.xlsx`,
+        filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
+    });
+    if (reponseDialog.canceled)
+        return "cancelado";
+    const filePath = reponseDialog.filePath;
+    const fileName = path.basename(filePath);
+    yield document.xlsx.writeFile(filePath);
+    return fileName;
 }));
 //# sourceMappingURL=electron.js.map

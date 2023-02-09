@@ -19,6 +19,8 @@ import { Documents } from "./config/entitys/documents";
 import { RecuperacionNota } from "./config/entitys/recuperacion_Nota";
 import { Etapas } from "./config/entitys/etapas";
 import { Representante } from "./config/entitys/representante";
+import Excel from "exceljs";
+import moment from "moment";
 let appDataSource: DataSource;
 function createWindow() {
   // Create the browser window.
@@ -543,13 +545,89 @@ ipcMain.handle("INSERT_AREA", async (event, area) => {
 
 ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
   try {
-    await appDataSource.transaction(async (manager) => {
+    return await appDataSource.transaction(async (manager) => {
       const seccion = await manager.getRepository(Seccion).findOne({
         relations: ["anio"],
         where: {
           id: data.seccion,
         },
       });
+      let basicDataId;
+
+      //insert or update representante
+      let existRepresentanteDB = await manager
+        .getRepository(Representante)
+        .findOne({
+          where: {
+            DatosPersonales: {
+              dni: data.representante.dni,
+            },
+          },
+          relations: {
+            DatosPersonales: true,
+          },
+        });
+
+      if (existRepresentanteDB) {
+        try {
+          await manager.getRepository(BasicData).update(
+            { id: existRepresentanteDB.DatosPersonales.id },
+            {
+              dni: data.representante.dni,
+              firstName: data.representante.firstName,
+              secondName: data.representante.secondName,
+              Surname: data.representante.surname,
+              secondSurname: data.representante.secondSurname,
+              email: data.representante.email,
+              Phone: data.representante.phone,
+              address: data.representante.address,
+              state: data.representante.state,
+              municipality: data.representante.municipality,
+            }
+          );
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+      } else {
+        const basicDataTwoDB = manager.getRepository(BasicData).create();
+        basicDataTwoDB.firstName = data.representante.firsName;
+        basicDataTwoDB.secondName = data.representante.secondName;
+        basicDataTwoDB.Surname = data.representante.surname;
+        basicDataTwoDB.secondSurname = data.representante.secondSurname;
+        basicDataTwoDB.email = data.representante.email;
+        basicDataTwoDB.dni = data.representante.dni;
+        basicDataTwoDB.Phone = data.representante.phone;
+        basicDataTwoDB.address = data.representante.address;
+        basicDataTwoDB.state = data.representante.state;
+        basicDataTwoDB.municipality = data.representante.municipality;
+
+        try {
+          basicDataId = await manager
+            .getRepository(BasicData)
+            .save(basicDataTwoDB);
+          //@ts-ignore
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+
+        const representanteDB = manager.getRepository(Representante).create();
+        representanteDB.DatosPersonales = basicDataId;
+        representanteDB.parentesco = data.representante.filiacion;
+
+        try {
+          existRepresentanteDB = await manager
+            .getRepository(Representante)
+            .save(representanteDB);
+        } catch (error) {
+          console.log(error);
+
+          throw new Error("No se pudo registrar el alumno");
+        }
+      }
+
+      console.log("representante", data.representante);
 
       const documentsDB = manager.getRepository(Documents).create();
       documentsDB.cedula = Boolean(data.alumno.cedula);
@@ -583,7 +661,6 @@ ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
       basicDataDB.DateOfBirth = data.alumno.fechaNacimiento;
       basicDataDB.Documents = documentsId;
 
-      let basicDataId;
       try {
         basicDataId = await manager.getRepository(BasicData).save(basicDataDB);
         //@ts-ignore
@@ -597,6 +674,7 @@ ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
       alumnoDB.condicion = data.alumno.condicion;
       alumnoDB.grupoEstable = data.alumno.grupoEstable;
       alumnoDB.DatosPersonales = basicDataId;
+      alumnoDB.representante = existRepresentanteDB;
 
       try {
         await manager.getRepository(Alumno).save(alumnoDB);
@@ -613,42 +691,6 @@ ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
 
       try {
         await manager.getRepository(Etapas).save(etapasDB);
-        //@ts-ignore
-      } catch (error) {
-        console.log(error);
-
-        throw new Error("No se pudo registrar el alumno");
-      }
-
-      const basicDataTwoDB = manager.getRepository(BasicData).create();
-      basicDataTwoDB.firstName = data.representante.firsName;
-      basicDataTwoDB.secondName = data.representante.secondName;
-      basicDataTwoDB.Surname = data.representante.surname;
-      basicDataTwoDB.secondSurname = data.representante.secondSurname;
-      basicDataTwoDB.email = data.representante.email;
-      basicDataTwoDB.dni = data.representante.dni;
-      basicDataTwoDB.Phone = data.representante.phone;
-      basicDataTwoDB.address = data.representante.address;
-      basicDataTwoDB.state = data.representante.state;
-      basicDataTwoDB.municipality = data.representante.municipality;
-
-      try {
-        basicDataId = await manager
-          .getRepository(BasicData)
-          .save(basicDataTwoDB);
-        //@ts-ignore
-      } catch (error) {
-        console.log(error);
-        throw new Error("No se pudo registrar el alumno");
-      }
-
-      const representanteDB = manager.getRepository(Representante).create();
-      representanteDB.DatosPersonales = basicDataId;
-      representanteDB.alumno = [alumnoDB];
-      representanteDB.parentesco = data.representante.filiacion;
-
-      try {
-        await manager.getRepository(Representante).save(representanteDB);
         //@ts-ignore
         new Notification({
           title: "Sistema De Notas",
@@ -1024,4 +1066,250 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+ipcMain.handle("GET_ALUMNO_BY_DNI", async (event, data) => {
+  try {
+    const alumno = await Alumno.findOne({
+      where: {
+        DatosPersonales: {
+          dni: data,
+        },
+      },
+    });
+
+    if (!alumno) return false;
+
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+ipcMain.handle("GET_REPRESENTANTE_BY_DNI", async (event, data) => {
+  try {
+    const representante = await Representante.findOne({
+      where: {
+        DatosPersonales: {
+          dni: data,
+        },
+      },
+      relations: {
+        DatosPersonales: true,
+      },
+    });
+
+    if (!representante) return false;
+
+    return representante;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
+  console.log(data);
+
+  const alumno = await Alumno.findOne({
+    where: {
+      id: data.alumnoId,
+    },
+    relations: {
+      DatosPersonales: true,
+      Etapas: {
+        anio: {
+          periodo: true,
+        },
+        seccione: true,
+      },
+    },
+  });
+
+  const currentEtapa = alumno?.Etapas.find(
+    (etapa) => etapa.anio.id === data.anioId
+  );
+
+  console.log("currentEtapa", currentEtapa);
+
+  const notas = await Nota.find({
+    where: {
+      alumno: {
+        id: data.alumnoId,
+      },
+    },
+    relations: {
+      materia: true,
+      recuperacion: true,
+    },
+  });
+
+  const materias: Materia[] = [];
+
+  notas.forEach((nota) => {
+    if (!materias.find((materia) => materia.id === nota.materia.id))
+      materias.push(nota.materia);
+  });
+
+  //ordernar materias alfabeticamente
+  materias.sort((a, b) => {
+    if (a.nombre < b.nombre) {
+      return -1;
+    }
+    if (a.nombre > b.nombre) {
+      return 1;
+    }
+    return 0;
+  });
+
+  let currentMomento = 1;
+
+  notas.forEach((nota) => {
+    if (currentMomento < Number(nota.momento))
+      currentMomento = Number(nota.momento);
+  });
+
+  console.log(materias);
+
+  const plantilla = path.join(__dirname, "./assets/boletin.xlsx");
+  const workbook = new Excel.Workbook();
+  const document = await workbook.xlsx.readFile(plantilla);
+  const sheet = document.getWorksheet("boletin");
+  sheet.getCell("K1").value = moment().format("DD/MM/YYYY");
+  sheet.getCell(
+    "A9"
+  ).value = `AÑO Y SECCIÓN DE ESTUDIO: ${currentEtapa?.anio.anio}- ${currentEtapa?.seccione.seccion}`;
+  sheet.getCell("F9").value = `MOMENTO ESCOLAR: ${currentMomento}`;
+  sheet.getCell(
+    "K9"
+  ).value = `AÑO ESCOLAR: ${currentEtapa?.anio.periodo.periodo}`;
+
+  sheet.getCell(
+    "A10"
+  ).value = `CEDULA O IDENTIFICACION: ${alumno?.DatosPersonales.dni}`;
+  sheet.getCell("F10").value =
+    `NOMBRES Y APELLIDOS: ${alumno?.DatosPersonales.firstName} ${alumno?.DatosPersonales.secondName} ${alumno?.DatosPersonales.Surname} ${alumno?.DatosPersonales.secondSurname}`.toLocaleUpperCase();
+
+  sheet.getCell("A11").value =
+    `LUGAR DE NACIMIENTO: ${alumno?.DatosPersonales.address}, ${alumno?.DatosPersonales.municipality}, ${alumno?.DatosPersonales.state}`.toLocaleUpperCase();
+
+  sheet.getCell("L11").value = `FECHA DE NACIMIENTO: ${moment(
+    alumno?.DatosPersonales.DateOfBirth
+  ).format("DD/MM/YYYY")}`;
+
+  let currentRow = 14;
+  let promedioMomentoOne = 0;
+  let promedioMomentoTwo = 0;
+  let promedioMomentoThree = 0;
+  for (const materia of materias) {
+    let notaRecuperacionOne = 0;
+    let notaRecuperacionTwo = 0;
+    let notaRecuperacionThree = 0;
+
+    sheet.getCell(`A${currentRow}`).value = `${materia.nombre}`;
+    const firsNota = notas.find(
+      (nota) => nota.materia.id === materia.id && nota.momento === "1"
+    );
+    if (
+      firsNota?.recuperacion &&
+      firsNota?.recuperacion?.length > 0 &&
+      firsNota?.recuperacion[0].Nota
+    ) {
+      notaRecuperacionOne = Number(firsNota?.recuperacion[0].Nota);
+    }
+
+    sheet.getCell(`D${currentRow}`).value = Number(firsNota?.nota);
+    sheet.getCell(`E${currentRow}`).value = Number(notaRecuperacionOne);
+    const secondNota = notas.find(
+      (nota) => nota.materia.id === materia.id && nota.momento === "2"
+    );
+
+    if (
+      secondNota?.recuperacion &&
+      secondNota?.recuperacion?.length > 0 &&
+      secondNota?.recuperacion[0].Nota
+    ) {
+      notaRecuperacionTwo = Number(secondNota?.recuperacion[0].Nota);
+    }
+
+    sheet.getCell(`F${currentRow}`).value = Number(secondNota?.nota);
+    sheet.getCell(`G${currentRow}`).value = Number(notaRecuperacionTwo);
+    const thirdNota = notas.find(
+      (nota) => nota.materia.id === materia.id && nota.momento === "3"
+    );
+
+    if (
+      thirdNota?.recuperacion &&
+      thirdNota?.recuperacion?.length > 0 &&
+      thirdNota?.recuperacion[0].Nota
+    ) {
+      notaRecuperacionThree = Number(thirdNota?.recuperacion[0].Nota);
+    }
+    sheet.getCell(`H${currentRow}`).value = Number(thirdNota?.nota);
+    sheet.getCell(`I${currentRow}`).value = Number(notaRecuperacionThree);
+
+    const notaOne =
+      //@ts-ignore
+      notaRecuperacionOne ? notaRecuperacionOne : firsNota?.nota;
+
+    promedioMomentoOne += Number(notaOne);
+
+    const notaTwo =
+      //@ts-ignore
+      notaRecuperacionTwo > 0 ? notaRecuperacionTwo : secondNota?.nota;
+
+    promedioMomentoTwo += Number(notaTwo);
+    const notaThree =
+      //@ts-ignore
+      notaRecuperacionThree > 0 ? notaRecuperacionThree : thirdNota?.nota;
+
+    promedioMomentoThree += Number(notaThree);
+
+    const promedio = (
+      (Number(notaOne) + Number(notaTwo) + Number(notaThree)) /
+      3
+    ).toFixed(2);
+
+    sheet.getCell(`J${currentRow}`).value = Number(promedio);
+
+    currentRow++;
+  }
+
+  promedioMomentoOne = Number(
+    (promedioMomentoOne / materias.length).toFixed(2)
+  );
+  promedioMomentoTwo = Number(
+    (promedioMomentoTwo / materias.length).toFixed(2)
+  );
+  promedioMomentoThree = Number(
+    (promedioMomentoThree / materias.length).toFixed(2)
+  );
+
+  sheet.getCell(`L14`).value = promedioMomentoOne;
+  sheet.getCell(`L15`).value = promedioMomentoTwo;
+  sheet.getCell(`L16`).value = promedioMomentoThree;
+
+  const promedioFinal = Number(
+    (
+      (promedioMomentoOne + promedioMomentoTwo + promedioMomentoThree) /
+      3
+    ).toFixed(2)
+  );
+  console.log(promedioFinal);
+
+  sheet.getCell(`L17`).value = promedioFinal;
+
+  const reponseDialog = await dialog.showSaveDialog({
+    title: "Guardar archivo",
+    //@ts-ignore
+    defaultPath: `${app.getPath("documents")}/boletin.xlsx`,
+    filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
+  });
+  if (reponseDialog.canceled) return "cancelado";
+
+  const filePath = reponseDialog.filePath;
+  const fileName = path.basename(filePath as string);
+
+  await document.xlsx.writeFile(filePath as string);
+
+  return fileName;
 });

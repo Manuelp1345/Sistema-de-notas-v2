@@ -94,6 +94,18 @@ const gradeAlumnos = async (data) => {
   return await ipcRenderer.invoke("GRADE_ALUMNOS", data);
 };
 
+const getAlumnoByDni = async (data) => {
+  return await ipcRenderer.invoke("GET_ALUMNO_BY_DNI", data);
+};
+
+const getRepresentanteByDni = async (data) => {
+  return await ipcRenderer.invoke("GET_REPRESENTANTE_BY_DNI", data);
+};
+
+const generarBoletin = async (data) => {
+  return await ipcRenderer.invoke("GENERAR_BOLETIN", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -117,6 +129,9 @@ const API = {
   setNota,
   getNotas,
   gradeAlumnos,
+  getAlumnoByDni,
+  getRepresentanteByDni,
+  generarBoletin,
 };
 
 contextBridge.exposeInMainWorld("API", API);

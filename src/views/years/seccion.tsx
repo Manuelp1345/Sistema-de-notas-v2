@@ -20,13 +20,38 @@ import {
   Stepper,
   TextField,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Label } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { CircularProgress } from "@mui/material";
 import moment from "moment";
 import { TableCustom } from "../table/TableCustom";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import { Etapas } from "../../config/entitys/etapas";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
+interface AlumnoData {
+  firsName: string;
+  SecondName: string;
+  surname: string;
+  secondSurname: string;
+  dni: string;
+  address: string;
+  municipality: string;
+  state: string;
+  cedula: boolean;
+  pasaporte: boolean;
+  partidaDeNacimiento: boolean;
+  fotos: boolean;
+  notasEscolares: boolean;
+  observacion: string;
+  condicion: string;
+  grupoEstable: string;
+  fechaNacimiento: null | Date;
+  phone: number;
+  sexo: string;
+  email: string;
+}
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -49,6 +74,7 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
+  zIndex: 1,
 };
 
 const steps = [
@@ -62,12 +88,44 @@ const Seccion = () => {
   const [anio, setAnio] = useState({});
   const [secciones, setSecciones] = useState({ seccion: "loading", id: 0 });
   const [activeStep, setActiveStep] = React.useState(0);
+  const [existAlumno, setExistAlumno] = useState(false);
+  const [inserAlumno, setInserAlumno] = useState(false);
+  const [errorDataAlumno, setErrorDataAlumno] = useState({
+    dni: false,
+    firstName: false,
+    SecondName: false,
+    surname: false,
+    secondSurname: false,
+    address: false,
+    municipality: false,
+    state: false,
+    phone: false,
+    email: false,
+    sexo: false,
+    fechaNacimiento: false,
+    grupoEstable: false,
+    condicion: false,
+  });
+  const [errorDataRepresentante, setErrorDataRepresentante] = useState({
+    dni: false,
+    firstName: false,
+    SecondName: false,
+    surname: false,
+    secondSurname: false,
+    address: false,
+    municipality: false,
+    state: false,
+    phone: false,
+    email: false,
+    filiacion: false,
+  });
+
   const [skipped, setSkipped] = useState(new Set());
   //  @ts-ignore
   const [alumnos, setAlumnos] = useState([{ id: 0 } as Etapas]);
   const { areas, alumno } = useContext(GlobalContext);
 
-  const [datosAlumno, setDatosAlumno] = useState({
+  const [datosAlumno, setDatosAlumno] = useState<AlumnoData>({
     firsName: "",
     SecondName: "",
     surname: "",
@@ -84,11 +142,12 @@ const Seccion = () => {
     observacion: "",
     condicion: "",
     grupoEstable: "",
-    fechaNacimiento: new Date(),
-    phone: 0,
-    sexo: "",
+    fechaNacimiento: null,
+    phone: Number(0),
+    sexo: "select",
     email: "",
   });
+
   const [datosRepresetante, setDatosRepresetante] = useState({
     firstName: "",
     secondName: "",
@@ -117,6 +176,62 @@ const Seccion = () => {
     });
   };
 
+  const handleChangeSexo = (event) => {
+    setDatosAlumno({
+      ...datosAlumno,
+      //@ts-ignore
+      sexo: event.target.value,
+    });
+    setErrorDataAlumno({
+      ...errorDataAlumno,
+      sexo: false,
+    });
+  };
+
+  const validateDniAlumno = async (dni: string) => {
+    //@ts-ignore
+    const response = await window.API.getAlumnoByDni(dni);
+
+    setExistAlumno(response);
+
+    return response;
+  };
+
+  const validateRepresentanteDNI = async (dni: string) => {
+    //@ts-ignore
+    const response = await window.API.getRepresentanteByDni(dni);
+
+    if (response) {
+      Swal.fire({
+        title: "El Rrepresentante ya existe",
+        text: "Desea cargar los datos del representante?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setDatosRepresetante({
+            ...datosRepresetante,
+            address: response.DatosPersonales.address,
+            email: response.DatosPersonales.email,
+            firstName: response.DatosPersonales.firstName,
+            municipality: response.DatosPersonales.municipality,
+            phone: response.DatosPersonales.Phone,
+            surname: response.DatosPersonales.Surname,
+            secondName: response.DatosPersonales.secondName,
+            secondSurname: response.DatosPersonales.secondSurname,
+            state: response.DatosPersonales.state,
+            filiacion: response.parentesco,
+          });
+        }
+      });
+    }
+
+    console.log(response);
+  };
+
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
@@ -134,7 +249,182 @@ const Seccion = () => {
     const findAlumnos = await getAlumno(secciones.id);
     console.log(findAlumnos);
 
+    console.log("response inser alumno", response);
+
+    if (response === true) {
+      setInserAlumno(response);
+    } else {
+      setInserAlumno(false);
+    }
+
     return response;
+  };
+
+  const validateFirstStep = () => {
+    if (activeStep === 0) {
+      console.log(errorDataAlumno);
+
+      if (datosAlumno.firsName === "") {
+        console.log(errorDataAlumno);
+        setErrorDataAlumno({ ...errorDataAlumno, firstName: true });
+        return false;
+      }
+
+      if (datosAlumno.SecondName === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, SecondName: true });
+        return false;
+      }
+
+      if (datosAlumno.surname === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, surname: true });
+        return false;
+      }
+
+      if (datosAlumno.dni === "" || existAlumno) {
+        setErrorDataAlumno({ ...errorDataAlumno, dni: true });
+        return false;
+      }
+
+      if (datosAlumno.address === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, address: true });
+        return false;
+      }
+
+      if (datosAlumno.municipality === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, municipality: true });
+        return false;
+      }
+
+      if (datosAlumno.state === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, state: true });
+        return false;
+      }
+
+      if (datosAlumno.phone === 0 || datosAlumno.phone.toString().length < 10) {
+        setErrorDataAlumno({ ...errorDataAlumno, phone: true });
+        return false;
+      }
+
+      if (datosAlumno.sexo === "select") {
+        setErrorDataAlumno({ ...errorDataAlumno, sexo: true });
+        return false;
+      }
+      if (
+        datosAlumno.email === "" ||
+        !datosAlumno.email.includes("@") ||
+        !datosAlumno.email.includes(".com")
+      ) {
+        setErrorDataAlumno({ ...errorDataAlumno, email: true });
+        return false;
+      }
+
+      if (
+        datosAlumno.fechaNacimiento === null ||
+        moment(datosAlumno.fechaNacimiento).toDate() === moment().toDate()
+      ) {
+        console.log(datosAlumno.fechaNacimiento);
+        setErrorDataAlumno({ ...errorDataAlumno, fechaNacimiento: true });
+        return false;
+      }
+
+      return true;
+    }
+    if (activeStep === 1) {
+      console.log(errorDataRepresentante);
+
+      if (datosRepresetante.dni === "") {
+        setErrorDataRepresentante({ ...errorDataRepresentante, dni: true });
+        return false;
+      }
+
+      if (datosRepresetante.firstName === "") {
+        console.log(errorDataAlumno);
+        setErrorDataRepresentante({
+          ...errorDataRepresentante,
+          firstName: true,
+        });
+        return false;
+      }
+
+      if (datosRepresetante.secondName === "") {
+        setErrorDataRepresentante({
+          ...errorDataRepresentante,
+          SecondName: true,
+        });
+        return false;
+      }
+
+      if (datosRepresetante.surname === "") {
+        setErrorDataRepresentante({ ...errorDataRepresentante, surname: true });
+        return false;
+      }
+
+      if (datosRepresetante.filiacion === "") {
+        setErrorDataRepresentante({
+          ...errorDataRepresentante,
+          filiacion: true,
+        });
+        return false;
+      }
+
+      if (
+        datosRepresetante.phone === 0 ||
+        datosRepresetante.phone.toString().length < 10
+      ) {
+        setErrorDataRepresentante({ ...errorDataRepresentante, phone: true });
+        return false;
+      }
+
+      if (
+        datosRepresetante.email === "" ||
+        !datosRepresetante.email.includes("@") ||
+        !datosRepresetante.email.includes(".com")
+      ) {
+        setErrorDataRepresentante({ ...errorDataRepresentante, email: true });
+        return false;
+      }
+
+      if (!datosRepresetante.alumnoAddress) {
+        if (datosRepresetante.address === "") {
+          setErrorDataRepresentante({
+            ...errorDataRepresentante,
+            address: true,
+          });
+          return false;
+        }
+
+        if (datosRepresetante.municipality === "") {
+          setErrorDataRepresentante({
+            ...errorDataRepresentante,
+            municipality: true,
+          });
+          return false;
+        }
+
+        if (datosRepresetante.state === "") {
+          setErrorDataRepresentante({ ...errorDataRepresentante, state: true });
+          return false;
+        }
+      }
+
+      return true;
+    }
+    if (activeStep === 2) {
+      console.log(errorDataAlumno);
+
+      if (datosAlumno.grupoEstable === "") {
+        console.log(errorDataAlumno);
+        setErrorDataAlumno({ ...errorDataAlumno, grupoEstable: true });
+        return false;
+      }
+
+      if (datosAlumno.condicion === "") {
+        setErrorDataAlumno({ ...errorDataAlumno, condicion: true });
+        return false;
+      }
+
+      return true;
+    }
   };
 
   const handleNext = async () => {
@@ -150,13 +440,6 @@ const Seccion = () => {
 
     if (newActive === 2) {
       if (datosRepresetante.alumnoAddress === true) {
-        console.log("misma dirrecion");
-        setDatosRepresetante({
-          ...datosRepresetante,
-          address: datosAlumno.address,
-          municipality: datosAlumno.municipality,
-          state: datosAlumno.state,
-        });
         setDatosAlumno({
           ...datosAlumno,
           fechaNacimiento: moment(datosAlumno.fechaNacimiento).toDate(),
@@ -392,7 +675,7 @@ const Seccion = () => {
                 if (index === 2) {
                   //@ts-ignore
                   labelProps.optional = (
-                    <Typography variant="caption">Paso Tre</Typography>
+                    <Typography variant="caption">Paso Tres</Typography>
                   );
                 }
                 if (isStepSkipped(index)) {
@@ -421,10 +704,44 @@ const Seccion = () => {
                   </Box>
                 ) : (
                   <>
-                    {" "}
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      All steps completed - you&apos;re finished
-                    </Typography>
+                    {/*interfaz para mostrar que se ingreso correctamente los datos del alumno  */}
+                    <Box
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {inserAlumno ? (
+                        <>
+                          <CheckCircleOutlineIcon
+                            sx={{
+                              fontSize: "5rem",
+                              color: "#4caf50",
+                              my: "5rem",
+                            }}
+                          />
+                          <Typography sx={{ mt: 2, mb: 1 }}>
+                            Alumno Ingresado Correctamente
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <ErrorOutlineIcon
+                            sx={{
+                              fontSize: "5rem",
+                              color: "#f44336",
+                              my: "5rem",
+                            }}
+                          />
+                          <Typography sx={{ mt: 2, mb: 1 }}>
+                            Error al Ingresar Alumno
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+
                     <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <Box sx={{ flex: "1 1 auto" }} />
                       <Button onClick={handleReset}>
@@ -473,34 +790,61 @@ const Seccion = () => {
                         >
                           <TextField
                             value={datosAlumno.firsName}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 firsName: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                firstName: false,
+                              });
+                            }}
                             label="Primer Nombre"
                             variant="standard"
+                            error={errorDataAlumno.firstName}
+                            helperText={
+                              errorDataAlumno.firstName &&
+                              'El campo "Primer Nombre" es obligatorio'
+                            }
                           />
                           <TextField
                             value={datosAlumno.SecondName}
-                            onChange={(e) =>
+                            error={errorDataAlumno.SecondName}
+                            helperText={
+                              errorDataAlumno.SecondName &&
+                              'El campo "Segundo Nombre" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 SecondName: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                SecondName: false,
+                              });
+                            }}
                             label="Segundo Nombre"
                             variant="standard"
                           />
                           <TextField
                             value={datosAlumno.surname}
-                            onChange={(e) =>
+                            error={errorDataAlumno.surname}
+                            helperText={
+                              errorDataAlumno.surname &&
+                              'El campo "Primer Apellido" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 surname: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                surname: false,
+                              });
+                            }}
                             label="Primer Apellido"
                             variant="standard"
                           />
@@ -525,45 +869,90 @@ const Seccion = () => {
                         >
                           <TextField
                             value={datosAlumno.dni}
-                            onChange={(e) =>
+                            error={errorDataAlumno.dni}
+                            helperText={
+                              errorDataAlumno.dni &&
+                              "El Numero ya existe / no es valido"
+                            }
+                            onChange={async (e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 dni: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                dni: false,
+                              });
+                            }}
+                            onKeyUp={async () => {
+                              const response = await validateDniAlumno(
+                                datosAlumno.dni
+                              );
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                dni: response,
+                              });
+                            }}
                             label="Cedula /Pasaporte /Cedula Escolar"
                             variant="standard"
                           />
                           <TextField
                             value={datosAlumno.address}
-                            onChange={(e) =>
+                            error={errorDataAlumno.address}
+                            helperText={
+                              errorDataAlumno.address &&
+                              'El campo "Direccion" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 address: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                address: false,
+                              });
+                            }}
                             label="Direccion"
                             variant="standard"
                           />
                           <TextField
                             value={datosAlumno.municipality}
-                            onChange={(e) =>
+                            error={errorDataAlumno.municipality}
+                            helperText={
+                              errorDataAlumno.municipality &&
+                              'El campo "Municipio" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 municipality: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                municipality: false,
+                              });
+                            }}
                             label="Municipio"
                             variant="standard"
                           />
                           <TextField
                             value={datosAlumno.state}
-                            onChange={(e) =>
+                            error={errorDataAlumno.state}
+                            helperText={
+                              errorDataAlumno.state &&
+                              'El campo "Estado" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 state: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                state: false,
+                              });
+                            }}
                             label="Estado"
                             variant="standard"
                           />
@@ -577,56 +966,97 @@ const Seccion = () => {
                         >
                           <TextField
                             value={datosAlumno.email}
-                            onChange={(e) =>
+                            error={errorDataAlumno.email}
+                            helperText={
+                              errorDataAlumno.email &&
+                              'El campo "Correo" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 email: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                email: false,
+                              });
+                            }}
                             label="Correo"
                             variant="standard"
                           />
                           <TextField
-                            value={datosAlumno.phone}
-                            onChange={(e) =>
+                            value={Number(datosAlumno.phone)}
+                            error={errorDataAlumno.phone}
+                            helperText={
+                              errorDataAlumno.phone &&
+                              'El campo "Telefono" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
-                                phone: parseInt(e.target.value),
-                              })
-                            }
+                                phone: Number(e.target.value),
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                phone: false,
+                              });
+                            }}
                             label="Telefono"
                             variant="standard"
                           />
 
-                          <Input
-                            type="Date"
-                            onBlur={(e) => {
-                              //@ts-ignore
-
-                              console.log(e.target.value);
-                              setDatosAlumno({
-                                ...datosAlumno,
+                          <FormControl>
+                            <Typography sx={{ color: "gray" }}>
+                              Fechan de nacimiento
+                            </Typography>
+                            <Input
+                              type="Date"
+                              error={errorDataAlumno.fechaNacimiento}
+                              onBlur={(e) => {
                                 //@ts-ignore
-                                fechaNacimiento:
-                                  //@ts-ignore
-                                  e.target.value,
-                              });
-                              console.log(datosAlumno);
-                            }}
-                            onChangeCapture={(e) => {
-                              //@ts-ignore
 
-                              console.log(e.target.value);
-                              setDatosAlumno({
-                                ...datosAlumno,
-                                //@ts-ignore
-                                fechaNacimiento:
+                                console.log(e.target.value);
+                                setDatosAlumno({
+                                  ...datosAlumno,
                                   //@ts-ignore
-                                  e.target.value,
-                              });
-                              console.log(datosAlumno);
-                            }}
-                          />
+                                  fechaNacimiento:
+                                    //@ts-ignore
+                                    e.target.value,
+                                });
+                                setErrorDataAlumno({
+                                  ...errorDataAlumno,
+                                  fechaNacimiento: false,
+                                });
+                                console.log(datosAlumno);
+                              }}
+                              onChangeCapture={(e) => {
+                                //@ts-ignore
+
+                                console.log(e.target.value);
+                                setDatosAlumno({
+                                  ...datosAlumno,
+                                  //@ts-ignore
+                                  fechaNacimiento:
+                                    //@ts-ignore
+                                    e.target.value,
+                                });
+                                setErrorDataAlumno({
+                                  ...errorDataAlumno,
+                                  fechaNacimiento: false,
+                                });
+                                console.log(datosAlumno);
+                              }}
+                            />
+                            {errorDataAlumno.fechaNacimiento && (
+                              <Typography
+                                sx={{ color: "red", fontSize: ".9rem" }}
+                              >
+                                {'El campo "Fechan de nacimiento"'} <br />{" "}
+                                {" es obligatorio"}
+                              </Typography>
+                            )}
+                          </FormControl>
+
                           <FormControl>
                             <InputLabel id="demo-simple-select-label">
                               Sexo
@@ -634,14 +1064,23 @@ const Seccion = () => {
                             <Select
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"
-                              value={"M"}
+                              value={datosAlumno.sexo}
                               label="Condicion"
-
-                              /*           onChange={handleChange} */
+                              onChange={handleChangeSexo}
                             >
+                              <MenuItem disabled value={"select"}>
+                                Sexo
+                              </MenuItem>
                               <MenuItem value={"F"}>Femenino</MenuItem>
                               <MenuItem value={"M"}>Masculino</MenuItem>
                             </Select>
+                            {errorDataAlumno.sexo && (
+                              <Typography
+                                sx={{ color: "red", fontSize: ".9rem" }}
+                              >
+                                {'El campo "Sexo"'} <br /> {" es obligatorio"}
+                              </Typography>
+                            )}
                           </FormControl>
                         </Box>
                       </Box>
@@ -674,38 +1113,98 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
+                            value={datosRepresetante.dni}
+                            error={errorDataRepresentante.dni}
+                            helperText={
+                              errorDataRepresentante.dni &&
+                              'El campo "Cedula / Pasaporte" es obligatorio'
+                            }
+                            onChange={(e) => {
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                dni: e.target.value,
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                dni: false,
+                              });
+                            }}
+                            onKeyUp={() =>
+                              validateRepresentanteDNI(datosRepresetante.dni)
+                            }
+                            label="Cedula / Pasaporte"
+                            variant="standard"
+                          />
+                          <TextField
                             value={datosRepresetante.firstName}
-                            onChange={(e) =>
+                            error={errorDataRepresentante.firstName}
+                            helperText={
+                              errorDataRepresentante.firstName &&
+                              'El campo "Primer Nombre" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore
                                 firstName: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                firstName: false,
+                              });
+                            }}
                             label="Primer Nombre"
                             variant="standard"
                           />
                           <TextField
                             value={datosRepresetante.secondName}
-                            onChange={(e) =>
+                            error={errorDataRepresentante.SecondName}
+                            helperText={
+                              errorDataRepresentante.SecondName &&
+                              'El campo "Segundo Nombre" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore
                                 secondName: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                SecondName: false,
+                              });
+                            }}
                             label="Segundo Nombre"
                             variant="standard"
                           />
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "1rem",
+                            width: "100%",
+                          }}
+                        >
                           <TextField
                             value={datosRepresetante.surname}
-                            onChange={(e) =>
+                            error={errorDataRepresentante.surname}
+                            helperText={
+                              errorDataRepresentante.surname &&
+                              'El campo "Primer Apellido" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore
                                 surname: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                surname: false,
+                              });
+                            }}
                             label="Primer Apellido"
                             variant="standard"
                           />
@@ -721,6 +1220,27 @@ const Seccion = () => {
                             label="Segundo Apellido"
                             variant="standard"
                           />
+                          <TextField
+                            value={datosRepresetante.filiacion}
+                            error={errorDataRepresentante.filiacion}
+                            helperText={
+                              errorDataRepresentante.filiacion &&
+                              'El campo "Filiación" es obligatorio'
+                            }
+                            onChange={(e) => {
+                              setDatosRepresetante({
+                                ...datosRepresetante,
+                                //@ts-ignore
+                                filiacion: e.target.value,
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                filiacion: false,
+                              });
+                            }}
+                            label="Filiación"
+                            variant="standard"
+                          />
                         </Box>
                         <Box
                           sx={{
@@ -731,27 +1251,45 @@ const Seccion = () => {
                           }}
                         >
                           <TextField
-                            value={datosRepresetante.filiacion}
-                            onChange={(e) =>
+                            value={datosRepresetante.phone}
+                            error={errorDataRepresentante.phone}
+                            helperText={
+                              errorDataRepresentante.phone &&
+                              'El campo "Telefono" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore
-                                filiacion: e.target.value,
-                              })
-                            }
-                            label="Filiación"
+                                phone: e.target.value,
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                phone: false,
+                              });
+                            }}
+                            label="Telefono"
                             variant="standard"
                           />
                           <TextField
-                            value={datosRepresetante.dni}
-                            onChange={(e) =>
+                            value={datosRepresetante.email}
+                            error={errorDataRepresentante.email}
+                            helperText={
+                              errorDataRepresentante.email &&
+                              'El campo "Email" es obligatorio'
+                            }
+                            onChange={(e) => {
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore
-                                dni: e.target.value,
-                              })
-                            }
-                            label="Cedula / Pasaporte"
+                                email: e.target.value,
+                              });
+                              setErrorDataRepresentante({
+                                ...errorDataRepresentante,
+                                email: false,
+                              });
+                            }}
+                            label="Email"
                             variant="standard"
                           />
                         </Box>
@@ -783,6 +1321,9 @@ const Seccion = () => {
                                   ...datosRepresetante,
                                   //@ts-ignore
                                   alumnoAddress: e.target.checked,
+                                  address: datosAlumno.address,
+                                  municipality: datosAlumno.municipality,
+                                  state: datosAlumno.state,
                                 })
                               }
                             />
@@ -791,37 +1332,64 @@ const Seccion = () => {
                             <>
                               <TextField
                                 value={datosRepresetante.address}
-                                onChange={(e) =>
+                                error={errorDataRepresentante.address}
+                                helperText={
+                                  errorDataRepresentante.address &&
+                                  'El campo "Direccion" es obligatorio'
+                                }
+                                onChange={(e) => {
                                   setDatosRepresetante({
                                     ...datosRepresetante,
                                     //@ts-ignore
                                     address: e.target.value,
-                                  })
-                                }
+                                  });
+                                  setErrorDataRepresentante({
+                                    ...errorDataRepresentante,
+                                    address: false,
+                                  });
+                                }}
                                 label="Direccion"
                                 variant="standard"
                               />
                               <TextField
                                 value={datosRepresetante.municipality}
-                                onChange={(e) =>
+                                error={errorDataRepresentante.municipality}
+                                helperText={
+                                  errorDataRepresentante.municipality &&
+                                  'El campo "Municipio" es obligatorio'
+                                }
+                                onChange={(e) => {
                                   setDatosRepresetante({
                                     ...datosRepresetante,
                                     //@ts-ignore
                                     municipality: e.target.value,
-                                  })
-                                }
+                                  });
+                                  setErrorDataRepresentante({
+                                    ...errorDataRepresentante,
+                                    municipality: false,
+                                  });
+                                }}
                                 label="Municipio"
                                 variant="standard"
                               />
                               <TextField
                                 value={datosRepresetante.state}
-                                onChange={(e) =>
+                                error={errorDataRepresentante.state}
+                                helperText={
+                                  errorDataRepresentante.state &&
+                                  'El campo "Estado" es obligatorio'
+                                }
+                                onChange={(e) => {
                                   setDatosRepresetante({
                                     ...datosRepresetante,
                                     //@ts-ignore
                                     state: e.target.value,
-                                  })
-                                }
+                                  });
+                                  setErrorDataRepresentante({
+                                    ...errorDataRepresentante,
+                                    state: false,
+                                  });
+                                }}
                                 label="Estado"
                                 variant="standard"
                               />
@@ -863,20 +1431,30 @@ const Seccion = () => {
                             sx={{ width: "100%" }}
                             label="Grupo Estable"
                             variant="standard"
+                            error={errorDataAlumno.grupoEstable}
+                            helperText={
+                              errorDataAlumno.grupoEstable &&
+                              'El campo "Grupo Estable" es obligatorio'
+                            }
                             value={datosAlumno.grupoEstable}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setDatosAlumno({
                                 ...datosAlumno,
                                 //@ts-ignore
                                 grupoEstable: e.target.value,
-                              })
-                            }
+                              });
+                              setErrorDataAlumno({
+                                ...errorDataAlumno,
+                                grupoEstable: false,
+                              });
+                            }}
                           />
                           <FormControl sx={{ width: "100%" }}>
                             <InputLabel id="demo-simple-select-label">
                               Condicion
                             </InputLabel>
                             <Select
+                              error={errorDataAlumno.condicion}
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"
                               value={datosAlumno.condicion}
@@ -1032,7 +1610,13 @@ const Seccion = () => {
                     </Button>
                   </Box>
 
-                  <Button onClick={handleNext}>
+                  <Button
+                    onClick={() => {
+                      const FirstStep = validateFirstStep();
+                      console.log("FirstStep", FirstStep);
+                      if (FirstStep) handleNext();
+                    }}
+                  >
                     {activeStep === steps.length - 1
                       ? "Registrar Datos"
                       : "Siguiente"}

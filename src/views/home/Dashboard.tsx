@@ -20,7 +20,7 @@ import DateRangeIcon from "@mui/icons-material/DateRange";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Home from "./Home";
-import { House } from "@mui/icons-material";
+import { House, SearchOffOutlined, SearchOutlined } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import SetupYear from "../years/SetupYear";
 import Year from "../years/Year";
@@ -28,6 +28,7 @@ import Seccion from "../years/seccion";
 import Alumno from "../years/alumno";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import { Tooltip } from "@mui/material";
+import "../../index.css";
 
 const drawerWidth = 240;
 
@@ -193,7 +194,7 @@ export default function Dashboard({ element }: { element: string }) {
           {[
             "Inicio",
             "Años",
-            "Estadísticas",
+            "Buscar",
             "Administración",
             "Perfil",
             "Salir",
@@ -204,7 +205,7 @@ export default function Dashboard({ element }: { element: string }) {
                 (element === "home" && index === 0) ||
                 (element === "anos" && index === 1) ||
                 (element === "perfil" && index === 4) ||
-                (element === "stats" && index === 2) ||
+                (element === "search" && index === 2) ||
                 (element === "admin" && index === 3)
               }
               //@ts-ignore
@@ -216,7 +217,7 @@ export default function Dashboard({ element }: { element: string }) {
                 (index === 1 && navigate("/anos")) ||
                 //@ts-ignore
 
-                (index === 2 && navigate("/stats")) ||
+                (index === 2 && navigate("/search")) ||
                 //@ts-ignore
 
                 (index === 3 && navigate("/admin")) ||
@@ -239,8 +240,8 @@ export default function Dashboard({ element }: { element: string }) {
                   </Tooltip>
                 )}
                 {index === 2 && (
-                  <Tooltip title={`Estadísticas`} arrow placement="right">
-                    <InsertChartOutlinedIcon />
+                  <Tooltip title={`Buscador`} arrow placement="right">
+                    <SearchOutlined />
                   </Tooltip>
                 )}
                 {index === 3 && (

@@ -49,6 +49,7 @@ const Alumno = (): JSX.Element => {
     setOpenDatosRepresentante(false);
   };
 
+  const [currentYear, setCurrentYear] = React.useState(0);
   const { areas, alumno } = useContext(GlobalContext);
   const { alumno: alumnoDb } = alumno.alumnoId;
   const { representante } = alumnoDb;
@@ -127,6 +128,7 @@ const Alumno = (): JSX.Element => {
     // @ts-ignore
     const anio = await window.API.getAnio(id);
     console.log(anio);
+    setCurrentYear(anio.id);
     // @ts-ignore
     const findSecciones = await getSecciones(anio.id);
     console.log(findSecciones);
@@ -202,6 +204,23 @@ const Alumno = (): JSX.Element => {
 
     // @ts-ignore
     return { data: findAreas, itemsCount: 0 };
+  };
+
+  const generarBoletin = async () => {
+    // @ts-ignore
+    const res = await window.API.generarBoletin({
+      alumnoId: alumno.alumnoId.alumno.id,
+      anioId: currentYear,
+    });
+    console.log(res);
+    if (res) {
+      Swal.fire({
+        title: "Boletin generado",
+        text: "El boletin se ha generado correctamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+      });
+    }
   };
 
   useEffect(() => {
@@ -289,6 +308,9 @@ const Alumno = (): JSX.Element => {
 
         <Button variant="contained" onClick={handleClickOpenDatosAlumno}>
           Cambiar Seccion / Año
+        </Button>
+        <Button variant="contained" onClick={generarBoletin}>
+          Generar Boletin
         </Button>
       </Box>
 
