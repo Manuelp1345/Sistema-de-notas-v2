@@ -43,7 +43,7 @@
     "@fullcalendar/timegrid": "^5.10.1",
     "@mui/icons-material": "^5.4.4",
     "@mui/material": "^5.10.11",
-    "@mui/x-data-grid": "^5.17.9",
+    "@mui/x-data-grid": "^5.17.23",
     "@mui/x-date-pickers": "^5.0.6",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.3",
