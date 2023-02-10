@@ -51,7 +51,7 @@
     "@types/jest": "^27.4.1",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.13",
-    "chart.js": "^3.9.1",
+    "chart.js": "^4.2.1",
     "electron-is-dev": "^2.0.0",
     "email-validator": "^2.0.4",
     "exceljs": "^4.3.0",
