@@ -65,7 +65,6 @@ const Year_1 = __importDefault(require("../years/Year"));
 const seccion_1 = __importDefault(require("../years/seccion"));
 const alumno_1 = __importDefault(require("../years/alumno"));
 const material_1 = require("@mui/material");
-require("../../index.css");
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
     width: drawerWidth,

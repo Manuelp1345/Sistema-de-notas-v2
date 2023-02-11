@@ -457,7 +457,7 @@ const Seccion = () => {
                     },
                 ], rows: alumnos, loading: false, handleDobleClick: () => {
                     console.log("first");
-                }, handleClick: handleClickRow }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
+                }, handleClick: handleClickRow }), (0, jsx_runtime_1.jsx)(material_1.Modal, Object.assign({ sx: { zIndex: 20 }, open: open, onClose: handleClose, "aria-labelledby": "modal-modal-title", "aria-describedby": "modal-modal-description" }, { children: (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: style }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { width: "100%", height: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.Stepper, Object.assign({ activeStep: activeStep }, { children: steps.map((label, index) => {
                                     const stepProps = {};
                                     const labelProps = {};
                                     if (index === 0) {

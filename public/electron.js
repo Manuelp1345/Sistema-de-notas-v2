@@ -1138,6 +1138,9 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
         let notaRecuperacionOne = 0;
         let notaRecuperacionTwo = 0;
         let notaRecuperacionThree = 0;
+        let notaOne = 0;
+        let notaTwo = 0;
+        let notaThree = 0;
         sheet.getCell(`A${currentRow}`).value = `${materia.nombre}`;
         const firsNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "1");
         if ((firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion) &&
@@ -1145,7 +1148,10 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             (firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion[0].Nota)) {
             notaRecuperacionOne = Number(firsNota === null || firsNota === void 0 ? void 0 : firsNota.recuperacion[0].Nota);
         }
-        sheet.getCell(`D${currentRow}`).value = Number(firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota);
+        if (firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota) {
+            notaOne += Number(firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota);
+        }
+        sheet.getCell(`D${currentRow}`).value = Number(notaOne);
         sheet.getCell(`E${currentRow}`).value = Number(notaRecuperacionOne);
         const secondNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "2");
         if ((secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion) &&
@@ -1153,7 +1159,10 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             (secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion[0].Nota)) {
             notaRecuperacionTwo = Number(secondNota === null || secondNota === void 0 ? void 0 : secondNota.recuperacion[0].Nota);
         }
-        sheet.getCell(`F${currentRow}`).value = Number(secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota);
+        if (secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota) {
+            notaTwo += Number(secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota);
+        }
+        sheet.getCell(`F${currentRow}`).value = Number(notaTwo);
         sheet.getCell(`G${currentRow}`).value = Number(notaRecuperacionTwo);
         const thirdNota = notas.find((nota) => nota.materia.id === materia.id && nota.momento === "3");
         if ((thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion) &&
@@ -1161,21 +1170,26 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             (thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion[0].Nota)) {
             notaRecuperacionThree = Number(thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.recuperacion[0].Nota);
         }
-        sheet.getCell(`H${currentRow}`).value = Number(thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota);
+        if (thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota) {
+            notaThree += Number(thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota);
+        }
+        sheet.getCell(`H${currentRow}`).value = Number(notaThree);
         sheet.getCell(`I${currentRow}`).value = Number(notaRecuperacionThree);
-        const notaOne = 
+        const notaPromedioOne = 
         //@ts-ignore
-        notaRecuperacionOne ? notaRecuperacionOne : firsNota === null || firsNota === void 0 ? void 0 : firsNota.nota;
-        promedioMomentoOne += Number(notaOne);
-        const notaTwo = 
+        notaRecuperacionOne ? notaRecuperacionOne : notaOne;
+        promedioMomentoOne += Number(notaPromedioOne);
+        const notaPromedioTwo = 
         //@ts-ignore
-        notaRecuperacionTwo > 0 ? notaRecuperacionTwo : secondNota === null || secondNota === void 0 ? void 0 : secondNota.nota;
-        promedioMomentoTwo += Number(notaTwo);
-        const notaThree = 
+        notaRecuperacionTwo > 0 ? notaRecuperacionTwo : notaTwo;
+        promedioMomentoTwo += Number(notaPromedioTwo);
+        const notaPromedioThree = 
         //@ts-ignore
-        notaRecuperacionThree > 0 ? notaRecuperacionThree : thirdNota === null || thirdNota === void 0 ? void 0 : thirdNota.nota;
-        promedioMomentoThree += Number(notaThree);
-        const promedio = ((Number(notaOne) + Number(notaTwo) + Number(notaThree)) /
+        notaRecuperacionThree > 0 ? notaRecuperacionThree : notaThree;
+        promedioMomentoThree += Number(notaPromedioThree);
+        const promedio = ((Number(notaPromedioOne) +
+            Number(notaPromedioTwo) +
+            Number(notaPromedioThree)) /
             3).toFixed(2);
         sheet.getCell(`J${currentRow}`).value = Number(promedio);
         currentRow++;

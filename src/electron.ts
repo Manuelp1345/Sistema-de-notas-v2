@@ -1204,6 +1204,9 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
     let notaRecuperacionOne = 0;
     let notaRecuperacionTwo = 0;
     let notaRecuperacionThree = 0;
+    let notaOne = 0;
+    let notaTwo = 0;
+    let notaThree = 0;
 
     sheet.getCell(`A${currentRow}`).value = `${materia.nombre}`;
     const firsNota = notas.find(
@@ -1217,7 +1220,11 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
       notaRecuperacionOne = Number(firsNota?.recuperacion[0].Nota);
     }
 
-    sheet.getCell(`D${currentRow}`).value = Number(firsNota?.nota);
+    if (firsNota?.nota) {
+      notaOne += Number(firsNota?.nota);
+    }
+
+    sheet.getCell(`D${currentRow}`).value = Number(notaOne);
     sheet.getCell(`E${currentRow}`).value = Number(notaRecuperacionOne);
     const secondNota = notas.find(
       (nota) => nota.materia.id === materia.id && nota.momento === "2"
@@ -1231,7 +1238,11 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
       notaRecuperacionTwo = Number(secondNota?.recuperacion[0].Nota);
     }
 
-    sheet.getCell(`F${currentRow}`).value = Number(secondNota?.nota);
+    if (secondNota?.nota) {
+      notaTwo += Number(secondNota?.nota);
+    }
+
+    sheet.getCell(`F${currentRow}`).value = Number(notaTwo);
     sheet.getCell(`G${currentRow}`).value = Number(notaRecuperacionTwo);
     const thirdNota = notas.find(
       (nota) => nota.materia.id === materia.id && nota.momento === "3"
@@ -1244,28 +1255,35 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
     ) {
       notaRecuperacionThree = Number(thirdNota?.recuperacion[0].Nota);
     }
-    sheet.getCell(`H${currentRow}`).value = Number(thirdNota?.nota);
+
+    if (thirdNota?.nota) {
+      notaThree += Number(thirdNota?.nota);
+    }
+
+    sheet.getCell(`H${currentRow}`).value = Number(notaThree);
     sheet.getCell(`I${currentRow}`).value = Number(notaRecuperacionThree);
 
-    const notaOne =
+    const notaPromedioOne =
       //@ts-ignore
-      notaRecuperacionOne ? notaRecuperacionOne : firsNota?.nota;
+      notaRecuperacionOne ? notaRecuperacionOne : notaOne;
 
-    promedioMomentoOne += Number(notaOne);
+    promedioMomentoOne += Number(notaPromedioOne);
 
-    const notaTwo =
+    const notaPromedioTwo =
       //@ts-ignore
-      notaRecuperacionTwo > 0 ? notaRecuperacionTwo : secondNota?.nota;
+      notaRecuperacionTwo > 0 ? notaRecuperacionTwo : notaTwo;
 
-    promedioMomentoTwo += Number(notaTwo);
-    const notaThree =
+    promedioMomentoTwo += Number(notaPromedioTwo);
+    const notaPromedioThree =
       //@ts-ignore
-      notaRecuperacionThree > 0 ? notaRecuperacionThree : thirdNota?.nota;
+      notaRecuperacionThree > 0 ? notaRecuperacionThree : notaThree;
 
-    promedioMomentoThree += Number(notaThree);
+    promedioMomentoThree += Number(notaPromedioThree);
 
     const promedio = (
-      (Number(notaOne) + Number(notaTwo) + Number(notaThree)) /
+      (Number(notaPromedioOne) +
+        Number(notaPromedioTwo) +
+        Number(notaPromedioThree)) /
       3
     ).toFixed(2);
 

@@ -42,5 +42,5 @@ html {
 }
 
 .swal2-container {
-  z-index: X;
+  z-index: 9999;
 }

@@ -8,6 +8,8 @@ const react_1 = __importDefault(require("react"));
 const react_dom_1 = __importDefault(require("react-dom"));
 const AppRouter_1 = __importDefault(require("./Router/AppRouter"));
 const GlobalContext_1 = require("./config/context/GlobalContext");
+require("./index.css");
+require("./App.css");
 const root = document.getElementById("root");
 //@ts-ignore
 root.style.overflow = "auto!important";

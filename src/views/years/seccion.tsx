@@ -649,6 +649,7 @@ const Seccion = () => {
         handleClick={handleClickRow}
       />
       <Modal
+        sx={{ zIndex: 20 }}
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"

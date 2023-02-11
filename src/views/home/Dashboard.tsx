@@ -28,8 +28,6 @@ import Seccion from "../years/seccion";
 import Alumno from "../years/alumno";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import { Tooltip } from "@mui/material";
-import "../../index.css";
-
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme) => ({
