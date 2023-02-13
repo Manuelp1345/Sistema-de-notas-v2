@@ -106,6 +106,22 @@ const generarBoletin = async (data) => {
   return await ipcRenderer.invoke("GENERAR_BOLETIN", data);
 };
 
+const getUsers = async () => {
+  return await ipcRenderer.invoke("GET_USERS");
+};
+
+const generateBackup = async () => {
+  return await ipcRenderer.invoke("GENERATE_RESPALDO");
+};
+
+const getBackup = async () => {
+  return await ipcRenderer.invoke("GET_RESPALDOS");
+};
+
+const restoreBackup = async (data) => {
+  return await ipcRenderer.invoke("RESTORE_RESPALDO", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -132,6 +148,10 @@ const API = {
   getAlumnoByDni,
   getRepresentanteByDni,
   generarBoletin,
+  getUsers,
+  generateBackup,
+  getBackup,
+  restoreBackup,
 };
 
 contextBridge.exposeInMainWorld("API", API);

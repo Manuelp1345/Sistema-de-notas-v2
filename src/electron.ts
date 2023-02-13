@@ -591,7 +591,7 @@ ipcMain.handle("INSERT_ALUMNO", async (event, data) => {
         }
       } else {
         const basicDataTwoDB = manager.getRepository(BasicData).create();
-        basicDataTwoDB.firstName = data.representante.firsName;
+        basicDataTwoDB.firstName = data.representante.firstName;
         basicDataTwoDB.secondName = data.representante.secondName;
         basicDataTwoDB.Surname = data.representante.surname;
         basicDataTwoDB.secondSurname = data.representante.secondSurname;
@@ -1330,4 +1330,100 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
   await document.xlsx.writeFile(filePath as string);
 
   return fileName;
+});
+
+ipcMain.handle("GET_USERS", async (event, args) => {
+  const users = await User.find({ relations: { datosBasicos: true } });
+
+  return users;
+});
+
+ipcMain.handle("GENERATE_RESPALDO", async (event, args) => {
+  // crear directorio del sistema para guardar los respaldos en la carpeta de documentos
+  const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
+  if (!fs.existsSync(pathRespaldo)) {
+    await fs.mkdirSync(pathRespaldo);
+  }
+
+  await appDataSource.transaction(async (manager) => {
+    const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${moment().format(
+      "YYYY-MM-DD"
+    )}.json`;
+
+    const entities = appDataSource.entityMetadatas;
+    const backup = entities.map((entity) => {
+      const repository = manager.getRepository(entity.name);
+      return repository
+        .find({
+          relations: entity.relations.map((relation) => relation.propertyName),
+        })
+        .then((records) => {
+          return {
+            entity: entity.name,
+            records: records,
+          };
+        });
+    });
+
+    await Promise.all(backup).then((results) => {
+      const data = results.reduce((acc, result) => {
+        acc[result.entity] = result.records;
+        return acc;
+      }, {});
+      fs.writeFileSync(nameFileJsonWithDate, JSON.stringify(data, null, 2));
+    });
+  });
+});
+
+ipcMain.handle("GET_RESPALDOS", async (event, args) => {
+  const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
+  if (!fs.existsSync(pathRespaldo)) {
+    await fs.mkdirSync(pathRespaldo);
+  }
+
+  const files = fs.readdirSync(pathRespaldo);
+
+  return files;
+});
+
+ipcMain.handle("RESTORE_RESPALDO", async (event, args) => {
+  const restoreName = args as string;
+  const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
+  const pathRestore = `${pathRespaldo}/${restoreName}`;
+
+  await appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
+
+  await appDataSource.query("CREATE DATABASE `db_notas`");
+
+  await appDataSource.destroy();
+
+  appDataSource = await ConnectionDB();
+
+  const data = JSON.parse(fs.readFileSync(pathRestore, "utf8"));
+
+  const orderedKeys = [
+    "Periodo",
+    "Anio",
+    "Seccion",
+    "Materia",
+    "Documents",
+    "BasicData",
+    "User",
+    "Representante",
+    "Alumno",
+    "Etapas",
+    "Nota",
+    "RecuperacionNota",
+  ];
+
+  const orderedObj = {};
+
+  orderedKeys.forEach((key) => {
+    orderedObj[key] = data[key];
+  });
+
+  for (const entity of orderedKeys) {
+    const repository = appDataSource.manager.getRepository(entity);
+    await repository.save(data[entity]);
+  }
 });

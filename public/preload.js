@@ -95,6 +95,18 @@ const getRepresentanteByDni = (data) => __awaiter(void 0, void 0, void 0, functi
 const generarBoletin = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GENERAR_BOLETIN", data);
 });
+const getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_USERS");
+});
+const generateBackup = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GENERATE_RESPALDO");
+});
+const getBackup = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_RESPALDOS");
+});
+const restoreBackup = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("RESTORE_RESPALDO", data);
+});
 const API = {
     getCredentialsDB,
     createCredentialsDB,
@@ -121,6 +133,10 @@ const API = {
     getAlumnoByDni,
     getRepresentanteByDni,
     generarBoletin,
+    getUsers,
+    generateBackup,
+    getBackup,
+    restoreBackup,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

@@ -28,6 +28,7 @@ import Seccion from "../years/seccion";
 import Alumno from "../years/alumno";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import { Tooltip } from "@mui/material";
+import Admin from "../admin/Admin";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme) => ({
@@ -269,6 +270,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "Year" && <Year />}
       {element === "seccion" && <Seccion />}
       {element === "alumno" && <Alumno />}
+      {element === "admin" && <Admin />}
     </Box>
   );
 }

@@ -592,7 +592,7 @@ electron_1.ipcMain.handle("INSERT_ALUMNO", (event, data) => __awaiter(void 0, vo
             }
             else {
                 const basicDataTwoDB = manager.getRepository(basicData_1.BasicData).create();
-                basicDataTwoDB.firstName = data.representante.firsName;
+                basicDataTwoDB.firstName = data.representante.firstName;
                 basicDataTwoDB.secondName = data.representante.secondName;
                 basicDataTwoDB.Surname = data.representante.surname;
                 basicDataTwoDB.secondSurname = data.representante.secondSurname;
@@ -1216,5 +1216,81 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     const fileName = path.basename(filePath);
     yield document.xlsx.writeFile(filePath);
     return fileName;
+}));
+electron_1.ipcMain.handle("GET_USERS", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield user_1.User.find({ relations: { datosBasicos: true } });
+    return users;
+}));
+electron_1.ipcMain.handle("GENERATE_RESPALDO", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    // crear directorio del sistema para guardar los respaldos en la carpeta de documentos
+    const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+    if (!fs_1.default.existsSync(pathRespaldo)) {
+        yield fs_1.default.mkdirSync(pathRespaldo);
+    }
+    yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+        const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${(0, moment_1.default)().format("YYYY-MM-DD")}.json`;
+        const entities = appDataSource.entityMetadatas;
+        const backup = entities.map((entity) => {
+            const repository = manager.getRepository(entity.name);
+            return repository
+                .find({
+                relations: entity.relations.map((relation) => relation.propertyName),
+            })
+                .then((records) => {
+                return {
+                    entity: entity.name,
+                    records: records,
+                };
+            });
+        });
+        yield Promise.all(backup).then((results) => {
+            const data = results.reduce((acc, result) => {
+                acc[result.entity] = result.records;
+                return acc;
+            }, {});
+            fs_1.default.writeFileSync(nameFileJsonWithDate, JSON.stringify(data, null, 2));
+        });
+    }));
+}));
+electron_1.ipcMain.handle("GET_RESPALDOS", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+    if (!fs_1.default.existsSync(pathRespaldo)) {
+        yield fs_1.default.mkdirSync(pathRespaldo);
+    }
+    const files = fs_1.default.readdirSync(pathRespaldo);
+    return files;
+}));
+electron_1.ipcMain.handle("RESTORE_RESPALDO", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const restoreName = args;
+    const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+    const pathRestore = `${pathRespaldo}/${restoreName}`;
+    yield appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
+    yield appDataSource.query("CREATE DATABASE `db_notas`");
+    yield appDataSource.destroy();
+    appDataSource = yield (0, database_1.ConnectionDB)();
+    const data = JSON.parse(fs_1.default.readFileSync(pathRestore, "utf8"));
+    const orderedKeys = [
+        "Periodo",
+        "Anio",
+        "Seccion",
+        "Materia",
+        "Documents",
+        "BasicData",
+        "User",
+        "Representante",
+        "Alumno",
+        "Etapas",
+        "Nota",
+        "RecuperacionNota",
+    ];
+    const orderedObj = {};
+    orderedKeys.forEach((key) => {
+        orderedObj[key] = data[key];
+    });
+    for (const entity of orderedKeys) {
+        const repository = appDataSource.manager.getRepository(entity);
+        //save or update
+        yield repository.save(data[entity]);
+    }
 }));
 //# sourceMappingURL=electron.js.map
