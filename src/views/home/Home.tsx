@@ -6,6 +6,10 @@ import Typography from "@mui/material/Typography";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import esLocale from "@fullcalendar/core/locales/es";
+import { GlobalContext } from "../../config/context/GlobalContext";
+import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -17,6 +21,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function Home() {
+  const { user } = React.useContext<any>(GlobalContext);
+  const navigate = useNavigate();
   return (
     <Box
       className="animate__animated animate__fadeInRight"
@@ -33,19 +39,35 @@ export default function Home() {
         />
       </Box>
       <Typography paragraph>
-        Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-        ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar elementum
-        integer enim neque volutpat ac tincidunt. Ornare suspendisse sed nisi
-        lacus sed viverra tellus. Purus sit amet volutpat consequat mauris.
-        Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-        vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra
-        accumsan in. In hendrerit gravida rutrum quisque non tellus orci ac.
-        Pellentesque nec nam aliquam sem et tortor. Habitant morbi tristique
-        senectus et. Adipiscing elit duis tristique sollicitudin nibh sit.
-        Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra
-        maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
-        aliquam ultrices sagittis orci a.
+        ¡Bienvenido al sistema de notas automatizado para el área administrativa
+        de la U.E Jose Enrique Arias! Este sistema en línea ha sido diseñado
+        para mejorar y simplificar el proceso de seguimiento y evaluación del
+        progreso académico de los estudiantes. Como miembro del equipo
+        administrativo, podrás acceder a las notas de los estudiantes en tiempo
+        real, recibir actualizaciones y estar al tanto del desempeño escolar de
+        manera más eficiente. Esperamos que este sistema sea una herramienta
+        útil para mejorar la comunicación y el éxito educativo de todos los
+        estudiantes en la U.E Jose Enrique Arias. ¡Gracias por utilizar nuestro
+        sistema de notas automatizado!
       </Typography>
+
+      {user.user.role === "USER" && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            mt: 2,
+            gap: 5,
+          }}
+        >
+          <Button variant="contained">Generar Consulta</Button>
+          <Button onClick={() => navigate("/logout")} variant="contained">
+            <LogoutIcon /> Salir del sistema
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 }

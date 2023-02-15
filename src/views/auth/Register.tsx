@@ -3,6 +3,9 @@ import { Box, Button, TextField } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GlobalContext } from "../../config/context/GlobalContext";
+import { useContext } from "react";
+import Swal from "sweetalert2";
 
 const CssTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -51,7 +54,53 @@ const Register = () => {
   const [correo, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const { user } = useContext(GlobalContext);
   const navigate = useNavigate();
+  const [error, setError] = useState({
+    correo: false,
+    password: false,
+    password2: false,
+    nombre: false,
+    apellido: false,
+  });
+
+  const validateData = () => {
+    if (nombre === "") {
+      setError({ ...error, nombre: true });
+      return true;
+    }
+    if (apellido === "") {
+      setError({ ...error, apellido: true });
+      return true;
+    }
+    if (correo === "") {
+      setError({ ...error, correo: true });
+      if (correo.includes("@")) {
+        setError({ ...error, correo: true });
+      }
+      if (correo.includes(".")) {
+        setError({ ...error, correo: true });
+      }
+
+      return true;
+    }
+    if (password === "") {
+      setError({ ...error, password: true });
+      return true;
+    }
+    if (password2 === "") {
+      setError({ ...error, password2: true });
+      return true;
+    }
+    setError({
+      correo: false,
+      password: false,
+      password2: false,
+      nombre: false,
+      apellido: false,
+    });
+    return false;
+  };
 
   const createCredentials = async () => {
     //@ts-ignore
@@ -65,11 +114,19 @@ const Register = () => {
   };
 
   const handledClick = async () => {
-    if (nombre !== "" && correo !== "" && password !== "" && password2 !== "") {
+    if (
+      error.correo === false &&
+      error.password === false &&
+      error.password2 === false &&
+      error.nombre === false &&
+      error.apellido === false
+    ) {
       if (password === password2) {
         const credentials = await createCredentials();
+
         console.log(credentials);
         if (credentials) {
+          user.setUser(credentials);
           navigate("/home");
         }
       }
@@ -112,6 +169,10 @@ const Register = () => {
           id="setupHost"
           label="Nombre"
           value={nombre}
+          error={error.nombre}
+          onKeyUp={validateData}
+          onBlur={validateData}
+          helperText={error.nombre ? "Campo requerido" : ""}
         />
         <CssTextField
           onChange={handleApellidoChange}
@@ -119,6 +180,10 @@ const Register = () => {
           id="setupHost"
           label="Apellido"
           value={apellido}
+          onBlur={validateData}
+          onKeyUp={validateData}
+          error={error.apellido}
+          helperText={error.apellido ? "Campo requerido" : ""}
         />
       </Box>
       <CssTextField
@@ -126,7 +191,11 @@ const Register = () => {
         id="setupUser"
         label="Correo"
         value={correo}
+        onKeyUp={validateData}
         onChange={handleUserChange}
+        error={error.correo}
+        onBlur={validateData}
+        helperText={error.correo ? "Campo requerido" : ""}
       />
       <CssTextField
         onChange={handlePasswordChange}
@@ -135,16 +204,31 @@ const Register = () => {
         id="setupPass"
         label="Contraseña"
         value={password}
+        onKeyUp={validateData}
+        error={error.password}
+        onBlur={validateData}
+        helperText={error.password ? "Campo requerido" : ""}
       />
       <CssTextField
         onChange={handlePassword2Change}
         type="password"
         sx={{ marginY: "0.3rem" }}
         id="setupPass"
+        onKeyUp={validateData}
+        onBlur={validateData}
         label="Confirmar contraseña"
         value={password2}
+        error={error.password2}
+        helperText={error.password2 ? "Campo requerido" : ""}
       />
-      <ColorButton onClick={handledClick}>Registrarse</ColorButton>
+      <ColorButton
+        onClick={() => {
+          const valid = validateData();
+          if (!valid) handledClick();
+        }}
+      >
+        Registrarse
+      </ColorButton>
     </Box>
   );
 };

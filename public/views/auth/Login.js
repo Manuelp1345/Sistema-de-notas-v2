@@ -41,6 +41,8 @@ const material_1 = require("@mui/material");
 const colors_1 = require("@mui/material/colors");
 const react_1 = __importStar(require("react"));
 const react_router_dom_1 = require("react-router-dom");
+const react_2 = require("react");
+const GlobalContext_1 = require("../../config/context/GlobalContext");
 const CssTextField = (0, styled_1.default)(material_1.TextField)({
     "& label.Mui-focused": {
         color: "black",
@@ -84,6 +86,7 @@ const ColorButton = (0, styled_1.default)(material_1.Button)(() => ({
 const Login = () => {
     const [correo, setCorreo] = (0, react_1.useState)("");
     const [password, setPassword] = (0, react_1.useState)("");
+    const { user } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const [open, setOpen] = react_1.default.useState(false);
     const handleClick = () => {
         setOpen(true);
@@ -107,6 +110,7 @@ const Login = () => {
             const credentials = yield loginUser();
             console.log(credentials);
             if (credentials) {
+                user.setUser(credentials);
                 localStorage.setItem("token", credentials);
                 navigate("/Home");
             }

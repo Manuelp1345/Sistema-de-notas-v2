@@ -18,6 +18,8 @@ const material_1 = require("@mui/material");
 const colors_1 = require("@mui/material/colors");
 const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
+const GlobalContext_1 = require("../../config/context/GlobalContext");
+const react_2 = require("react");
 const CssTextField = (0, styled_1.default)(material_1.TextField)({
     "& label.Mui-focused": {
         color: "black",
@@ -63,6 +65,7 @@ const Register = () => {
     const [correo, setUser] = (0, react_1.useState)("");
     const [password, setPassword] = (0, react_1.useState)("");
     const [password2, setPassword2] = (0, react_1.useState)("");
+    const { user } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const navigate = (0, react_router_dom_1.useNavigate)();
     const createCredentials = () => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
@@ -80,6 +83,7 @@ const Register = () => {
                 const credentials = yield createCredentials();
                 console.log(credentials);
                 if (credentials) {
+                    user.setUser(credentials);
                     navigate("/home");
                 }
             }

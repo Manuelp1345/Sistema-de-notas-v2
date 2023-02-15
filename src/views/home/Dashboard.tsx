@@ -15,20 +15,21 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Home from "./Home";
-import { House, SearchOffOutlined, SearchOutlined } from "@mui/icons-material";
+import { House } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import SetupYear from "../years/SetupYear";
 import Year from "../years/Year";
 import Seccion from "../years/seccion";
 import Alumno from "../years/alumno";
-import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
 import { Tooltip } from "@mui/material";
 import Admin from "../admin/Admin";
+import Search from "../years/search";
+import SchoolIcon from "@mui/icons-material/School";
+import { GlobalContext } from "../../config/context/GlobalContext";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme) => ({
@@ -104,6 +105,7 @@ export default function Dashboard({ element }: { element: string }) {
 
   const [open, setOpen] = React.useState(false);
   const [periodo, setPeriodo] = React.useState({ periodo: "", id: 0 });
+  const { user } = React.useContext(GlobalContext);
   const navigate = useNavigate();
   const theme = useTheme();
   const handleDrawerOpen = () => {
@@ -190,78 +192,90 @@ export default function Dashboard({ element }: { element: string }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {[
-            "Inicio",
-            "Años",
-            "Buscar",
-            "Administración",
-            "Perfil",
-            "Salir",
-          ].map((text, index) => (
-            <ListItem
-              button
-              selected={
-                (element === "home" && index === 0) ||
-                (element === "anos" && index === 1) ||
-                (element === "perfil" && index === 4) ||
-                (element === "search" && index === 2) ||
-                (element === "admin" && index === 3)
-              }
-              //@ts-ignore
-              onClick={() =>
-                //@ts-ignore
-                (index === 0 && navigate("/home")) ||
-                //@ts-ignore
+          {["Inicio", "Años", "Graduados", "Administración", "Salir"].map(
+            (text, index) =>
+              user.user.role !== "USER" && (
+                <ListItem
+                  button
+                  selected={
+                    (element === "home" &&
+                      user.user.role !== "USER" &&
+                      index === 0) ||
+                    (element === "anos" &&
+                      user.user.role !== "USER" &&
+                      index === 1) ||
+                    /*                 (element === "perfil" && index === 4) || */
+                    (element === "search" &&
+                      user.user.role !== "USER" &&
+                      index === 2) ||
+                    (element === "admin" &&
+                      user.user.role !== "USER" &&
+                      index === 3)
+                  }
+                  //@ts-ignore
+                  onClick={() =>
+                    //@ts-ignore
+                    (index === 0 &&
+                      user.user.role !== "USER" &&
+                      navigate("/home")) ||
+                    //@ts-ignore
 
-                (index === 1 && navigate("/anos")) ||
-                //@ts-ignore
+                    (index === 1 &&
+                      user.user.role !== "USER" &&
+                      navigate("/anos")) ||
+                    //@ts-ignore
 
-                (index === 2 && navigate("/search")) ||
-                //@ts-ignore
+                    (index === 2 &&
+                      user.user.role !== "USER" &&
+                      navigate("/search")) ||
+                    //@ts-ignore
 
-                (index === 3 && navigate("/admin")) ||
-                //@ts-ignore
-                (index === 4 && navigate("/perfil")) ||
-                //@ts-ignore
-                (index === 5 && navigate("/logout"))
-              }
-              key={text}
-            >
-              <ListItemIcon>
-                {index === 0 && (
-                  <Tooltip title={`inicio`} arrow placement="right">
-                    <House />
-                  </Tooltip>
-                )}
-                {index === 1 && (
-                  <Tooltip title={`Años`} arrow placement="right">
-                    <DateRangeIcon />
-                  </Tooltip>
-                )}
-                {index === 2 && (
-                  <Tooltip title={`Buscador`} arrow placement="right">
-                    <SearchOutlined />
-                  </Tooltip>
-                )}
-                {index === 3 && (
-                  <Tooltip title={`Administración`} arrow placement="right">
-                    <AdminPanelSettingsIcon />
-                  </Tooltip>
-                )}
-                {index === 4 && (
+                    (index === 3 &&
+                      user.user.role !== "USER" &&
+                      navigate("/admin")) ||
+                    /*                 //@ts-ignore
+                (index === 4 && navigate("/perfil")) || */
+                    //@ts-ignore
+                    (index === 4 && navigate("/logout"))
+                  }
+                  key={text}
+                >
+                  <ListItemIcon>
+                    {index === 0 && (
+                      <Tooltip title={`inicio`} arrow placement="right">
+                        <House />
+                      </Tooltip>
+                    )}
+                    {index === 1 && user.user.role !== "USER" && (
+                      <Tooltip title={`Años`} arrow placement="right">
+                        <DateRangeIcon />
+                      </Tooltip>
+                    )}
+                    {index === 2 && user.user.role !== "USER" && (
+                      <Tooltip title={`Graduados`} arrow placement="right">
+                        <SchoolIcon />
+                      </Tooltip>
+                    )}
+                    {index === 3 && user.user.role !== "USER" && (
+                      <Tooltip title={`Administración`} arrow placement="right">
+                        <AdminPanelSettingsIcon />
+                      </Tooltip>
+                    )}
+                    {/*                 {index === 4 && (
                   <Tooltip title={`Perfil`} arrow placement="right">
                     <AccountCircleIcon />
                   </Tooltip>
-                )}
-                {index === 5 && (
-                  <Tooltip title={`Salir`} arrow placement="right">
-                    <LogoutIcon />
-                  </Tooltip>
-                )}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+                )} */}
+                    {index === 4 && (
+                      <Tooltip title={`Salir`} arrow placement="right">
+                        <LogoutIcon />
+                      </Tooltip>
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItem>
+              )
+          )}
         </List>
         <Divider />
       </Drawer>
@@ -269,6 +283,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "anos" && <SetupYear idPeriodo={periodo.id} />}
       {element === "Year" && <Year />}
       {element === "seccion" && <Seccion />}
+      {element === "search" && <Search />}
       {element === "alumno" && <Alumno />}
       {element === "admin" && <Admin />}
     </Box>

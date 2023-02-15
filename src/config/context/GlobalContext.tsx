@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import { Etapas } from "../entitys/etapas";
+import { User } from "../entitys/user";
 
 interface Areas {
   id: number;
@@ -16,6 +17,10 @@ interface ContextGlobal {
     alumnoId: Etapas;
     setAlumnoId: React.Dispatch<React.SetStateAction<Etapas>>;
   };
+  user: {
+    user: User;
+    setUser: React.Dispatch<React.SetStateAction<User>>;
+  };
 }
 
 export const GlobalContext = createContext<ContextGlobal>({} as ContextGlobal);
@@ -25,6 +30,7 @@ export const GlobalProvider = ({ children }) => {
     { id: 0, nombre: "", añoId: 0 },
   ]);
   const [alumnoId, setAlumnoId] = useState({} as Etapas);
+  const [user, setUser] = useState({} as User);
   return (
     <GlobalContext.Provider
       value={{
@@ -35,6 +41,10 @@ export const GlobalProvider = ({ children }) => {
         alumno: {
           alumnoId,
           setAlumnoId,
+        },
+        user: {
+          user,
+          setUser,
         },
       }}
     >

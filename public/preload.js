@@ -107,6 +107,21 @@ const getBackup = () => __awaiter(void 0, void 0, void 0, function* () {
 const restoreBackup = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("RESTORE_RESPALDO", data);
 });
+const updateAlumno = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("UPDATE_ALUMNO", data);
+});
+const getAniosAndSecciones = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_ANIOS_AND_SECCIONS", id);
+});
+const updateAlumnoSeccionAndAnio = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("UPDATE_ALUMNO_SECCION_AND_ANIO", data);
+});
+const updateUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("UPDATE_USER", data);
+});
+const getAlumnosGraduados = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GET_ALUMNOS_GRADUADOS", data);
+});
 const API = {
     getCredentialsDB,
     createCredentialsDB,
@@ -137,6 +152,11 @@ const API = {
     generateBackup,
     getBackup,
     restoreBackup,
+    updateAlumno,
+    getAniosAndSecciones,
+    updateAlumnoSeccionAndAnio,
+    updateUser,
+    getAlumnosGraduados,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

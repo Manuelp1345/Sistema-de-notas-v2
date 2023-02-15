@@ -9,6 +9,7 @@ const GlobalProvider = ({ children }) => {
         { id: 0, nombre: "", añoId: 0 },
     ]);
     const [alumnoId, setAlumnoId] = (0, react_1.useState)({});
+    const [user, setUser] = (0, react_1.useState)({});
     return ((0, jsx_runtime_1.jsx)(exports.GlobalContext.Provider, Object.assign({ value: {
             areas: {
                 areas,
@@ -17,6 +18,10 @@ const GlobalProvider = ({ children }) => {
             alumno: {
                 alumnoId,
                 setAlumnoId,
+            },
+            user: {
+                user,
+                setUser,
             },
         } }, { children: children })));
 };

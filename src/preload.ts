@@ -122,6 +122,26 @@ const restoreBackup = async (data) => {
   return await ipcRenderer.invoke("RESTORE_RESPALDO", data);
 };
 
+const updateAlumno = async (data) => {
+  return await ipcRenderer.invoke("UPDATE_ALUMNO", data);
+};
+
+const getAniosAndSecciones = async (id) => {
+  return await ipcRenderer.invoke("GET_ANIOS_AND_SECCIONS", id);
+};
+
+const updateAlumnoSeccionAndAnio = async (data) => {
+  return await ipcRenderer.invoke("UPDATE_ALUMNO_SECCION_AND_ANIO", data);
+};
+
+const updateUser = async (data) => {
+  return await ipcRenderer.invoke("UPDATE_USER", data);
+};
+
+const getAlumnosGraduados = async (data) => {
+  return await ipcRenderer.invoke("GET_ALUMNOS_GRADUADOS", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -152,6 +172,11 @@ const API = {
   generateBackup,
   getBackup,
   restoreBackup,
+  updateAlumno,
+  getAniosAndSecciones,
+  updateAlumnoSeccionAndAnio,
+  updateUser,
+  getAlumnosGraduados,
 };
 
 contextBridge.exposeInMainWorld("API", API);

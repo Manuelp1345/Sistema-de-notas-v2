@@ -53,7 +53,6 @@ const ChevronRight_1 = __importDefault(require("@mui/icons-material/ChevronRight
 const ListItem_1 = __importDefault(require("@mui/material/ListItem"));
 const ListItemIcon_1 = __importDefault(require("@mui/material/ListItemIcon"));
 const ListItemText_1 = __importDefault(require("@mui/material/ListItemText"));
-const AccountCircle_1 = __importDefault(require("@mui/icons-material/AccountCircle"));
 const DateRange_1 = __importDefault(require("@mui/icons-material/DateRange"));
 const AdminPanelSettings_1 = __importDefault(require("@mui/icons-material/AdminPanelSettings"));
 const Logout_1 = __importDefault(require("@mui/icons-material/Logout"));
@@ -66,6 +65,9 @@ const seccion_1 = __importDefault(require("../years/seccion"));
 const alumno_1 = __importDefault(require("../years/alumno"));
 const material_1 = require("@mui/material");
 const Admin_1 = __importDefault(require("../admin/Admin"));
+const search_1 = __importDefault(require("../years/search"));
+const School_1 = __importDefault(require("@mui/icons-material/School"));
+const GlobalContext_1 = require("../../config/context/GlobalContext");
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -110,6 +112,7 @@ function Dashboard({ element }) {
     document.querySelector("html").style.removeProperty("overflow");
     const [open, setOpen] = React.useState(false);
     const [periodo, setPeriodo] = React.useState({ periodo: "", id: 0 });
+    const { user } = React.useContext(GlobalContext_1.GlobalContext);
     const navigate = (0, react_router_dom_1.useNavigate)();
     const theme = (0, styles_1.useTheme)();
     const handleDrawerOpen = () => {
@@ -144,32 +147,41 @@ function Dashboard({ element }) {
     }, [navigate]);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
             display: "flex",
-        } }, { children: [(0, jsx_runtime_1.jsx)(CssBaseline_1.default, {}), (0, jsx_runtime_1.jsx)(AppBar, Object.assign({ position: "fixed", open: open }, { children: (0, jsx_runtime_1.jsxs)(Toolbar_1.default, { children: [(0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ color: "inherit", "aria-label": "open drawer", onClick: handleDrawerOpen, edge: "start", sx: Object.assign({ marginRight: "36px" }, (open && { display: "none" })) }, { children: (0, jsx_runtime_1.jsx)(Menu_1.default, {}) })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h6", noWrap: true, component: "div" }, { children: "U.E | Jose Enrique Arias | Sistema de Notas" })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { marginLeft: "10rem" }, variant: "h6", noWrap: true, component: "div" }, { children: ["Periodo Actual: ", periodo.periodo] }))] }) })), (0, jsx_runtime_1.jsxs)(Drawer, Object.assign({ variant: "permanent", open: open }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, { children: (0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ onClick: handleDrawerClose }, { children: theme.direction === "rtl" ? ((0, jsx_runtime_1.jsx)(ChevronRight_1.default, {})) : ((0, jsx_runtime_1.jsx)(ChevronLeft_1.default, {})) })) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {}), (0, jsx_runtime_1.jsx)(List_1.default, { children: [
-                            "Inicio",
-                            "Años",
-                            "Buscar",
-                            "Administración",
-                            "Perfil",
-                            "Salir",
-                        ].map((text, index) => ((0, jsx_runtime_1.jsxs)(ListItem_1.default, Object.assign({ button: true, selected: (element === "home" && index === 0) ||
-                                (element === "anos" && index === 1) ||
-                                (element === "perfil" && index === 4) ||
-                                (element === "search" && index === 2) ||
-                                (element === "admin" && index === 3), 
+        } }, { children: [(0, jsx_runtime_1.jsx)(CssBaseline_1.default, {}), (0, jsx_runtime_1.jsx)(AppBar, Object.assign({ position: "fixed", open: open }, { children: (0, jsx_runtime_1.jsxs)(Toolbar_1.default, { children: [(0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ color: "inherit", "aria-label": "open drawer", onClick: handleDrawerOpen, edge: "start", sx: Object.assign({ marginRight: "36px" }, (open && { display: "none" })) }, { children: (0, jsx_runtime_1.jsx)(Menu_1.default, {}) })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h6", noWrap: true, component: "div" }, { children: "U.E | Jose Enrique Arias | Sistema de Notas" })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: { marginLeft: "10rem" }, variant: "h6", noWrap: true, component: "div" }, { children: ["Periodo Actual: ", periodo.periodo] }))] }) })), (0, jsx_runtime_1.jsxs)(Drawer, Object.assign({ variant: "permanent", open: open }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, { children: (0, jsx_runtime_1.jsx)(IconButton_1.default, Object.assign({ onClick: handleDrawerClose }, { children: theme.direction === "rtl" ? ((0, jsx_runtime_1.jsx)(ChevronRight_1.default, {})) : ((0, jsx_runtime_1.jsx)(ChevronLeft_1.default, {})) })) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {}), (0, jsx_runtime_1.jsx)(List_1.default, { children: ["Inicio", "Años", "Graduados", "Administración", "Salir"].map((text, index) => user.user.role !== "USER" && ((0, jsx_runtime_1.jsxs)(ListItem_1.default, Object.assign({ button: true, selected: (element === "home" &&
+                                user.user.role !== "USER" &&
+                                index === 0) ||
+                                (element === "anos" &&
+                                    user.user.role !== "USER" &&
+                                    index === 1) ||
+                                /*                 (element === "perfil" && index === 4) || */
+                                (element === "search" &&
+                                    user.user.role !== "USER" &&
+                                    index === 2) ||
+                                (element === "admin" &&
+                                    user.user.role !== "USER" &&
+                                    index === 3), 
                             //@ts-ignore
                             onClick: () => 
                             //@ts-ignore
-                            (index === 0 && navigate("/home")) ||
+                            (index === 0 &&
+                                user.user.role !== "USER" &&
+                                navigate("/home")) ||
                                 //@ts-ignore
-                                (index === 1 && navigate("/anos")) ||
+                                (index === 1 &&
+                                    user.user.role !== "USER" &&
+                                    navigate("/anos")) ||
                                 //@ts-ignore
-                                (index === 2 && navigate("/search")) ||
+                                (index === 2 &&
+                                    user.user.role !== "USER" &&
+                                    navigate("/search")) ||
                                 //@ts-ignore
-                                (index === 3 && navigate("/admin")) ||
+                                (index === 3 &&
+                                    user.user.role !== "USER" &&
+                                    navigate("/admin")) ||
+                                /*                 //@ts-ignore
+                            (index === 4 && navigate("/perfil")) || */
                                 //@ts-ignore
-                                (index === 4 && navigate("/perfil")) ||
-                                //@ts-ignore
-                                (index === 5 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `inicio`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(icons_material_1.House, {}) }))), index === 1 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Años`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(DateRange_1.default, {}) }))), index === 2 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Buscador`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(icons_material_1.SearchOutlined, {}) }))), index === 3 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Administración`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}) }))), index === 4 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Perfil`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(AccountCircle_1.default, {}) }))), index === 5 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Salir`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(Logout_1.default, {}) })))] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPeriodo: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {}), element === "seccion" && (0, jsx_runtime_1.jsx)(seccion_1.default, {}), element === "alumno" && (0, jsx_runtime_1.jsx)(alumno_1.default, {}), element === "admin" && (0, jsx_runtime_1.jsx)(Admin_1.default, {})] })));
+                                (index === 4 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `inicio`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(icons_material_1.House, {}) }))), index === 1 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Años`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(DateRange_1.default, {}) }))), index === 2 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Graduados`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(School_1.default, {}) }))), index === 3 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Administración`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}) }))), index === 4 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Salir`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(Logout_1.default, {}) })))] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPeriodo: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {}), element === "seccion" && (0, jsx_runtime_1.jsx)(seccion_1.default, {}), element === "search" && (0, jsx_runtime_1.jsx)(search_1.default, {}), element === "alumno" && (0, jsx_runtime_1.jsx)(alumno_1.default, {}), element === "admin" && (0, jsx_runtime_1.jsx)(Admin_1.default, {})] })));
 }
 exports.default = Dashboard;
 //# sourceMappingURL=Dashboard.js.map

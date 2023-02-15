@@ -1,19 +1,16 @@
 import {
-  Backdrop,
   Button,
-  Fade,
   List,
   ListItem,
   ListItemText,
   Pagination,
-  Modal,
 } from "@mui/material";
 import React from "react";
 import { useState } from "react";
 import { CustomModal } from "../modals/customModal";
 import moment from "moment";
 
-const BackupList = () => {
+const BackupList = ({ refresh }) => {
   const [selectedBackup, setSelectedBackup] = useState(null);
   const [page, setPage] = useState(1);
   const [backups, setBackups] = useState([]);
@@ -74,7 +71,7 @@ const BackupList = () => {
     (async () => {
       await getBackups();
     })();
-  }, []);
+  }, [refresh]);
 
   return (
     <div>

@@ -3,6 +3,8 @@ import { Alert, Box, Button, Snackbar, Stack, TextField } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { GlobalContext } from "../../config/context/GlobalContext";
 
 const CssTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -49,6 +51,7 @@ const ColorButton = styled(Button)(() => ({
 const Login = () => {
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
+  const { user } = useContext(GlobalContext);
 
   const [open, setOpen] = React.useState(false);
 
@@ -79,6 +82,7 @@ const Login = () => {
       const credentials = await loginUser();
       console.log(credentials);
       if (credentials) {
+        user.setUser(credentials);
         localStorage.setItem("token", credentials);
         navigate("/Home");
       } else {

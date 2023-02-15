@@ -206,6 +206,8 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
     dataBasic.firstName = user.nombre;
     dataBasic.Surname = user.apellido;
     dataBasic.email = user.email;
+    //ranmdom dni
+    dataBasic.dni = String(Math.floor(Math.random() * 1000000000));
     let dataBasicId;
     try {
         dataBasicId = yield dataBasic.save();
@@ -221,8 +223,9 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
         .update(user.password)
         .digest("hex");
     userDB.role = user.role;
+    let userId;
     try {
-        yield userDB.save();
+        userId = yield userDB.save();
         //@ts-ignore
         new electron_1.Notification({
             title: "Sistema De Notas",
@@ -230,7 +233,7 @@ electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, v
             icon: path.join(__dirname, "./img/logo.png"),
             //@ts-ignore
         }).show();
-        return true;
+        return userId;
     }
     catch (error) {
         console.log(error);
@@ -258,7 +261,7 @@ electron_1.ipcMain.handle("LOGIN", (event, user) => __awaiter(void 0, void 0, vo
         if (userJson.contraseña ===
             //@ts-ignore
             crypto_1.default.createHash("sha256").update(user.password).digest("hex")) {
-            return true;
+            return userJson;
         }
     }
     //@ts-ignore
@@ -592,7 +595,7 @@ electron_1.ipcMain.handle("INSERT_ALUMNO", (event, data) => __awaiter(void 0, vo
             }
             else {
                 const basicDataTwoDB = manager.getRepository(basicData_1.BasicData).create();
-                basicDataTwoDB.firstName = data.representante.firsName;
+                basicDataTwoDB.firstName = data.representante.firstName;
                 basicDataTwoDB.secondName = data.representante.secondName;
                 basicDataTwoDB.Surname = data.representante.surname;
                 basicDataTwoDB.secondSurname = data.representante.secondSurname;
@@ -717,12 +720,16 @@ electron_1.ipcMain.handle("GET_ALUMNOS", (evet, id) => __awaiter(void 0, void 0,
         Alumnos = yield etapas_1.Etapas.find({
             relations: {
                 alumno: {
-                    DatosPersonales: true,
+                    DatosPersonales: {
+                        Documents: true,
+                    },
                     representante: {
                         DatosPersonales: true,
                     },
                 },
-                anio: true,
+                anio: {
+                    periodo: true,
+                },
                 seccione: true,
             },
             where: {
@@ -1082,12 +1089,18 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             },
         },
     });
-    const currentEtapa = alumno === null || alumno === void 0 ? void 0 : alumno.Etapas.find((etapa) => etapa.anio.id === data.anioId);
+    const currentEtapa = alumno === null || alumno === void 0 ? void 0 : alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodoId);
     console.log("currentEtapa", currentEtapa);
     const notas = yield nota_1.Nota.find({
         where: {
             alumno: {
                 id: data.alumnoId,
+                Etapas: {
+                    id: currentEtapa === null || currentEtapa === void 0 ? void 0 : currentEtapa.id,
+                },
+            },
+            anio: {
+                id: data.anioId,
             },
         },
         relations: {
@@ -1095,6 +1108,7 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             recuperacion: true,
         },
     });
+    console.log("notas", notas);
     const materias = [];
     notas.forEach((nota) => {
         if (!materias.find((materia) => materia.id === nota.materia.id))
@@ -1216,5 +1230,332 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     const fileName = path.basename(filePath);
     yield document.xlsx.writeFile(filePath);
     return fileName;
+}));
+electron_1.ipcMain.handle("GET_USERS", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield user_1.User.find({ relations: { datosBasicos: true } });
+    return users;
+}));
+electron_1.ipcMain.handle("GENERATE_RESPALDO", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // crear directorio del sistema para guardar los respaldos en la carpeta de documentos
+        const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+        if (!fs_1.default.existsSync(pathRespaldo)) {
+            yield fs_1.default.mkdirSync(pathRespaldo);
+        }
+        yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${(0, moment_1.default)().format("YYYY-MM-DD")}.json`;
+            const entities = appDataSource.entityMetadatas;
+            const backup = entities.map((entity) => {
+                const repository = manager.getRepository(entity.name);
+                return repository
+                    .find({
+                    relations: entity.relations.map((relation) => relation.propertyName),
+                })
+                    .then((records) => {
+                    return {
+                        entity: entity.name,
+                        records: records,
+                    };
+                });
+            });
+            yield Promise.all(backup).then((results) => {
+                const data = results.reduce((acc, result) => {
+                    acc[result.entity] = result.records;
+                    return acc;
+                }, {});
+                fs_1.default.writeFileSync(nameFileJsonWithDate, JSON.stringify(data, null, 2));
+            });
+        }));
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Respaldo generado con exito",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+    }
+    catch (error) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Error al generar el respaldo",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+    }
+}));
+electron_1.ipcMain.handle("GET_RESPALDOS", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+    if (!fs_1.default.existsSync(pathRespaldo)) {
+        yield fs_1.default.mkdirSync(pathRespaldo);
+    }
+    const files = fs_1.default.readdirSync(pathRespaldo);
+    return files;
+}));
+electron_1.ipcMain.handle("RESTORE_RESPALDO", (event, args) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const restoreName = args;
+        const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
+        const pathRestore = `${pathRespaldo}/${restoreName}`;
+        yield appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
+        yield appDataSource.query("CREATE DATABASE `db_notas`");
+        yield appDataSource.destroy();
+        appDataSource = yield (0, database_1.ConnectionDB)();
+        const data = JSON.parse(fs_1.default.readFileSync(pathRestore, "utf8"));
+        const orderedKeys = [
+            "Periodo",
+            "Anio",
+            "Seccion",
+            "Materia",
+            "Documents",
+            "BasicData",
+            "User",
+            "Representante",
+            "Alumno",
+            "Etapas",
+            "Nota",
+            "RecuperacionNota",
+        ];
+        const orderedObj = {};
+        orderedKeys.forEach((key) => {
+            orderedObj[key] = data[key];
+        });
+        for (const entity of orderedKeys) {
+            const repository = appDataSource.manager.getRepository(entity);
+            yield repository.save(data[entity]);
+        }
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Respaldo restaurado con exito",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+    }
+    catch (error) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "Error al restaurar el respaldo",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+    }
+}));
+electron_1.ipcMain.handle("UPDATE_ALUMNO", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            const alumno = yield manager.getRepository(alumnos_1.Alumno).findOne({
+                where: {
+                    DatosPersonales: {
+                        dni: data.alumno.dni,
+                    },
+                },
+                relations: {
+                    DatosPersonales: {
+                        Documents: true,
+                    },
+                    representante: {
+                        DatosPersonales: true,
+                    },
+                    Etapas: true,
+                },
+            });
+            if (alumno) {
+                try {
+                    yield manager.getRepository(basicData_1.BasicData).update({ id: alumno.representante.DatosPersonales.id }, {
+                        dni: data.representante.dni,
+                        firstName: data.representante.firstName,
+                        secondName: data.representante.secondName,
+                        Surname: data.representante.surname,
+                        secondSurname: data.representante.secondSurname,
+                        email: data.representante.email,
+                        Phone: data.representante.phone,
+                        address: data.representante.address,
+                        state: data.representante.state,
+                        municipality: data.representante.municipality,
+                    });
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+                try {
+                    yield manager.getRepository(documents_1.Documents).update({ id: alumno.DatosPersonales.Documents.id }, {
+                        cedula: Boolean(data.alumno.cedula),
+                        pasaporte: Boolean(data.alumno.pasaporte),
+                        partida_nacimiento: Boolean(data.alumno.partidaDeNacimiento),
+                        fotos_carnet: Boolean(data.alumno.fotos),
+                        notas_escuela: Boolean(data.alumno.notasEscolares),
+                    });
+                    //@ts-ignore
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+                try {
+                    yield manager.getRepository(basicData_1.BasicData).update({
+                        id: alumno.DatosPersonales.id,
+                    }, {
+                        firstName: data.alumno.firsName,
+                        secondName: data.alumno.SecondName,
+                        Surname: data.alumno.surname,
+                        secondSurname: data.alumno.secondSurname,
+                        email: data.alumno.email,
+                        sexo: data.alumno.sexo,
+                        dni: data.alumno.dni,
+                        Phone: data.alumno.phone,
+                        address: data.alumno.address,
+                        state: data.alumno.state,
+                        municipality: data.alumno.municipality,
+                        DateOfBirth: data.alumno.fechaNacimiento,
+                    });
+                    //@ts-ignore
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+                try {
+                    yield manager.getRepository(alumnos_1.Alumno).update({
+                        id: alumno.id,
+                    }, {
+                        observacion: data.alumno.observacion,
+                        condicion: data.alumno.condicion,
+                        grupoEstable: data.alumno.grupoEstable,
+                    });
+                    //@ts-ignore
+                    //@ts-ignore
+                    new electron_1.Notification({
+                        title: "Sistema De Notas",
+                        body: "Alumno Actualizado con exito",
+                        icon: path.join(__dirname, "./img/logo.png"),
+                        //@ts-ignore
+                    }).show();
+                    return true;
+                }
+                catch (error) {
+                    console.log(error);
+                    throw new Error("No se pudo registrar el alumno");
+                }
+            }
+            return true;
+        }));
+    }
+    catch (error) {
+        console.log(error);
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "No se pudo actualizar el alumno",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        throw new Error("No se pudo registrar el alumno");
+    }
+}));
+electron_1.ipcMain.handle("GET_ANIOS_AND_SECCIONS", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const anios = yield appDataSource.manager.getRepository(anios_1.Anio).find({
+        where: {
+            periodo: {
+                id: data,
+            },
+        },
+        relations: {
+            secciones: true,
+        },
+    });
+    return anios;
+}));
+electron_1.ipcMain.handle("UPDATE_ALUMNO_SECCION_AND_ANIO", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const alumno = yield appDataSource.manager.getRepository(alumnos_1.Alumno).findOne({
+        where: {
+            DatosPersonales: {
+                dni: data.alumno.dni,
+            },
+        },
+        relations: {
+            DatosPersonales: true,
+            Etapas: true,
+        },
+    });
+    if (alumno) {
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield manager.getRepository(etapas_1.Etapas).update({
+                    id: data.etapa,
+                }, {
+                    anio: data.anio,
+                    seccione: data.seccion,
+                });
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Alumno Actualizado con exito",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+        }));
+    }
+}));
+electron_1.ipcMain.handle("UPDATE_USER", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield appDataSource.manager.getRepository(user_1.User).findOne({
+        where: {
+            id: data.id,
+        },
+    });
+    if (user) {
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield manager.getRepository(user_1.User).update({
+                    id: data.id,
+                }, {
+                    role: data.role,
+                });
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Usuario Actualizado con exito",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+        }));
+    }
+}));
+electron_1.ipcMain.handle("GET_ALUMNOS_GRADUADOS", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const alumnos = yield appDataSource.manager.getRepository(etapas_1.Etapas).find({
+        where: {
+            alumno: {
+                condicion: "Graduado",
+            },
+        },
+        relations: {
+            alumno: {
+                DatosPersonales: {
+                    Documents: true,
+                },
+                representante: {
+                    DatosPersonales: true,
+                },
+            },
+            anio: {
+                periodo: true,
+            },
+            seccione: true,
+        },
+    });
+    return alumnos;
 }));
 //# sourceMappingURL=electron.js.map

@@ -21,11 +21,16 @@ const react_2 = require("react");
 const TableCustom_1 = require("../table/TableCustom");
 const backupListComponenet_1 = __importDefault(require("./backupListComponenet"));
 const material_1 = require("@mui/material");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
+const GlobalContext_1 = require("../../config/context/GlobalContext");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Admin = () => {
     const [users, setUsers] = react_1.default.useState([]);
     const [loading, setLoading] = react_1.default.useState(false);
     const [dataEdit, setDataEdit] = react_1.default.useState("");
+    const [user, setUser] = react_1.default.useState(0);
+    const [counter, setCounter] = react_1.default.useState(0);
+    const { user: userContext } = react_1.default.useContext(GlobalContext_1.GlobalContext);
     const generateBackup = () => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
         const backup = yield window.API.generateBackup();
@@ -79,11 +84,13 @@ const Admin = () => {
             type: "select",
             align: "center",
             editable: true,
-            renderEditCell: (params) => {
-                console.log("Params edirt componenet ", params);
+            renderEditCell: () => {
                 return ((0, jsx_runtime_1.jsx)(material_1.FormControl, Object.assign({ sx: {
                         width: "100%",
-                    } }, { children: (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: params.row.role, placeholder: "Rol", label: "Rol" }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ disabled: true, value: "select" }, { children: "Rol" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "user" }, { children: "Usuario" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Admin" }, { children: "Administrador" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "OWNER" }, { children: "Super Administrador" }))] })) })));
+                    } }, { children: (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ labelId: "demo-simple-select-label", id: "demo-simple-select", value: dataEdit, placeholder: "Rol", label: "Rol", onChange: (e) => {
+                            console.log("e.target.value ", e.target.value);
+                            setDataEdit(e.target.value);
+                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ disabled: true, value: "select" }, { children: "Rol" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "USER" }, { children: "Usuario" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "ADMIN" }, { children: "Administrador" }))] })) })));
             },
             renderCell: (params) => {
                 return ((0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
@@ -92,7 +99,7 @@ const Admin = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         padding: "0.5rem",
-                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue === "OWNER" && "Super Administrador", params.formattedValue === "user" && "usuario", params.formattedValue === "admin" && " Administrador", "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
+                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue === "OWNER" && "Super Administrador", params.formattedValue === "USER" && "Usuario", params.formattedValue === "ADMIN" && " Administrador", "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
             },
         },
     ];
@@ -100,10 +107,40 @@ const Admin = () => {
         //@ts-ignore
         const response = yield window.API.getUsers();
         const mapUsers = response.map((user) => {
-            user = Object.assign(Object.assign({}, user), user.datosBasicos);
+            delete user.datosBasicos.id;
+            user = Object.assign(Object.assign({}, user.datosBasicos), user);
             return user;
         });
-        setUsers(mapUsers);
+        //filter user not OWNER
+        const filterUsers = mapUsers.filter((user) => {
+            return user.role !== "OWNER";
+        });
+        setUsers(filterUsers);
+    });
+    const editUser = () => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("dataEdit ", dataEdit);
+        console.log("user ", user);
+        //@ts-ignore
+        const response = yield window.API.updateUser({
+            id: user,
+            role: dataEdit,
+        });
+        console.log("response ", response);
+        if (response) {
+            sweetalert2_1.default.fire({
+                title: "Usuario Actualizado correctamente",
+                icon: "success",
+                confirmButtonText: "Aceptar",
+            });
+            yield fetchUsers();
+        }
+        else {
+            sweetalert2_1.default.fire({
+                title: "Error al actualizar el usuario",
+                icon: "error",
+                confirmButtonText: "Aceptar",
+            });
+        }
     });
     (0, react_2.useEffect)(() => {
         setLoading(true);
@@ -118,7 +155,12 @@ const Admin = () => {
                     alignItems: "center",
                     width: "100%",
                     flexWrap: "wrap",
-                } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", gutterBottom: true, component: "div" }, { children: "Administraci\u00F3n" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", gutterBottom: true, component: "div" }, { children: "Lista de usuarios" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: fields, rows: users, loading: loading, handleClick: (as) => console.log(), handleDobleClick: (as) => console.log(), handleEditCell: (as) => console.log(), toolbar: true })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", gutterBottom: true, component: "div" }, { children: "Respaldo de base de datos" })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
+                } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h4", gutterBottom: true, component: "div" }, { children: "Administraci\u00F3n" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", gutterBottom: true, component: "div" }, { children: "Lista de usuarios" })), (0, jsx_runtime_1.jsx)(TableCustom_1.TableCustom, { columns: fields, rows: users, loading: loading, handleClick: (as) => {
+                            setDataEdit(as.row.role);
+                            setUser(as.row.id);
+                        }, handleDobleClick: (as) => {
+                            console.log(as, "EDIT");
+                        }, toolbar: false, handleEditCell: () => __awaiter(void 0, void 0, void 0, function* () { return yield editUser(); }) })] })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ width: "100%", textAlign: "center", variant: "h5", gutterBottom: true, component: "div" }, { children: "Respaldo de base de datos" })), (0, jsx_runtime_1.jsx)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -129,7 +171,10 @@ const Admin = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         flexDirection: "column",
-                    } }, { children: [(0, jsx_runtime_1.jsx)("div", { children: "Generar respaldo" }), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", color: "primary", onClick: () => __awaiter(void 0, void 0, void 0, function* () { return yield generateBackup(); }) }, { children: "Respaldar base de datos" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)("div", { children: "Lista de respaldos" }), (0, jsx_runtime_1.jsx)(backupListComponenet_1.default, {})] })) }))] })));
+                    } }, { children: [(0, jsx_runtime_1.jsx)("div", { children: "Generar respaldo" }), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", color: "primary", onClick: () => __awaiter(void 0, void 0, void 0, function* () {
+                                yield generateBackup();
+                                setCounter(counter + 1);
+                            }) }, { children: "Respaldar base de datos" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)("div", { children: "Lista de respaldos" }), (0, jsx_runtime_1.jsx)(backupListComponenet_1.default, { refresh: counter })] })) }))] })));
 };
 exports.default = Admin;
 //# sourceMappingURL=Admin.js.map

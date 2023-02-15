@@ -2,19 +2,12 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { TableCustom } from "../table/TableCustom";
-import GenerateBackup from "./BackupComponent";
 import BackupList from "./backupListComponenet";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tooltip,
-} from "@mui/material";
+import { Button, FormControl, MenuItem, Select, Tooltip } from "@mui/material";
+import Swal from "sweetalert2";
+import { GlobalContext } from "../../config/context/GlobalContext";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -30,6 +23,9 @@ const Admin = (): JSX.Element => {
   const [users, setUsers] = React.useState<any>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [dataEdit, setDataEdit] = React.useState<string>("");
+  const [user, setUser] = React.useState<any>(0);
+  const [counter, setCounter] = React.useState<number>(0);
+  const { user: userContext } = React.useContext<any>(GlobalContext);
 
   const generateBackup = async () => {
     //@ts-ignore
@@ -86,8 +82,7 @@ const Admin = (): JSX.Element => {
       type: "select",
       align: "center",
       editable: true,
-      renderEditCell: (params) => {
-        console.log("Params edirt componenet ", params);
+      renderEditCell: () => {
         return (
           <FormControl
             sx={{
@@ -97,16 +92,19 @@ const Admin = (): JSX.Element => {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={params.row.role}
+              value={dataEdit}
               placeholder="Rol"
               label="Rol"
+              onChange={(e) => {
+                console.log("e.target.value ", e.target.value);
+                setDataEdit(e.target.value);
+              }}
             >
               <MenuItem disabled value={"select"}>
                 Rol
               </MenuItem>
-              <MenuItem value={"user"}>Usuario</MenuItem>
-              <MenuItem value={"Admin"}>Administrador</MenuItem>
-              <MenuItem value={"OWNER"}>Super Administrador</MenuItem>
+              <MenuItem value={"USER"}>Usuario</MenuItem>
+              <MenuItem value={"ADMIN"}>Administrador</MenuItem>
             </Select>
             {/*               {errorDataAlumno.sexo && (
             <Typography sx={{ color: "red", fontSize: ".9rem" }}>
@@ -132,8 +130,8 @@ const Admin = (): JSX.Element => {
               <Box>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 {params.formattedValue === "OWNER" && "Super Administrador"}
-                {params.formattedValue === "user" && "usuario"}
-                {params.formattedValue === "admin" && " Administrador"}
+                {params.formattedValue === "USER" && "Usuario"}
+                {params.formattedValue === "ADMIN" && " Administrador"}
                 &nbsp;&nbsp;&nbsp;&nbsp;
               </Box>
             </Tooltip>
@@ -148,14 +146,46 @@ const Admin = (): JSX.Element => {
     const response = await window.API.getUsers();
 
     const mapUsers = response.map((user: any) => {
+      delete user.datosBasicos.id;
       user = {
-        ...user,
         ...user.datosBasicos,
+        ...user,
       };
       return user;
     });
 
-    setUsers(mapUsers);
+    //filter user not OWNER
+    const filterUsers = mapUsers.filter((user: any) => {
+      return user.role !== "OWNER";
+    });
+
+    setUsers(filterUsers);
+  };
+
+  const editUser = async () => {
+    console.log("dataEdit ", dataEdit);
+    console.log("user ", user);
+    //@ts-ignore
+    const response = await window.API.updateUser({
+      id: user,
+      role: dataEdit,
+    });
+    console.log("response ", response);
+    if (response) {
+      Swal.fire({
+        title: "Usuario Actualizado correctamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+      });
+
+      await fetchUsers();
+    } else {
+      Swal.fire({
+        title: "Error al actualizar el usuario",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+    }
   };
 
   useEffect(() => {
@@ -208,10 +238,15 @@ const Admin = (): JSX.Element => {
           columns={fields}
           rows={users}
           loading={loading}
-          handleClick={(as) => console.log()}
-          handleDobleClick={(as) => console.log()}
-          handleEditCell={(as) => console.log()}
-          toolbar
+          handleClick={(as) => {
+            setDataEdit(as.row.role);
+            setUser(as.row.id);
+          }}
+          handleDobleClick={(as) => {
+            console.log(as, "EDIT");
+          }}
+          toolbar={false}
+          handleEditCell={async () => await editUser()}
         />
       </Box>
       <br />
@@ -245,13 +280,16 @@ const Admin = (): JSX.Element => {
           <Button
             variant="contained"
             color="primary"
-            onClick={async () => await generateBackup()}
+            onClick={async () => {
+              await generateBackup();
+              setCounter(counter + 1);
+            }}
           >
             Respaldar base de datos
           </Button>
           <br />
           <div>Lista de respaldos</div>
-          <BackupList />
+          <BackupList refresh={counter} />
         </Box>
       </Box>
     </Box>

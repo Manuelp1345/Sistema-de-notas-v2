@@ -32,6 +32,9 @@ const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, to
                 timer: 1500,
             });
         };
+        if (newCell["role"]) {
+            handleEditCell(newCell, oldCell);
+        }
         if (newCell["1"]) {
             if (Number(newCell["1"]) > 20 || Number(newCell["1"]) <= 0)
                 return alert();

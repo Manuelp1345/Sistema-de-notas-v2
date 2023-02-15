@@ -188,6 +188,8 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
   dataBasic.firstName = user.nombre;
   dataBasic.Surname = user.apellido;
   dataBasic.email = user.email;
+  //ranmdom dni
+  dataBasic.dni = String(Math.floor(Math.random() * 1000000000));
   let dataBasicId;
   try {
     dataBasicId = await dataBasic.save();
@@ -203,9 +205,9 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
     .update(user.password)
     .digest("hex");
   userDB.role = user.role;
-
+  let userId;
   try {
-    await userDB.save();
+    userId = await userDB.save();
     //@ts-ignore
     new Notification({
       title: "Sistema De Notas",
@@ -214,7 +216,7 @@ ipcMain.handle("CREATE_USER_DB", async (event, user) => {
       //@ts-ignore
     }).show();
 
-    return true;
+    return userId;
   } catch (error) {
     console.log(error);
     //@ts-ignore
@@ -245,7 +247,7 @@ ipcMain.handle("LOGIN", async (event, user) => {
       //@ts-ignore
       crypto.createHash("sha256").update(user.password).digest("hex")
     ) {
-      return true;
+      return userJson;
     }
   }
   //@ts-ignore
@@ -725,12 +727,16 @@ ipcMain.handle("GET_ALUMNOS", async (evet, id) => {
     Alumnos = await Etapas.find({
       relations: {
         alumno: {
-          DatosPersonales: true,
+          DatosPersonales: {
+            Documents: true,
+          },
           representante: {
             DatosPersonales: true,
           },
         },
-        anio: true,
+        anio: {
+          periodo: true,
+        },
         seccione: true,
       },
       where: {
@@ -1126,7 +1132,7 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
   });
 
   const currentEtapa = alumno?.Etapas.find(
-    (etapa) => etapa.anio.id === data.anioId
+    (etapa) => etapa.anio.periodo.id === data.periodoId
   );
 
   console.log("currentEtapa", currentEtapa);
@@ -1135,6 +1141,12 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
     where: {
       alumno: {
         id: data.alumnoId,
+        Etapas: {
+          id: currentEtapa?.id,
+        },
+      },
+      anio: {
+        id: data.anioId,
       },
     },
     relations: {
@@ -1142,6 +1154,8 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
       recuperacion: true,
     },
   });
+
+  console.log("notas", notas);
 
   const materias: Materia[] = [];
 
@@ -1339,40 +1353,59 @@ ipcMain.handle("GET_USERS", async (event, args) => {
 });
 
 ipcMain.handle("GENERATE_RESPALDO", async (event, args) => {
-  // crear directorio del sistema para guardar los respaldos en la carpeta de documentos
-  const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
-  if (!fs.existsSync(pathRespaldo)) {
-    await fs.mkdirSync(pathRespaldo);
+  try {
+    // crear directorio del sistema para guardar los respaldos en la carpeta de documentos
+    const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
+    if (!fs.existsSync(pathRespaldo)) {
+      await fs.mkdirSync(pathRespaldo);
+    }
+
+    await appDataSource.transaction(async (manager) => {
+      const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${moment().format(
+        "YYYY-MM-DD"
+      )}.json`;
+
+      const entities = appDataSource.entityMetadatas;
+      const backup = entities.map((entity) => {
+        const repository = manager.getRepository(entity.name);
+        return repository
+          .find({
+            relations: entity.relations.map(
+              (relation) => relation.propertyName
+            ),
+          })
+          .then((records) => {
+            return {
+              entity: entity.name,
+              records: records,
+            };
+          });
+      });
+
+      await Promise.all(backup).then((results) => {
+        const data = results.reduce((acc, result) => {
+          acc[result.entity] = result.records;
+          return acc;
+        }, {});
+        fs.writeFileSync(nameFileJsonWithDate, JSON.stringify(data, null, 2));
+      });
+    });
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Respaldo generado con exito",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+  } catch (error) {
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Error al generar el respaldo",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
   }
-
-  await appDataSource.transaction(async (manager) => {
-    const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${moment().format(
-      "YYYY-MM-DD"
-    )}.json`;
-
-    const entities = appDataSource.entityMetadatas;
-    const backup = entities.map((entity) => {
-      const repository = manager.getRepository(entity.name);
-      return repository
-        .find({
-          relations: entity.relations.map((relation) => relation.propertyName),
-        })
-        .then((records) => {
-          return {
-            entity: entity.name,
-            records: records,
-          };
-        });
-    });
-
-    await Promise.all(backup).then((results) => {
-      const data = results.reduce((acc, result) => {
-        acc[result.entity] = result.records;
-        return acc;
-      }, {});
-      fs.writeFileSync(nameFileJsonWithDate, JSON.stringify(data, null, 2));
-    });
-  });
 });
 
 ipcMain.handle("GET_RESPALDOS", async (event, args) => {
@@ -1387,43 +1420,300 @@ ipcMain.handle("GET_RESPALDOS", async (event, args) => {
 });
 
 ipcMain.handle("RESTORE_RESPALDO", async (event, args) => {
-  const restoreName = args as string;
-  const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
-  const pathRestore = `${pathRespaldo}/${restoreName}`;
+  try {
+    const restoreName = args as string;
+    const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
+    const pathRestore = `${pathRespaldo}/${restoreName}`;
 
-  await appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
+    await appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
 
-  await appDataSource.query("CREATE DATABASE `db_notas`");
+    await appDataSource.query("CREATE DATABASE `db_notas`");
 
-  await appDataSource.destroy();
+    await appDataSource.destroy();
 
-  appDataSource = await ConnectionDB();
+    appDataSource = await ConnectionDB();
 
-  const data = JSON.parse(fs.readFileSync(pathRestore, "utf8"));
+    const data = JSON.parse(fs.readFileSync(pathRestore, "utf8"));
 
-  const orderedKeys = [
-    "Periodo",
-    "Anio",
-    "Seccion",
-    "Materia",
-    "Documents",
-    "BasicData",
-    "User",
-    "Representante",
-    "Alumno",
-    "Etapas",
-    "Nota",
-    "RecuperacionNota",
-  ];
+    const orderedKeys = [
+      "Periodo",
+      "Anio",
+      "Seccion",
+      "Materia",
+      "Documents",
+      "BasicData",
+      "User",
+      "Representante",
+      "Alumno",
+      "Etapas",
+      "Nota",
+      "RecuperacionNota",
+    ];
 
-  const orderedObj = {};
+    const orderedObj = {};
 
-  orderedKeys.forEach((key) => {
-    orderedObj[key] = data[key];
+    orderedKeys.forEach((key) => {
+      orderedObj[key] = data[key];
+    });
+
+    for (const entity of orderedKeys) {
+      const repository = appDataSource.manager.getRepository(entity);
+      await repository.save(data[entity]);
+    }
+
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Respaldo restaurado con exito",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+  } catch (error) {
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "Error al restaurar el respaldo",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+  }
+});
+
+ipcMain.handle("UPDATE_ALUMNO", async (event, data) => {
+  try {
+    return await appDataSource.transaction(async (manager) => {
+      const alumno = await manager.getRepository(Alumno).findOne({
+        where: {
+          DatosPersonales: {
+            dni: data.alumno.dni,
+          },
+        },
+        relations: {
+          DatosPersonales: {
+            Documents: true,
+          },
+          representante: {
+            DatosPersonales: true,
+          },
+          Etapas: true,
+        },
+      });
+
+      if (alumno) {
+        try {
+          await manager.getRepository(BasicData).update(
+            { id: alumno.representante.DatosPersonales.id },
+            {
+              dni: data.representante.dni,
+              firstName: data.representante.firstName,
+              secondName: data.representante.secondName,
+              Surname: data.representante.surname,
+              secondSurname: data.representante.secondSurname,
+              email: data.representante.email,
+              Phone: data.representante.phone,
+              address: data.representante.address,
+              state: data.representante.state,
+              municipality: data.representante.municipality,
+            }
+          );
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+        try {
+          await manager.getRepository(Documents).update(
+            { id: alumno.DatosPersonales.Documents.id },
+            {
+              cedula: Boolean(data.alumno.cedula),
+              pasaporte: Boolean(data.alumno.pasaporte),
+              partida_nacimiento: Boolean(data.alumno.partidaDeNacimiento),
+              fotos_carnet: Boolean(data.alumno.fotos),
+              notas_escuela: Boolean(data.alumno.notasEscolares),
+            }
+          );
+          //@ts-ignore
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+
+        try {
+          await manager.getRepository(BasicData).update(
+            {
+              id: alumno.DatosPersonales.id,
+            },
+            {
+              firstName: data.alumno.firsName,
+              secondName: data.alumno.SecondName,
+              Surname: data.alumno.surname,
+              secondSurname: data.alumno.secondSurname,
+              email: data.alumno.email,
+              sexo: data.alumno.sexo,
+              dni: data.alumno.dni,
+              Phone: data.alumno.phone,
+              address: data.alumno.address,
+              state: data.alumno.state,
+              municipality: data.alumno.municipality,
+              DateOfBirth: data.alumno.fechaNacimiento,
+            }
+          );
+          //@ts-ignore
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+
+        try {
+          await manager.getRepository(Alumno).update(
+            {
+              id: alumno.id,
+            },
+            {
+              observacion: data.alumno.observacion,
+              condicion: data.alumno.condicion,
+              grupoEstable: data.alumno.grupoEstable,
+            }
+          );
+          //@ts-ignore
+          //@ts-ignore
+          new Notification({
+            title: "Sistema De Notas",
+            body: "Alumno Actualizado con exito",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+          }).show();
+          return true;
+        } catch (error) {
+          console.log(error);
+          throw new Error("No se pudo registrar el alumno");
+        }
+      }
+
+      return true;
+    });
+  } catch (error) {
+    console.log(error);
+    new Notification({
+      title: "Sistema De Notas",
+      body: "No se pudo actualizar el alumno",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    throw new Error("No se pudo registrar el alumno");
+  }
+});
+
+ipcMain.handle("GET_ANIOS_AND_SECCIONS", async (event, data) => {
+  const anios = await appDataSource.manager.getRepository(Anio).find({
+    where: {
+      periodo: {
+        id: data,
+      },
+    },
+    relations: {
+      secciones: true,
+    },
   });
 
-  for (const entity of orderedKeys) {
-    const repository = appDataSource.manager.getRepository(entity);
-    await repository.save(data[entity]);
+  return anios;
+});
+
+ipcMain.handle("UPDATE_ALUMNO_SECCION_AND_ANIO", async (event, data) => {
+  const alumno = await appDataSource.manager.getRepository(Alumno).findOne({
+    where: {
+      DatosPersonales: {
+        dni: data.alumno.dni,
+      },
+    },
+    relations: {
+      DatosPersonales: true,
+      Etapas: true,
+    },
+  });
+
+  if (alumno) {
+    return await appDataSource.transaction(async (manager) => {
+      try {
+        await manager.getRepository(Etapas).update(
+          {
+            id: data.etapa,
+          },
+          {
+            anio: data.anio,
+            seccione: data.seccion,
+          }
+        );
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "Alumno Actualizado con exito",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+    });
   }
+});
+
+ipcMain.handle("UPDATE_USER", async (event, data) => {
+  const user = await appDataSource.manager.getRepository(User).findOne({
+    where: {
+      id: data.id,
+    },
+  });
+  if (user) {
+    return await appDataSource.transaction(async (manager) => {
+      try {
+        await manager.getRepository(User).update(
+          {
+            id: data.id,
+          },
+          {
+            role: data.role,
+          }
+        );
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "Usuario Actualizado con exito",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+    });
+  }
+});
+
+ipcMain.handle("GET_ALUMNOS_GRADUADOS", async (event, data) => {
+  const alumnos = await appDataSource.manager.getRepository(Etapas).find({
+    where: {
+      alumno: {
+        condicion: "Graduado",
+      },
+    },
+    relations: {
+      alumno: {
+        DatosPersonales: {
+          Documents: true,
+        },
+        representante: {
+          DatosPersonales: true,
+        },
+      },
+      anio: {
+        periodo: true,
+      },
+      seccione: true,
+    },
+  });
+
+  return alumnos;
 });
