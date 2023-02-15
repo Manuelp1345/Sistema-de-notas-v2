@@ -122,6 +122,9 @@ const updateUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
 const getAlumnosGraduados = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_ALUMNOS_GRADUADOS", data);
 });
+const deleteUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("DELETE_USER", data);
+});
 const API = {
     getCredentialsDB,
     createCredentialsDB,
@@ -157,6 +160,7 @@ const API = {
     updateAlumnoSeccionAndAnio,
     updateUser,
     getAlumnosGraduados,
+    deleteUser,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

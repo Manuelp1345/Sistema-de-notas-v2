@@ -914,29 +914,17 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     },
                 },
             });
-            const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
-                where: {
-                    Etapas: {
-                        anio: {
-                            periodo: {
-                                id: data.periodo,
-                            },
-                        },
-                    },
-                },
-                relations: {
-                    notas: {
-                        materia: true,
-                        recuperacion: true,
-                    },
-                    Etapas: {
-                        anio: {
-                            periodo: true,
-                        },
-                        seccione: true,
-                    },
-                },
-            });
+            const alumnos = yield transaction
+                .createQueryBuilder(alumnos_1.Alumno, "alumno")
+                .where("alumno.condicion = :condicion1 OR alumno.condicion = :condicion2", { condicion1: "Regular", condicion2: "Nuevo Ingreso" })
+                .andWhere("alumno.Etapas.anio.periodo.id = :periodoId", {
+                periodoId: data.periodo,
+            })
+                .leftJoinAndSelect("alumno.notas", "notas")
+                .leftJoinAndSelect("alumno.Etapas", "etapas")
+                .leftJoinAndSelect("etapas.anio", "anio")
+                .leftJoinAndSelect("etapas.seccione", "secciones")
+                .getMany();
             console.log("ALUMNOS", alumnos);
             for (const alumno of alumnos) {
                 let promedio = 0;
@@ -1557,5 +1545,33 @@ electron_1.ipcMain.handle("GET_ALUMNOS_GRADUADOS", (event, data) => __awaiter(vo
         },
     });
     return alumnos;
+}));
+electron_1.ipcMain.handle("DELETE_USER", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield appDataSource.manager.getRepository(user_1.User).findOne({
+        where: {
+            id: data.id,
+        },
+    });
+    if (user) {
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield manager.getRepository(user_1.User).delete({
+                    id: data.id,
+                });
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Usuario Eliminado con exito",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+        }));
+    }
 }));
 //# sourceMappingURL=electron.js.map

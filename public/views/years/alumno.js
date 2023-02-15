@@ -280,6 +280,7 @@ const Alumno = () => {
             alumno: datosAlumno,
             representante: datosRepresetante,
         };
+        console.log(data);
         //@ts-ignore
         const response = yield window.API.updateAlumno(data);
         setloading(false);
@@ -490,16 +491,19 @@ const Alumno = () => {
         console.log("new seccion", newSeccion);
         const seccionId = (_b = aniosAndSecciones
             .find((anio) => anio.numberAnio === newAnio)) === null || _b === void 0 ? void 0 : _b.secciones.find((seccion) => seccion.seccion === newSeccion);
+        const anioId = aniosAndSecciones.find((anio) => anio.numberAnio === newAnio);
         console.log(seccionId, "seccionId");
-        // @ts-ignore
-        const res = yield window.API.updateAlumnoSeccionAndAnio({
+        const data = {
             alumno: {
                 dni: alumno.alumnoId.alumno.DatosPersonales.dni,
             },
             etapa: alumno.alumnoId.id,
             seccion: seccionId === null || seccionId === void 0 ? void 0 : seccionId.id,
-            anio: newAnio,
-        });
+            anio: anioId,
+        };
+        console.log(data);
+        // @ts-ignore
+        const res = yield window.API.updateAlumnoSeccionAndAnio(data);
         console.log(res);
         if (res) {
             sweetalert2_1.default.fire({

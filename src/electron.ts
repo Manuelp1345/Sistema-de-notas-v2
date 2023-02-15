@@ -925,29 +925,20 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         },
       });
 
-      const alumnos = await transaction.getRepository(Alumno).find({
-        where: {
-          Etapas: {
-            anio: {
-              periodo: {
-                id: data.periodo,
-              },
-            },
-          },
-        },
-        relations: {
-          notas: {
-            materia: true,
-            recuperacion: true,
-          },
-          Etapas: {
-            anio: {
-              periodo: true,
-            },
-            seccione: true,
-          },
-        },
-      });
+      const alumnos = await transaction
+        .createQueryBuilder(Alumno, "alumno")
+        .where(
+          "alumno.condicion = :condicion1 OR alumno.condicion = :condicion2",
+          { condicion1: "Regular", condicion2: "Nuevo Ingreso" }
+        )
+        .andWhere("alumno.Etapas.anio.periodo.id = :periodoId", {
+          periodoId: data.periodo,
+        })
+        .leftJoinAndSelect("alumno.notas", "notas")
+        .leftJoinAndSelect("alumno.Etapas", "etapas")
+        .leftJoinAndSelect("etapas.anio", "anio")
+        .leftJoinAndSelect("etapas.seccione", "secciones")
+        .getMany();
       console.log("ALUMNOS", alumnos);
 
       for (const alumno of alumnos) {
@@ -1716,4 +1707,32 @@ ipcMain.handle("GET_ALUMNOS_GRADUADOS", async (event, data) => {
   });
 
   return alumnos;
+});
+
+ipcMain.handle("DELETE_USER", async (event, data) => {
+  const user = await appDataSource.manager.getRepository(User).findOne({
+    where: {
+      id: data.id,
+    },
+  });
+  if (user) {
+    return await appDataSource.transaction(async (manager) => {
+      try {
+        await manager.getRepository(User).delete({
+          id: data.id,
+        });
+        //@ts-ignore
+        new Notification({
+          title: "Sistema De Notas",
+          body: "Usuario Eliminado con exito",
+          icon: path.join(__dirname, "./img/logo.png"),
+          //@ts-ignore
+        }).show();
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw new Error("No se pudo registrar el alumno");
+      }
+    });
+  }
 });

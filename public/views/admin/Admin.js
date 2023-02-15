@@ -23,6 +23,9 @@ const backupListComponenet_1 = __importDefault(require("./backupListComponenet")
 const material_1 = require("@mui/material");
 const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const GlobalContext_1 = require("../../config/context/GlobalContext");
+const RemoveCircle_1 = __importDefault(require("@mui/icons-material/RemoveCircle"));
+const customModal_1 = require("../modals/customModal");
+const DialogContentText_1 = __importDefault(require("@mui/material/DialogContentText"));
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const Admin = () => {
     const [users, setUsers] = react_1.default.useState([]);
@@ -31,10 +34,62 @@ const Admin = () => {
     const [user, setUser] = react_1.default.useState(0);
     const [counter, setCounter] = react_1.default.useState(0);
     const { user: userContext } = react_1.default.useContext(GlobalContext_1.GlobalContext);
+    const [idUserDelete, setIdUserDelete] = react_1.default.useState({
+        id: 0,
+    });
+    const [openDeleteUser, setOpenUser] = react_1.default.useState(false);
+    const handleClickOpenDeleteUser = () => setOpenUser(true);
+    const handleCloseDeleteUser = () => setOpenUser(false);
     const generateBackup = () => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
         const backup = yield window.API.generateBackup();
         console.log(backup);
+    });
+    const fetchUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+        //@ts-ignore
+        const response = yield window.API.getUsers();
+        const mapUsers = response.map((user) => {
+            delete user.datosBasicos.id;
+            user = Object.assign(Object.assign({}, user.datosBasicos), user);
+            return user;
+        });
+        //filter user not OWNER
+        const filterUsers = mapUsers.filter((user) => {
+            return user.role !== "OWNER";
+        });
+        setUsers(filterUsers);
+    });
+    const handledDeleteAnio = () => __awaiter(void 0, void 0, void 0, function* () {
+        handleCloseDeleteUser();
+        let deleteUser;
+        try {
+            //@ts-ignore
+            deleteUser = yield window.API.deleteUser(idUserDelete);
+        }
+        catch (error) {
+            sweetalert2_1.default.fire({
+                title: `Error al borrar el usuario`,
+                icon: "error",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        }
+        console.log("delete response", deleteUser);
+        if (deleteUser === "error") {
+            return sweetalert2_1.default.fire({
+                title: `NO puedes borrar el usuario `,
+                icon: "error",
+                showConfirmButton: false,
+                timer: 2000,
+            });
+        }
+        yield fetchUsers();
+        sweetalert2_1.default.fire({
+            title: `Usuario Borrado`,
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+        });
     });
     const fields = [
         {
@@ -102,21 +157,25 @@ const Admin = () => {
                     } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue === "OWNER" && "Super Administrador", params.formattedValue === "USER" && "Usuario", params.formattedValue === "ADMIN" && " Administrador", "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
             },
         },
+        {
+            field: "estado",
+            headerName: "Opciones",
+            width: 150,
+            headerClassName: "backGround",
+            headerAlign: "center",
+            align: "center",
+            renderCell: (params) => {
+                return ((0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ sx: {
+                        display: "flex",
+                        width: "100%",
+                        justifyContent: "center",
+                    }, onClick: () => {
+                        handleClickOpenDeleteUser();
+                        setIdUserDelete(params.row);
+                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Borrar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(RemoveCircle_1.default, { sx: { color: "red" } }) })) })));
+            },
+        },
     ];
-    const fetchUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-        //@ts-ignore
-        const response = yield window.API.getUsers();
-        const mapUsers = response.map((user) => {
-            delete user.datosBasicos.id;
-            user = Object.assign(Object.assign({}, user.datosBasicos), user);
-            return user;
-        });
-        //filter user not OWNER
-        const filterUsers = mapUsers.filter((user) => {
-            return user.role !== "OWNER";
-        });
-        setUsers(filterUsers);
-    });
     const editUser = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log("dataEdit ", dataEdit);
         console.log("user ", user);
@@ -174,7 +233,7 @@ const Admin = () => {
                     } }, { children: [(0, jsx_runtime_1.jsx)("div", { children: "Generar respaldo" }), (0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ variant: "contained", color: "primary", onClick: () => __awaiter(void 0, void 0, void 0, function* () {
                                 yield generateBackup();
                                 setCounter(counter + 1);
-                            }) }, { children: "Respaldar base de datos" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)("div", { children: "Lista de respaldos" }), (0, jsx_runtime_1.jsx)(backupListComponenet_1.default, { refresh: counter })] })) }))] })));
+                            }) }, { children: "Respaldar base de datos" })), (0, jsx_runtime_1.jsx)("br", {}), (0, jsx_runtime_1.jsx)("div", { children: "Lista de respaldos" }), (0, jsx_runtime_1.jsx)(backupListComponenet_1.default, { refresh: counter })] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Eliminar", color: "red", tittle: "Alerta", openDialog: openDeleteUser, handleCloseDialog: handleCloseDeleteUser, handledConfirm: handledDeleteAnio }, { children: (0, jsx_runtime_1.jsx)(DialogContentText_1.default, { children: "Confirma que desea eliminar el usuario seleccionado" }) }))] })));
 };
 exports.default = Admin;
 //# sourceMappingURL=Admin.js.map

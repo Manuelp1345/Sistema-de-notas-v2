@@ -312,37 +312,37 @@ const SetupYear = ({ idPeriodo }) => {
                                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Borrar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(RemoveCircle_1.default, { sx: { color: "red" } }) })) })));
                                         },
                                     },
-                                ] })] }))] })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Eliminar", color: "red", tittle: "Alerta", openDialog: openDeleteAnio, handleCloseDialog: handleCloseDeleteAnio, handledConfirm: handledDeleteAnio }, { children: (0, jsx_runtime_1.jsxs)(DialogContentText_1.default, { children: ["Confirma que desea eliminar ", idAnioDelete.anio] }) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "green", tittle: "Agregar Periodo", openDialog: openAddPeriodo, handleCloseDialog: handleCloseAddPeriodo, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                                ] })] }))] })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Eliminar", color: "red", tittle: "Alerta", openDialog: openDeleteAnio, handleCloseDialog: handleCloseDeleteAnio, handledConfirm: handledDeleteAnio }, { children: (0, jsx_runtime_1.jsxs)(DialogContentText_1.default, { children: ["Confirma que desea eliminar ", idAnioDelete.anio] }) })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "primary", tittle: "Agregar Periodo", openDialog: openAddPeriodo, handleCloseDialog: handleCloseAddPeriodo, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertPeriodo(`${value.yearOne} - ${value.yearTwo}`);
                     handleCloseAddPeriodo();
-                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
-                        gap: 2,
-                        mt: 2,
-                    } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
-                                    setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
-                                    setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                            gap: 2,
+                            mt: 2,
+                        } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
+                                        setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
+                                        setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
                     handleCloseAddAnio();
-                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
-                        gap: 2,
-                        mt: 2,
-                    } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { label: "A\u00F1o (Primer A\u00F1o)", variant: "outlined", value: value.anio, onChange: (e) => {
-                                setValue(Object.assign(Object.assign({}, value), { anio: e.target.value }));
-                            } }), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "number", placeholder: "Valor Numerico (1)", value: value.numberAnio, onChange: (e) => {
-                                setValue(Object.assign(Object.assign({}, value), { numberAnio: Number(e.target.value) }));
-                            } })] })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "green", tittle: "Agrega el nuevo periodo", openDialog: openAddPeriodoGrade, handleCloseDialog: handleCloseAddPeriodoGrade, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue un nuevo a\u00F1o, no podr\u00E1 editarlo. Adem\u00E1s, solo se podr\u00E1 borrar si no est\u00E1 actualmente en uso.", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar un nuevo a\u00F1o?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                            gap: 2,
+                            mt: 2,
+                        } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { label: "A\u00F1o (Primer A\u00F1o)", variant: "outlined", value: value.anio, onChange: (e) => {
+                                    setValue(Object.assign(Object.assign({}, value), { anio: e.target.value }));
+                                } }), (0, jsx_runtime_1.jsx)(material_1.Typography, { children: "Ingrese el numero correspondiente al a\u00F1o" }), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "number", placeholder: "Valor Numerico (1)", value: value.numberAnio, onChange: (e) => {
+                                    setValue(Object.assign(Object.assign({}, value), { numberAnio: Number(e.target.value) }));
+                                } })] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "primary", tittle: "Agrega el nuevo periodo", openDialog: openAddPeriodoGrade, handleCloseDialog: handleCloseAddPeriodoGrade, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield gradeAlumnos(idPeriodo, `${value.yearOne} - ${value.yearTwo}`);
                     handleCloseAddPeriodoGrade();
-                }) }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
-                        gap: 2,
-                        mt: 2,
-                    } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
-                                    setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
-                                    setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] })) }))] })));
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                            gap: 2,
+                            mt: 2,
+                        } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
+                                        setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
+                                        setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
+                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] }))] }))] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

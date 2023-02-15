@@ -441,7 +441,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
       </CustomModal>
       <CustomModal
         btnText="Agregar"
-        color="green"
+        color="primary"
         tittle={"Agregar Periodo"}
         openDialog={openAddPeriodo}
         handleCloseDialog={handleCloseAddPeriodo}
@@ -450,6 +450,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           handleCloseAddPeriodo();
         }}
       >
+        <Typography>
+          "¡Advertencia! Una vez que ingrese un nuevo periodo, no podrá editarlo
+          ni eliminarlo. <br /> Asegúrese de verificar cuidadosamente la
+          información antes de guardar. ¿Desea continuar?"
+        </Typography>
         <FormGroup
           sx={{
             gap: 2,
@@ -497,6 +502,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           handleCloseAddAnio();
         }}
       >
+        <Typography>
+          "¡Atención! Una vez que agregue un nuevo año, no podrá editarlo.
+          Además, solo se podrá borrar si no está actualmente en uso.
+          <br /> ¿Desea continuar con la acción de agregar un nuevo año?"
+        </Typography>
         <FormGroup
           sx={{
             gap: 2,
@@ -511,6 +521,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
               setValue({ ...value, anio: e.target.value });
             }}
           />
+          <Typography>Ingrese el numero correspondiente al año</Typography>
           <Input
             type="number"
             placeholder="Valor Numerico (1)"
@@ -523,7 +534,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
       </CustomModal>
       <CustomModal
         btnText="Agregar"
-        color="green"
+        color="primary"
         tittle={"Agrega el nuevo periodo"}
         openDialog={openAddPeriodoGrade}
         handleCloseDialog={handleCloseAddPeriodoGrade}
@@ -532,6 +543,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           handleCloseAddPeriodoGrade();
         }}
       >
+        <Typography>
+          "¡Advertencia! Una vez que ingrese un nuevo periodo, no podrá editarlo
+          ni eliminarlo. <br /> Asegúrese de verificar cuidadosamente la
+          información antes de guardar. ¿Desea continuar?"
+        </Typography>
         <FormGroup
           sx={{
             gap: 2,

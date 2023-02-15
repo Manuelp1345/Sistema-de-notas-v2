@@ -142,6 +142,10 @@ const getAlumnosGraduados = async (data) => {
   return await ipcRenderer.invoke("GET_ALUMNOS_GRADUADOS", data);
 };
 
+const deleteUser = async (data) => {
+  return await ipcRenderer.invoke("DELETE_USER", data);
+};
+
 const API = {
   getCredentialsDB,
   createCredentialsDB,
@@ -177,6 +181,7 @@ const API = {
   updateAlumnoSeccionAndAnio,
   updateUser,
   getAlumnosGraduados,
+  deleteUser,
 };
 
 contextBridge.exposeInMainWorld("API", API);

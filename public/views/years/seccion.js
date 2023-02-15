@@ -151,8 +151,8 @@ const Seccion = () => {
         const response = yield window.API.getRepresentanteByDni(dni);
         if (response) {
             sweetalert2_1.default.fire({
-                title: "El Rrepresentante ya existe",
-                text: "Desea cargar los datos del representante?",
+                title: "Atención",
+                text: "El representante que está tratando de agregar ya existe en el sistema. ¿Desea cargar la información del representante en el formulario. ",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",

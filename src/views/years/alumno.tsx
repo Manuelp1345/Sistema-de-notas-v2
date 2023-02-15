@@ -387,6 +387,8 @@ const Alumno = (): JSX.Element => {
       alumno: datosAlumno,
       representante: datosRepresetante,
     };
+
+    console.log(data);
     //@ts-ignore
     const response = await window.API.updateAlumno(data);
     setloading(false);
@@ -661,16 +663,24 @@ const Alumno = (): JSX.Element => {
       .find((anio) => anio.numberAnio === newAnio)
       ?.secciones.find((seccion) => seccion.seccion === newSeccion);
 
+    const anioId = aniosAndSecciones.find(
+      (anio) => anio.numberAnio === newAnio
+    );
+
     console.log(seccionId, "seccionId");
-    // @ts-ignore
-    const res = await window.API.updateAlumnoSeccionAndAnio({
+
+    const data = {
       alumno: {
         dni: alumno.alumnoId.alumno.DatosPersonales.dni,
       },
       etapa: alumno.alumnoId.id,
       seccion: seccionId?.id,
-      anio: newAnio,
-    });
+      anio: anioId,
+    };
+    console.log(data);
+
+    // @ts-ignore
+    const res = await window.API.updateAlumnoSeccionAndAnio(data);
     console.log(res);
     if (res) {
       Swal.fire({

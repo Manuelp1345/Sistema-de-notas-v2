@@ -282,32 +282,6 @@ const Year = (): JSX.Element => {
                 align: "center",
                 editable: true,
               },
-              {
-                field: "estado",
-                headerName: "Opciones",
-                width: 150,
-                headerClassName: "backGround",
-                headerAlign: "center",
-                align: "center",
-                renderCell: () => {
-                  return (
-                    <Button
-                      sx={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "center",
-                      }}
-                      onClick={() => {
-                        console.log("params");
-                      }}
-                    >
-                      <Tooltip title="Borrar" arrow placement="right">
-                        <RemoveCircleIcon sx={{ color: "red" }} />
-                      </Tooltip>
-                    </Button>
-                  );
-                },
-              },
             ]}
           />
         </Box>
@@ -323,6 +297,12 @@ const Year = (): JSX.Element => {
           handleCloseAddSeccion();
         }}
       >
+        <Typography>
+          "¡Atención! Una vez que agregue una nueva sección, no podrá editarla
+          ni borrarla. <br /> Asegúrese de verificar cuidadosamente la
+          información antes de guardar. <br /> ¿Desea continuar con la acción de
+          agregar una nueva sección?"
+        </Typography>
         <FormGroup
           sx={{
             gap: 2,
@@ -350,6 +330,12 @@ const Year = (): JSX.Element => {
           handleCloseAddArea();
         }}
       >
+        <Typography>
+          "¡Atención! Una vez que agregue un nueva área, no podrá editarla ni
+          borrarla. <br /> Asegúrese de verificar cuidadosamente la información
+          antes de guardar. <br /> ¿Desea continuar con la acción de agregar una
+          nueva área?"
+        </Typography>
         <FormGroup
           sx={{
             gap: 2,

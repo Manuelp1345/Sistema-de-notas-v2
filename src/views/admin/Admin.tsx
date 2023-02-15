@@ -8,6 +8,9 @@ import BackupList from "./backupListComponenet";
 import { Button, FormControl, MenuItem, Select, Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import { GlobalContext } from "../../config/context/GlobalContext";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import { CustomModal } from "../modals/customModal";
+import DialogContentText from "@mui/material/DialogContentText";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -26,11 +29,72 @@ const Admin = (): JSX.Element => {
   const [user, setUser] = React.useState<any>(0);
   const [counter, setCounter] = React.useState<number>(0);
   const { user: userContext } = React.useContext<any>(GlobalContext);
+  const [idUserDelete, setIdUserDelete] = React.useState({
+    id: 0,
+  });
+  const [openDeleteUser, setOpenUser] = React.useState(false);
+  const handleClickOpenDeleteUser = () => setOpenUser(true);
+  const handleCloseDeleteUser = () => setOpenUser(false);
 
   const generateBackup = async () => {
     //@ts-ignore
     const backup = await window.API.generateBackup();
     console.log(backup);
+  };
+
+  const fetchUsers = async () => {
+    //@ts-ignore
+    const response = await window.API.getUsers();
+
+    const mapUsers = response.map((user: any) => {
+      delete user.datosBasicos.id;
+      user = {
+        ...user.datosBasicos,
+        ...user,
+      };
+      return user;
+    });
+
+    //filter user not OWNER
+    const filterUsers = mapUsers.filter((user: any) => {
+      return user.role !== "OWNER";
+    });
+
+    setUsers(filterUsers);
+  };
+
+  const handledDeleteAnio = async () => {
+    handleCloseDeleteUser();
+    let deleteUser;
+    try {
+      //@ts-ignore
+      deleteUser = await window.API.deleteUser(idUserDelete);
+    } catch (error) {
+      Swal.fire({
+        title: `Error al borrar el usuario`,
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+    console.log("delete response", deleteUser);
+    if (deleteUser === "error") {
+      return Swal.fire({
+        title: `NO puedes borrar el usuario `,
+        icon: "error",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+
+    await fetchUsers();
+
+    Swal.fire({
+      title: `Usuario Borrado`,
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1500,
+    });
   };
 
   const fields = [
@@ -139,28 +203,34 @@ const Admin = (): JSX.Element => {
         );
       },
     },
+    userContext.user.role !== "ADMIN" && {
+      field: "estado",
+      headerName: "Opciones",
+      width: 150,
+      headerClassName: "backGround",
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        return (
+          <Button
+            sx={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+            }}
+            onClick={() => {
+              handleClickOpenDeleteUser();
+              setIdUserDelete(params.row);
+            }}
+          >
+            <Tooltip title="Borrar" arrow placement="right">
+              <RemoveCircleIcon sx={{ color: "red" }} />
+            </Tooltip>
+          </Button>
+        );
+      },
+    },
   ];
-
-  const fetchUsers = async () => {
-    //@ts-ignore
-    const response = await window.API.getUsers();
-
-    const mapUsers = response.map((user: any) => {
-      delete user.datosBasicos.id;
-      user = {
-        ...user.datosBasicos,
-        ...user,
-      };
-      return user;
-    });
-
-    //filter user not OWNER
-    const filterUsers = mapUsers.filter((user: any) => {
-      return user.role !== "OWNER";
-    });
-
-    setUsers(filterUsers);
-  };
 
   const editUser = async () => {
     console.log("dataEdit ", dataEdit);
@@ -292,6 +362,18 @@ const Admin = (): JSX.Element => {
           <BackupList refresh={counter} />
         </Box>
       </Box>
+      <CustomModal
+        btnText="Eliminar"
+        color="red"
+        tittle={"Alerta"}
+        openDialog={openDeleteUser}
+        handleCloseDialog={handleCloseDeleteUser}
+        handledConfirm={handledDeleteAnio}
+      >
+        <DialogContentText>
+          Confirma que desea eliminar el usuario seleccionado
+        </DialogContentText>
+      </CustomModal>
     </Box>
   );
 };

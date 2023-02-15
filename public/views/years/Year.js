@@ -204,23 +204,23 @@ const Year = () => {
                                                 } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Borrar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(RemoveCircle_1.default, { sx: { color: "red" } }) })) })));
                                         },
                                     },
-                                ] })] }))] })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Seccion", openDialog: openAddSeccion, handleCloseDialog: handleCloseAddSeccion, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                                ] })] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Seccion", openDialog: openAddSeccion, handleCloseDialog: handleCloseAddSeccion, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertSeccion(value.seccion);
                     handleCloseAddSeccion();
-                }) }, { children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
-                        gap: 2,
-                        mt: 2,
-                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "Seccion", variant: "outlined", value: value.seccion, onChange: (e) => {
-                            setValue(Object.assign(Object.assign({}, value), { seccion: e.target.value }));
-                        } }) })) })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Area", openDialog: openAddArea, handleCloseDialog: handleCloseAddArea, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue una nueva secci\u00F3n, no podr\u00E1 editarla ni borrarla. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. ", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar una nueva secci\u00F3n?\""] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
+                            gap: 2,
+                            mt: 2,
+                        } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "Seccion", variant: "outlined", value: value.seccion, onChange: (e) => {
+                                setValue(Object.assign(Object.assign({}, value), { seccion: e.target.value }));
+                            } }) }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Area", openDialog: openAddArea, handleCloseDialog: handleCloseAddArea, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertArea(value.area);
                     handleCloseAddArea();
-                }) }, { children: (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
-                        gap: 2,
-                        mt: 2,
-                    } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "Area", variant: "outlined", value: value.area, onChange: (e) => {
-                            setValue(Object.assign(Object.assign({}, value), { area: e.target.value }));
-                        } }) })) }))] })));
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue un nueva \u00E1rea, no podr\u00E1 editarla ni borrarla. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. ", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar una nueva \u00E1rea?\""] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
+                            gap: 2,
+                            mt: 2,
+                        } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "Area", variant: "outlined", value: value.area, onChange: (e) => {
+                                setValue(Object.assign(Object.assign({}, value), { area: e.target.value }));
+                            } }) }))] }))] })));
 };
 exports.default = Year;
 //# sourceMappingURL=Year.js.map
