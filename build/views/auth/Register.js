@@ -67,6 +67,49 @@ const Register = () => {
     const [password2, setPassword2] = (0, react_1.useState)("");
     const { user } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const navigate = (0, react_router_dom_1.useNavigate)();
+    const [error, setError] = (0, react_1.useState)({
+        correo: false,
+        password: false,
+        password2: false,
+        nombre: false,
+        apellido: false,
+    });
+    const validateData = () => {
+        if (nombre === "") {
+            setError(Object.assign(Object.assign({}, error), { nombre: true }));
+            return true;
+        }
+        if (apellido === "") {
+            setError(Object.assign(Object.assign({}, error), { apellido: true }));
+            return true;
+        }
+        if (correo === "") {
+            setError(Object.assign(Object.assign({}, error), { correo: true }));
+            if (correo.includes("@")) {
+                setError(Object.assign(Object.assign({}, error), { correo: true }));
+            }
+            if (correo.includes(".")) {
+                setError(Object.assign(Object.assign({}, error), { correo: true }));
+            }
+            return true;
+        }
+        if (password === "") {
+            setError(Object.assign(Object.assign({}, error), { password: true }));
+            return true;
+        }
+        if (password2 === "") {
+            setError(Object.assign(Object.assign({}, error), { password2: true }));
+            return true;
+        }
+        setError({
+            correo: false,
+            password: false,
+            password2: false,
+            nombre: false,
+            apellido: false,
+        });
+        return false;
+    };
     const createCredentials = () => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
         return yield window.API.createUserDB({
@@ -78,7 +121,11 @@ const Register = () => {
         });
     });
     const handledClick = () => __awaiter(void 0, void 0, void 0, function* () {
-        if (nombre !== "" && correo !== "" && password !== "" && password2 !== "") {
+        if (error.correo === false &&
+            error.password === false &&
+            error.password2 === false &&
+            error.nombre === false &&
+            error.apellido === false) {
             if (password === password2) {
                 const credentials = yield createCredentials();
                 console.log(credentials);
@@ -104,7 +151,11 @@ const Register = () => {
     const handlePassword2Change = (event) => {
         setPassword2(event.target.value);
     };
-    return ((0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ sx: { display: "flex", flexDirection: "column" } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Box, { children: [(0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleHostChange, sx: { marginY: "0.3rem", marginRight: "0.3rem" }, id: "setupHost", label: "Nombre", value: nombre }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleApellidoChange, sx: { marginY: "0.3rem", marginLeft: "0.3rem" }, id: "setupHost", label: "Apellido", value: apellido })] }), (0, jsx_runtime_1.jsx)(CssTextField, { sx: { marginY: "0.3rem" }, id: "setupUser", label: "Correo", value: correo, onChange: handleUserChange }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePasswordChange, type: "password", sx: { marginY: "0.3rem" }, id: "setupPass", label: "Contrase\u00F1a", value: password }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePassword2Change, type: "password", sx: { marginY: "0.3rem" }, id: "setupPass", label: "Confirmar contrase\u00F1a", value: password2 }), (0, jsx_runtime_1.jsx)(ColorButton, Object.assign({ onClick: handledClick }, { children: "Registrarse" }))] })));
+    return ((0, jsx_runtime_1.jsxs)(material_1.Box, Object.assign({ sx: { display: "flex", flexDirection: "column" } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Box, { children: [(0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleHostChange, sx: { marginY: "0.3rem", marginRight: "0.3rem" }, id: "setupHost", label: "Nombre", value: nombre, error: error.nombre, onKeyUp: validateData, onBlur: validateData, helperText: error.nombre ? "Campo requerido" : "" }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handleApellidoChange, sx: { marginY: "0.3rem", marginLeft: "0.3rem" }, id: "setupHost", label: "Apellido", value: apellido, onBlur: validateData, onKeyUp: validateData, error: error.apellido, helperText: error.apellido ? "Campo requerido" : "" })] }), (0, jsx_runtime_1.jsx)(CssTextField, { sx: { marginY: "0.3rem" }, id: "setupUser", label: "Correo", value: correo, onKeyUp: validateData, onChange: handleUserChange, error: error.correo, onBlur: validateData, helperText: error.correo ? "Campo requerido" : "" }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePasswordChange, type: "password", sx: { marginY: "0.3rem" }, id: "setupPass", label: "Contrase\u00F1a", value: password, onKeyUp: validateData, error: error.password, onBlur: validateData, helperText: error.password ? "Campo requerido" : "" }), (0, jsx_runtime_1.jsx)(CssTextField, { onChange: handlePassword2Change, type: "password", sx: { marginY: "0.3rem" }, id: "setupPass", onKeyUp: validateData, onBlur: validateData, label: "Confirmar contrase\u00F1a", value: password2, error: error.password2, helperText: error.password2 ? "Campo requerido" : "" }), (0, jsx_runtime_1.jsx)(ColorButton, Object.assign({ onClick: () => {
+                    const valid = validateData();
+                    if (!valid)
+                        handledClick();
+                } }, { children: "Registrarse" }))] })));
 };
 exports.default = Register;
 //# sourceMappingURL=Register.js.map

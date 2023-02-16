@@ -28,6 +28,42 @@ const TableCustom_1 = require("../table/TableCustom");
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const CheckCircleOutline_1 = __importDefault(require("@mui/icons-material/CheckCircleOutline"));
 const ErrorOutline_1 = __importDefault(require("@mui/icons-material/ErrorOutline"));
+const initialStateAlumno = {
+    firsName: "",
+    SecondName: "",
+    surname: "",
+    secondSurname: "",
+    dni: "",
+    address: "",
+    municipality: "",
+    state: "",
+    cedula: false,
+    pasaporte: false,
+    partidaDeNacimiento: false,
+    fotos: false,
+    notasEscolares: false,
+    observacion: "",
+    condicion: "",
+    grupoEstable: "",
+    fechaNacimiento: null,
+    phone: Number(0),
+    sexo: "select",
+    email: "",
+};
+const initialStateRepresentante = {
+    firstName: "",
+    secondName: "",
+    surname: "",
+    secondSurname: "",
+    dni: "",
+    address: "",
+    municipality: "",
+    state: "",
+    filiacion: "",
+    phone: 0,
+    alumnoAddress: false,
+    email: "",
+};
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const style = {
     position: "absolute",
@@ -88,28 +124,7 @@ const Seccion = () => {
     //  @ts-ignore
     const [alumnos, setAlumnos] = (0, react_2.useState)([{ id: 0 }]);
     const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
-    const [datosAlumno, setDatosAlumno] = (0, react_2.useState)({
-        firsName: "",
-        SecondName: "",
-        surname: "",
-        secondSurname: "",
-        dni: "",
-        address: "",
-        municipality: "",
-        state: "",
-        cedula: false,
-        pasaporte: false,
-        partidaDeNacimiento: false,
-        fotos: false,
-        notasEscolares: false,
-        observacion: "",
-        condicion: "",
-        grupoEstable: "",
-        fechaNacimiento: null,
-        phone: Number(0),
-        sexo: "select",
-        email: "",
-    });
+    const [datosAlumno, setDatosAlumno] = (0, react_2.useState)(initialStateAlumno);
     const [datosRepresetante, setDatosRepresetante] = (0, react_2.useState)({
         firstName: "",
         secondName: "",
@@ -183,6 +198,8 @@ const Seccion = () => {
         console.log("response inser alumno", response);
         if (response === true) {
             setInserAlumno(response);
+            setDatosAlumno(initialStateAlumno);
+            setDatosRepresetante(initialStateRepresentante);
         }
         else {
             setInserAlumno(false);

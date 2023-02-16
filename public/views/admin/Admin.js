@@ -116,7 +116,6 @@ const Admin = () => {
             flex: 1,
             type: "number",
             align: "center",
-            editable: true,
         },
         {
             field: "email",
@@ -127,7 +126,6 @@ const Admin = () => {
             flex: 1,
             type: "number",
             align: "center",
-            editable: true,
         },
         {
             field: "role",
@@ -157,7 +155,7 @@ const Admin = () => {
                     } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Doble click para editar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsxs)(Box_1.default, { children: ["\u00A0\u00A0\u00A0\u00A0", params.formattedValue === "OWNER" && "Super Administrador", params.formattedValue === "USER" && "Usuario", params.formattedValue === "ADMIN" && " Administrador", "\u00A0\u00A0\u00A0\u00A0"] }) })) })));
             },
         },
-        {
+        userContext.user.role !== "ADMIN" && {
             field: "estado",
             headerName: "Opciones",
             width: 150,

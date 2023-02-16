@@ -28,7 +28,8 @@ __decorate([
     __metadata("design:type", anios_1.Anio)
 ], Seccion.prototype, "anio", void 0);
 Seccion = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)(),
+    (0, typeorm_1.Index)(["seccion", "anio"], { unique: true })
 ], Seccion);
 exports.Seccion = Seccion;
 //# sourceMappingURL=secciones.js.map

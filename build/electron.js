@@ -200,6 +200,23 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
     }
 }));
 electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const existUser = yield user_1.User.findOne({
+        where: {
+            datosBasicos: {
+                email: user.email,
+            },
+        },
+    });
+    if (existUser) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "El usuario ya existe",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
     console.log("File:electron.ts CREATE_USER_DB", user);
     //@ts-ignore
     const dataBasic = new basicData_1.BasicData();
@@ -470,6 +487,24 @@ electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0
             id: seccion.anio,
         },
     });
+    const existSeccion = yield secciones_1.Seccion.findOne({
+        where: {
+            seccion: seccion.seccion,
+            anio: {
+                id: seccion.anio,
+            },
+        },
+    });
+    if (existSeccion) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "La seccion ya existe",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
     console.log("insert seccion", anio);
     const seccionDB = new secciones_1.Seccion();
     seccionDB.seccion = seccion.seccion;
@@ -939,6 +974,8 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
             });
             console.log("ALUMNOS", alumnos);
             for (const alumno of alumnos) {
+                if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
+                    continue;
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
@@ -1557,5 +1594,33 @@ electron_1.ipcMain.handle("GET_ALUMNOS_GRADUADOS", (event, data) => __awaiter(vo
         },
     });
     return alumnos;
+}));
+electron_1.ipcMain.handle("DELETE_USER", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield appDataSource.manager.getRepository(user_1.User).findOne({
+        where: {
+            id: data.id,
+        },
+    });
+    if (user) {
+        return yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
+            try {
+                yield manager.getRepository(user_1.User).delete({
+                    id: data.id,
+                });
+                //@ts-ignore
+                new electron_1.Notification({
+                    title: "Sistema De Notas",
+                    body: "Usuario Eliminado con exito",
+                    icon: path.join(__dirname, "./img/logo.png"),
+                    //@ts-ignore
+                }).show();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error("No se pudo registrar el alumno");
+            }
+        }));
+    }
 }));
 //# sourceMappingURL=electron.js.map

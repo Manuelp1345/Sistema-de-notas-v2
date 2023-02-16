@@ -4,13 +4,23 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import { Button, Tooltip, FormGroup, TextField } from "@mui/material";
+import {
+  Button,
+  Tooltip,
+  FormGroup,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { TableCustom } from "../table/TableCustom";
 import { CustomModal } from "../modals/customModal";
+import { Anio } from "../../config/entitys/anios";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -35,7 +45,7 @@ const Year = (): JSX.Element => {
   });
 
   const [loading, setLoading] = useState(true);
-
+  const [anio, setAnio] = useState<Anio>({} as Anio);
   const [openAddSeccion, setOpenAddSeccion] = React.useState(false);
   const handleClickOpenAddSeccion = () => setOpenAddSeccion(true);
   const handleCloseAddSeccion = () => {
@@ -48,6 +58,12 @@ const Year = (): JSX.Element => {
     setOpenAddArea(false);
   };
 
+  const [letter, setLetter] = React.useState("");
+
+  const handleChange = (event) => {
+    setLetter(event.target.value);
+  };
+
   const navigate = useNavigate();
   const { areas } = useContext(GlobalContext);
 
@@ -55,6 +71,7 @@ const Year = (): JSX.Element => {
     // @ts-ignore
     const anio = await window.API.getAnio(id);
     console.log(anio);
+    setAnio(anio);
     // @ts-ignore
     const findSecciones = await getSecciones(anio.id);
     console.log(findSecciones);
@@ -130,6 +147,12 @@ const Year = (): JSX.Element => {
       sx={{ flexGrow: 1, p: 3 }}
     >
       <DrawerHeader />
+      <Typography
+        variant="h4"
+        sx={{ marginTop: "0.5rem", textAlign: "center", width: "100%" }}
+      >
+        {anio.anio}
+      </Typography>
       <Button
         onClick={() => {
           setSecciones([]);
@@ -280,7 +303,6 @@ const Year = (): JSX.Element => {
                 headerAlign: "center",
                 flex: 1,
                 align: "center",
-                editable: true,
               },
             ]}
           />
@@ -293,7 +315,7 @@ const Year = (): JSX.Element => {
         openDialog={openAddSeccion}
         handleCloseDialog={handleCloseAddSeccion}
         handledConfirm={async () => {
-          await insertSeccion(value.seccion);
+          await insertSeccion(value.seccion?.toLocaleUpperCase());
           handleCloseAddSeccion();
         }}
       >
@@ -309,14 +331,33 @@ const Year = (): JSX.Element => {
             mt: 2,
           }}
         >
-          <TextField
+          <FormControl>
+            <InputLabel sx={{ mb: 5 }} id="letter-select-label">
+              Seccion
+            </InputLabel>
+            <Select
+              labelId="letter-select-label"
+              id="letter-select"
+              value={value.seccion}
+              onChange={(e) => {
+                setValue({ ...value, seccion: e.target.value });
+              }}
+            >
+              {[...Array(26)].map((_, i) => (
+                <MenuItem key={i} value={String.fromCharCode(65 + i)}>
+                  {String.fromCharCode(65 + i)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {/* <TextField
             label="Seccion"
             variant="outlined"
             value={value.seccion}
             onChange={(e) => {
               setValue({ ...value, seccion: e.target.value });
             }}
-          />
+          /> */}
         </FormGroup>
       </CustomModal>
       <CustomModal

@@ -123,7 +123,6 @@ const Admin = (): JSX.Element => {
       type: "number",
 
       align: "center",
-      editable: true,
     },
     {
       field: "email",
@@ -134,7 +133,6 @@ const Admin = (): JSX.Element => {
       flex: 1,
       type: "number",
       align: "center",
-      editable: true,
     },
     {
       field: "role",

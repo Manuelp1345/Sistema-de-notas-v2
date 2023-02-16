@@ -200,6 +200,23 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
     }
 }));
 electron_1.ipcMain.handle("CREATE_USER_DB", (event, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const existUser = yield user_1.User.findOne({
+        where: {
+            datosBasicos: {
+                email: user.email,
+            },
+        },
+    });
+    if (existUser) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "El usuario ya existe",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
     console.log("File:electron.ts CREATE_USER_DB", user);
     //@ts-ignore
     const dataBasic = new basicData_1.BasicData();
@@ -470,6 +487,24 @@ electron_1.ipcMain.handle("INSERT_SECCION", (event, seccion) => __awaiter(void 0
             id: seccion.anio,
         },
     });
+    const existSeccion = yield secciones_1.Seccion.findOne({
+        where: {
+            seccion: seccion.seccion,
+            anio: {
+                id: seccion.anio,
+            },
+        },
+    });
+    if (existSeccion) {
+        //@ts-ignore
+        new electron_1.Notification({
+            title: "Sistema De Notas",
+            body: "La seccion ya existe",
+            icon: path.join(__dirname, "./img/logo.png"),
+            //@ts-ignore
+        }).show();
+        return false;
+    }
     console.log("insert seccion", anio);
     const seccionDB = new secciones_1.Seccion();
     seccionDB.seccion = seccion.seccion;
@@ -914,19 +949,33 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     },
                 },
             });
-            const alumnos = yield transaction
-                .createQueryBuilder(alumnos_1.Alumno, "alumno")
-                .where("alumno.condicion = :condicion1 OR alumno.condicion = :condicion2", { condicion1: "Regular", condicion2: "Nuevo Ingreso" })
-                .andWhere("alumno.Etapas.anio.periodo.id = :periodoId", {
-                periodoId: data.periodo,
-            })
-                .leftJoinAndSelect("alumno.notas", "notas")
-                .leftJoinAndSelect("alumno.Etapas", "etapas")
-                .leftJoinAndSelect("etapas.anio", "anio")
-                .leftJoinAndSelect("etapas.seccione", "secciones")
-                .getMany();
+            const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
+                where: {
+                    Etapas: {
+                        anio: {
+                            periodo: {
+                                id: data.periodo,
+                            },
+                        },
+                    },
+                },
+                relations: {
+                    notas: {
+                        materia: true,
+                        recuperacion: true,
+                    },
+                    Etapas: {
+                        anio: {
+                            periodo: true,
+                        },
+                        seccione: true,
+                    },
+                },
+            });
             console.log("ALUMNOS", alumnos);
             for (const alumno of alumnos) {
+                if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
+                    continue;
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
@@ -1231,7 +1280,7 @@ electron_1.ipcMain.handle("GENERATE_RESPALDO", (event, args) => __awaiter(void 0
             yield fs_1.default.mkdirSync(pathRespaldo);
         }
         yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${(0, moment_1.default)().format("YYYY-MM-DD")}.json`;
+            const nameFileJsonWithDate = `${pathRespaldo}/Respaldo-${(0, moment_1.default)().format("YYYY-MM-DD-HH-mm")}.json`;
             const entities = appDataSource.entityMetadatas;
             const backup = entities.map((entity) => {
                 const repository = manager.getRepository(entity.name);

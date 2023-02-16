@@ -19,23 +19,23 @@ __decorate([
     __metadata("design:type", String)
 ], BasicData.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "firstName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "secondName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "Surname", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "secondSurname", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "email", void 0);
 __decorate([
@@ -43,31 +43,31 @@ __decorate([
     __metadata("design:type", String)
 ], BasicData.prototype, "dni", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "sexo", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "bigint" }),
+    (0, typeorm_1.Column)({ type: "bigint", default: 0 }),
     __metadata("design:type", String)
 ], BasicData.prototype, "Phone", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "address", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "municipality", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "state", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "text" }),
+    (0, typeorm_1.Column)({ type: "text", default: "" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "city", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "date" }),
+    (0, typeorm_1.Column)({ type: "date", default: "1999/12/12" }),
     __metadata("design:type", String)
 ], BasicData.prototype, "DateOfBirth", void 0);
 __decorate([

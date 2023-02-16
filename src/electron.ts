@@ -182,6 +182,25 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
 });
 
 ipcMain.handle("CREATE_USER_DB", async (event, user) => {
+  const existUser = await User.findOne({
+    where: {
+      datosBasicos: {
+        email: user.email,
+      },
+    },
+  });
+  if (existUser) {
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "El usuario ya existe",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+
+    return false;
+  }
+
   console.log("File:electron.ts CREATE_USER_DB", user);
   //@ts-ignore
   const dataBasic = new BasicData();
@@ -461,6 +480,25 @@ ipcMain.handle("INSERT_SECCION", async (event, seccion) => {
       id: seccion.anio,
     },
   });
+
+  const existSeccion = await Seccion.findOne({
+    where: {
+      seccion: seccion.seccion,
+      anio: {
+        id: seccion.anio,
+      },
+    },
+  });
+  if (existSeccion) {
+    //@ts-ignore
+    new Notification({
+      title: "Sistema De Notas",
+      body: "La seccion ya existe",
+      icon: path.join(__dirname, "./img/logo.png"),
+      //@ts-ignore
+    }).show();
+    return false;
+  }
 
   console.log("insert seccion", anio);
   const seccionDB = new Seccion();
@@ -925,23 +963,35 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         },
       });
 
-      const alumnos = await transaction
-        .createQueryBuilder(Alumno, "alumno")
-        .where(
-          "alumno.condicion = :condicion1 OR alumno.condicion = :condicion2",
-          { condicion1: "Regular", condicion2: "Nuevo Ingreso" }
-        )
-        .andWhere("alumno.Etapas.anio.periodo.id = :periodoId", {
-          periodoId: data.periodo,
-        })
-        .leftJoinAndSelect("alumno.notas", "notas")
-        .leftJoinAndSelect("alumno.Etapas", "etapas")
-        .leftJoinAndSelect("etapas.anio", "anio")
-        .leftJoinAndSelect("etapas.seccione", "secciones")
-        .getMany();
+      const alumnos = await transaction.getRepository(Alumno).find({
+        where: {
+          Etapas: {
+            anio: {
+              periodo: {
+                id: data.periodo,
+              },
+            },
+          },
+        },
+        relations: {
+          notas: {
+            materia: true,
+            recuperacion: true,
+          },
+          Etapas: {
+            anio: {
+              periodo: true,
+            },
+            seccione: true,
+          },
+        },
+      });
       console.log("ALUMNOS", alumnos);
 
       for (const alumno of alumnos) {
+        if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
+          continue;
+
         let promedio = 0;
         let recuperacionCount = 0;
         let materiaCount = 0;
@@ -1352,8 +1402,8 @@ ipcMain.handle("GENERATE_RESPALDO", async (event, args) => {
     }
 
     await appDataSource.transaction(async (manager) => {
-      const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${moment().format(
-        "YYYY-MM-DD"
+      const nameFileJsonWithDate = `${pathRespaldo}/Respaldo-${moment().format(
+        "YYYY-MM-DD-HH-mm"
       )}.json`;
 
       const entities = appDataSource.entityMetadatas;

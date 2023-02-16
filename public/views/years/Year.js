@@ -23,7 +23,6 @@ const material_1 = require("@mui/material");
 const icons_material_1 = require("@mui/icons-material");
 const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const GlobalContext_1 = require("../../config/context/GlobalContext");
-const RemoveCircle_1 = __importDefault(require("@mui/icons-material/RemoveCircle"));
 const TableCustom_1 = require("../table/TableCustom");
 const customModal_1 = require("../modals/customModal");
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
@@ -35,6 +34,7 @@ const Year = () => {
         area: null,
     });
     const [loading, setLoading] = (0, react_2.useState)(true);
+    const [anio, setAnio] = (0, react_2.useState)({});
     const [openAddSeccion, setOpenAddSeccion] = react_1.default.useState(false);
     const handleClickOpenAddSeccion = () => setOpenAddSeccion(true);
     const handleCloseAddSeccion = () => {
@@ -45,12 +45,17 @@ const Year = () => {
     const handleCloseAddArea = () => {
         setOpenAddArea(false);
     };
+    const [letter, setLetter] = react_1.default.useState("");
+    const handleChange = (event) => {
+        setLetter(event.target.value);
+    };
     const navigate = (0, react_router_dom_1.useNavigate)();
     const { areas } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
     const getData = () => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const anio = yield window.API.getAnio(id);
         console.log(anio);
+        setAnio(anio);
         // @ts-ignore
         const findSecciones = yield getSecciones(anio.id);
         console.log(findSecciones);
@@ -111,7 +116,7 @@ const Year = () => {
             //@ts-ignore
         }))();
     }, []);
-    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
+    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3 } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ variant: "h4", sx: { marginTop: "0.5rem", textAlign: "center", width: "100%" } }, { children: anio.anio })), (0, jsx_runtime_1.jsxs)(material_1.Button, Object.assign({ onClick: () => {
                     setSecciones([]);
                     areas.setAreas([]);
                     navigate(-1);
@@ -185,34 +190,17 @@ const Year = () => {
                                         headerAlign: "center",
                                         flex: 1,
                                         align: "center",
-                                        editable: true,
-                                    },
-                                    {
-                                        field: "estado",
-                                        headerName: "Opciones",
-                                        width: 150,
-                                        headerClassName: "backGround",
-                                        headerAlign: "center",
-                                        align: "center",
-                                        renderCell: () => {
-                                            return ((0, jsx_runtime_1.jsx)(material_1.Button, Object.assign({ sx: {
-                                                    display: "flex",
-                                                    width: "100%",
-                                                    justifyContent: "center",
-                                                }, onClick: () => {
-                                                    console.log("params");
-                                                } }, { children: (0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: "Borrar", arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(RemoveCircle_1.default, { sx: { color: "red" } }) })) })));
-                                        },
                                     },
                                 ] })] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Seccion", openDialog: openAddSeccion, handleCloseDialog: handleCloseAddSeccion, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertSeccion(value.seccion);
+                    var _a;
+                    yield insertSeccion((_a = value.seccion) === null || _a === void 0 ? void 0 : _a.toLocaleUpperCase());
                     handleCloseAddSeccion();
                 }) }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue una nueva secci\u00F3n, no podr\u00E1 editarla ni borrarla. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. ", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar una nueva secci\u00F3n?\""] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
                             gap: 2,
                             mt: 2,
-                        } }, { children: (0, jsx_runtime_1.jsx)(material_1.TextField, { label: "Seccion", variant: "outlined", value: value.seccion, onChange: (e) => {
-                                setValue(Object.assign(Object.assign({}, value), { seccion: e.target.value }));
-                            } }) }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Area", openDialog: openAddArea, handleCloseDialog: handleCloseAddArea, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                        } }, { children: (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ sx: { mb: 5 }, id: "letter-select-label" }, { children: "Seccion" })), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ labelId: "letter-select-label", id: "letter-select", value: value.seccion, onChange: (e) => {
+                                        setValue(Object.assign(Object.assign({}, value), { seccion: e.target.value }));
+                                    } }, { children: [...Array(26)].map((_, i) => ((0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: String.fromCharCode(65 + i) }, { children: String.fromCharCode(65 + i) }), i))) }))] }) }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Area", openDialog: openAddArea, handleCloseDialog: handleCloseAddArea, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertArea(value.area);
                     handleCloseAddArea();
                 }) }, { children: [(0, jsx_runtime_1.jsxs)(Typography_1.default, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue un nueva \u00E1rea, no podr\u00E1 editarla ni borrarla. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. ", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar una nueva \u00E1rea?\""] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {

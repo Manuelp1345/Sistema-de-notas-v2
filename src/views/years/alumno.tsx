@@ -772,7 +772,7 @@ const Alumno = (): JSX.Element => {
           gutterBottom
         >
           {datosAlumno.firsName.toUpperCase()}{" "}
-          {datosAlumno.secondSurname.toUpperCase()}{" "}
+          {datosAlumno.SecondName.toUpperCase()}{" "}
           {datosAlumno.surname.toUpperCase()}{" "}
           {datosAlumno.secondSurname.toUpperCase()} |{" "}
           {alumno.alumnoId.anio.anio} "{alumno.alumnoId.seccione.seccion}"

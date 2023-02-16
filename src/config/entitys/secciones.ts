@@ -7,9 +7,11 @@ import {
   BaseEntity,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 
 @Entity()
+@Index(["seccion", "anio"], { unique: true })
 export class Seccion extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: string;

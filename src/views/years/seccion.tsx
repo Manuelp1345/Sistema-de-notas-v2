@@ -53,6 +53,44 @@ interface AlumnoData {
   email: string;
 }
 
+const initialStateAlumno = {
+  firsName: "",
+  SecondName: "",
+  surname: "",
+  secondSurname: "",
+  dni: "",
+  address: "",
+  municipality: "",
+  state: "",
+  cedula: false,
+  pasaporte: false,
+  partidaDeNacimiento: false,
+  fotos: false,
+  notasEscolares: false,
+  observacion: "",
+  condicion: "",
+  grupoEstable: "",
+  fechaNacimiento: null,
+  phone: Number(0),
+  sexo: "select",
+  email: "",
+};
+
+const initialStateRepresentante = {
+  firstName: "",
+  secondName: "",
+  surname: "",
+  secondSurname: "",
+  dni: "",
+  address: "",
+  municipality: "",
+  state: "",
+  filiacion: "",
+  phone: 0,
+  alumnoAddress: false,
+  email: "",
+};
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -125,28 +163,8 @@ const Seccion = () => {
   const [alumnos, setAlumnos] = useState([{ id: 0 } as Etapas]);
   const { areas, alumno } = useContext(GlobalContext);
 
-  const [datosAlumno, setDatosAlumno] = useState<AlumnoData>({
-    firsName: "",
-    SecondName: "",
-    surname: "",
-    secondSurname: "",
-    dni: "",
-    address: "",
-    municipality: "",
-    state: "",
-    cedula: false,
-    pasaporte: false,
-    partidaDeNacimiento: false,
-    fotos: false,
-    notasEscolares: false,
-    observacion: "",
-    condicion: "",
-    grupoEstable: "",
-    fechaNacimiento: null,
-    phone: Number(0),
-    sexo: "select",
-    email: "",
-  });
+  const [datosAlumno, setDatosAlumno] =
+    useState<AlumnoData>(initialStateAlumno);
 
   const [datosRepresetante, setDatosRepresetante] = useState({
     firstName: "",
@@ -253,6 +271,8 @@ const Seccion = () => {
 
     if (response === true) {
       setInserAlumno(response);
+      setDatosAlumno(initialStateAlumno);
+      setDatosRepresetante(initialStateRepresentante);
     } else {
       setInserAlumno(false);
     }
