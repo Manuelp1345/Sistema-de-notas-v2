@@ -4,7 +4,6 @@ import { Setup } from "../views/setup/Setup";
 import { CreateUser } from "../views/setup/CreateClient";
 import Auth from "../views/auth/Auth";
 import Dashboard from "../views/home/Dashboard";
-import Year from "../views/years/Year";
 
 const AppRouter = () => {
   return (
@@ -22,6 +21,7 @@ const AppRouter = () => {
         <Route path="/logout" element={<Auth />} />
         <Route path="/create-user" element={<CreateUser />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/stats" element={<Dashboard element="stats" />} />
       </Routes>
     </HashRouter>
   );

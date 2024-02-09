@@ -17,6 +17,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Home from "./Home";
 import { House } from "@mui/icons-material";
@@ -30,6 +31,8 @@ import Admin from "../admin/Admin";
 import Search from "../years/search";
 import SchoolIcon from "@mui/icons-material/School";
 import { GlobalContext } from "../../config/context/GlobalContext";
+import Stats from "../stats/Stats";
+import { Periodo } from "../../config/entitys/periodo";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme) => ({
@@ -105,7 +108,7 @@ export default function Dashboard({ element }: { element: string }) {
 
   const [open, setOpen] = React.useState(false);
   const [periodo, setPeriodo] = React.useState({ periodo: "", id: 0 });
-  const { user } = React.useContext(GlobalContext);
+  const { user, periodo: periodoContext } = React.useContext(GlobalContext);
   const navigate = useNavigate();
   const theme = useTheme();
   const handleDrawerOpen = () => {
@@ -122,6 +125,7 @@ export default function Dashboard({ element }: { element: string }) {
       console.log(item);
       if (item.estado) {
         setPeriodo({ periodo: item.periodo, id: item.id });
+        periodoContext.setPeriodo(item as Periodo);
       }
     });
   };
@@ -192,7 +196,14 @@ export default function Dashboard({ element }: { element: string }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Inicio", "Años", "Graduados", "Administración", "Salir"].map(
+          {[
+            "Inicio",
+            "Años",
+            "Graduados",
+            "Administración",
+            "Estadisticas",
+            "Salir",
+          ].map(
             (text, index) =>
               user.user.role !== "USER" && (
                 <ListItem
@@ -204,7 +215,7 @@ export default function Dashboard({ element }: { element: string }) {
                     (element === "anos" &&
                       user.user.role !== "USER" &&
                       index === 1) ||
-                    /*                 (element === "perfil" && index === 4) || */
+                    (element === "stats" && index === 4) ||
                     (element === "search" &&
                       user.user.role !== "USER" &&
                       index === 2) ||
@@ -233,10 +244,10 @@ export default function Dashboard({ element }: { element: string }) {
                     (index === 3 &&
                       user.user.role !== "USER" &&
                       navigate("/admin")) ||
-                    /*                 //@ts-ignore
-                (index === 4 && navigate("/perfil")) || */
                     //@ts-ignore
-                    (index === 4 && navigate("/logout"))
+                    (index === 4 && navigate("/stats")) ||
+                    //@ts-ignore
+                    (index === 5 && navigate("/logout"))
                   }
                   key={text}
                 >
@@ -261,12 +272,12 @@ export default function Dashboard({ element }: { element: string }) {
                         <AdminPanelSettingsIcon />
                       </Tooltip>
                     )}
-                    {/*                 {index === 4 && (
-                  <Tooltip title={`Perfil`} arrow placement="right">
-                    <AccountCircleIcon />
-                  </Tooltip>
-                )} */}
                     {index === 4 && (
+                      <Tooltip title={`stats`} arrow placement="right">
+                        <QueryStatsIcon />
+                      </Tooltip>
+                    )}
+                    {index === 5 && (
                       <Tooltip title={`Salir`} arrow placement="right">
                         <LogoutIcon />
                       </Tooltip>
@@ -286,6 +297,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "search" && <Search />}
       {element === "alumno" && <Alumno />}
       {element === "admin" && <Admin />}
+      {element === "stats" && <Stats />}
     </Box>
   );
 }
