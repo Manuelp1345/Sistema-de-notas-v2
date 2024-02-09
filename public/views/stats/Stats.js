@@ -39,12 +39,12 @@ const jsx_runtime_1 = require("react/jsx-runtime");
 const React = __importStar(require("react"));
 const styles_1 = require("@mui/material/styles");
 const Box_1 = __importDefault(require("@mui/material/Box"));
+const recharts_1 = require("recharts");
 const Typography_1 = __importDefault(require("@mui/material/Typography"));
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const material_1 = require("@mui/material");
 const react_router_dom_1 = require("react-router-dom");
 const Logout_1 = __importDefault(require("@mui/icons-material/Logout"));
-const recharts_1 = require("recharts");
 const data = [
     { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
     { name: "Page B", uv: 300, pv: 2400, amt: 2400 },
@@ -64,6 +64,9 @@ function Stats() {
     const [secciones, setSecciones] = React.useState(-1);
     const [year, setYear] = React.useState(-1);
     const [alumnos, setAlumnos] = React.useState([]);
+    const [periodos, setPeriodos] = React.useState([]);
+    const [periodoSelected, setPeriodoSelected] = React.useState(-1);
+    const [sizeScreen, setSizeScreen] = React.useState(window.innerWidth);
     const navigate = (0, react_router_dom_1.useNavigate)();
     const getAniosAndSecciones = () => __awaiter(this, void 0, void 0, function* () {
         //@ts-ignore
@@ -89,14 +92,30 @@ function Stats() {
         // @ts-ignore
         return findSecciones;
     });
+    const getPeriodos = (filter) => __awaiter(this, void 0, void 0, function* () {
+        // @ts-ignore
+        const data = yield window.API.getPeriodos(filter);
+        setPeriodos(data[0]);
+        return data[0];
+    });
     React.useEffect(() => {
         if (secciones !== -1)
             getAlumno();
     }, [secciones]);
     React.useEffect(() => {
-        getAniosAndSecciones();
+        if (periodoSelected !== -1)
+            getAniosAndSecciones();
+    }, [periodoSelected]);
+    React.useEffect(() => {
+        getPeriodos({ pageIndex: 1, pageSize: 3 });
+    }, []);
+    React.useEffect(() => {
+        window.addEventListener("resize", () => {
+            setSizeScreen(window.innerWidth);
+        });
     }, []);
     console.log("alumnos", alumnos);
+    console.log("window.innerWidth", window.innerWidth);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3, overflow: "auto !important" } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: {
                     display: "flex",
                     justifyContent: "center",
@@ -109,15 +128,41 @@ function Stats() {
                     justifyContent: "center",
                     alignItems: "center",
                     gap: 5,
-                } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "50%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-helper-label" }, { children: "A\u00F1o" })), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ labelId: "demo-simple-select-helper-label", id: "demo-simple-select-helper", label: "A\u00F1o", value: year, onChange: (e) => setYear(e.target.value) }, { children: aniosAndSecciones.map((item) => {
+                } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Periodo" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Periodo", value: periodoSelected, onChange: (e) => setPeriodoSelected(e.target.value) }, { children: periodos.map((item) => {
+                                    return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.periodo }));
+                                }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "A\u00F1o" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "A\u00F1o", value: year, onChange: (e) => setYear(e.target.value), disabled: periodoSelected === -1 }, { children: aniosAndSecciones.map((item) => {
                                     return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.anio }));
-                                }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "50%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-helper-label" }, { children: "Seccion" })), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ labelId: "demo-simple-select-helper-label", id: "demo-simple-select-helper", label: "Seccion", value: secciones, onChange: (e) => setSecciones(e.target.value), disabled: year === -1 }, { children: aniosAndSecciones
+                                }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Seccion" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Seccion", value: secciones, onChange: (e) => setSecciones(e.target.value), disabled: year === -1 }, { children: aniosAndSecciones
                                     .filter((item) => item.id === year)
                                     .map((item) => {
                                     return item.secciones.map((seccion) => {
                                         return ((0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: seccion.id }, { children: seccion.seccion })));
                                     });
-                                }) }))] }))] })), (0, jsx_runtime_1.jsx)(recharts_1.LineChart, Object.assign({ width: 400, height: 400, data: data }, { children: (0, jsx_runtime_1.jsx)(recharts_1.Line, { type: "monotone", dataKey: "uv", stroke: "#8884d8" }) })), user.user.role === "USER" && ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                }) }))] }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                    mt: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: window.innerWidth < 1024 ? "column" : "row",
+                    gap: 5,
+                } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            width: "50%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                        } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Grafico De Genero" }), (0, jsx_runtime_1.jsx)(recharts_1.ResponsiveContainer, Object.assign({ width: "100%", height: "100%" }, { children: (0, jsx_runtime_1.jsxs)(recharts_1.BarChart, Object.assign({ width: 500, height: 300, data: data, margin: {
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }, barSize: 20 }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.XAxis, { dataKey: "name", scale: "point", padding: { left: 10, right: 10 } }), (0, jsx_runtime_1.jsx)(recharts_1.YAxis, {}), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {}), (0, jsx_runtime_1.jsx)(recharts_1.Legend, {}), (0, jsx_runtime_1.jsx)(recharts_1.CartesianGrid, { strokeDasharray: "3 3" }), (0, jsx_runtime_1.jsx)(recharts_1.Bar, { dataKey: "pv", fill: "#8884d8", background: { fill: "#eee" } })] })) }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            width: "50%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                        } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Promedio De edad" }), (0, jsx_runtime_1.jsxs)(recharts_1.LineChart, Object.assign({ width: 600, height: 300, data: data, margin: { top: 5, right: 20, bottom: 5, left: 0 } }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.Line, { type: "monotone", dataKey: "uv", stroke: "#8884d8" }), (0, jsx_runtime_1.jsx)(recharts_1.CartesianGrid, { stroke: "#ccc", strokeDasharray: "5 5" }), (0, jsx_runtime_1.jsx)(recharts_1.XAxis, { dataKey: "name" }), (0, jsx_runtime_1.jsx)(recharts_1.YAxis, {}), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {})] }))] }))] })), user.user.role === "USER" && ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
