@@ -44,35 +44,27 @@ const file = () => __awaiter(void 0, void 0, void 0, function* () {
 const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function* () {
     const credentialsDB = credentials ? credentials : JSON.parse(yield file());
     console.log("file:DATABASE credentials ", credentialsDB);
-    const connection = new typeorm_1.DataSource({
-        type: "mysql",
-        host: credentialsDB.host,
-        port: credentialsDB.port,
-        username: credentialsDB.user,
-        password: credentials ? credentials.pass : credentialsDB.password,
-        database: credentials ? "" : credentialsDB.database,
-        entities: credentials
-            ? []
-            : [
-                user_1.User,
-                nota_1.Nota,
-                anios_1.Anio,
-                etapas_1.Etapas,
-                alumnos_1.Alumno,
-                periodo_1.Periodo,
-                materias_1.Materia,
-                secciones_1.Seccion,
-                basicData_1.BasicData,
-                documents_1.Documents,
-                representante_1.Representante,
-                recuperacion_Nota_1.RecuperacionNota,
-            ],
+    const connection = yield (0, typeorm_1.createConnection)({
+        type: "sqlite",
+        database: credentials ? credentials.database : credentialsDB.database,
+        entities: [
+            user_1.User,
+            nota_1.Nota,
+            anios_1.Anio,
+            etapas_1.Etapas,
+            alumnos_1.Alumno,
+            periodo_1.Periodo,
+            materias_1.Materia,
+            secciones_1.Seccion,
+            basicData_1.BasicData,
+            documents_1.Documents,
+            representante_1.Representante,
+            recuperacion_Nota_1.RecuperacionNota,
+        ],
         synchronize: true,
         logging: true,
-        extra: {
-            connectionLimit: 4000,
-        },
     });
+    console.log("dataBase connection", connection);
     if (!connection.isInitialized) {
         try {
             yield connection.initialize();

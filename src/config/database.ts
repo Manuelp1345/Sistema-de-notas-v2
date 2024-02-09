@@ -1,5 +1,5 @@
 import { app } from "electron";
-import { DataSource } from "typeorm";
+import { DataSource, createConnection } from "typeorm";
 import { User } from "./entitys/user";
 import fs from "fs";
 import { Anio } from "./entitys/anios";
@@ -36,35 +36,28 @@ export const ConnectionDB = async (
   const credentialsDB = credentials ? credentials : JSON.parse(await file());
   console.log("file:DATABASE credentials ", credentialsDB);
 
-  const connection = new DataSource({
-    type: "mysql",
-    host: credentialsDB.host,
-    port: credentialsDB.port,
-    username: credentialsDB.user,
-    password: credentials ? credentials.pass : credentialsDB.password,
-    database: credentials ? "" : credentialsDB.database,
-    entities: credentials
-      ? []
-      : [
-          User,
-          Nota,
-          Anio,
-          Etapas,
-          Alumno,
-          Periodo,
-          Materia,
-          Seccion,
-          BasicData,
-          Documents,
-          Representante,
-          RecuperacionNota,
-        ],
+  const connection = await createConnection({
+    type: "sqlite",
+    database: credentials ? credentials.database : credentialsDB.database,
+    entities: [
+      User,
+      Nota,
+      Anio,
+      Etapas,
+      Alumno,
+      Periodo,
+      Materia,
+      Seccion,
+      BasicData,
+      Documents,
+      Representante,
+      RecuperacionNota,
+    ],
     synchronize: true,
     logging: true,
-    extra: {
-      connectionLimit: 4000,
-    },
   });
+
+  console.log("dataBase connection", connection);
 
   if (!connection.isInitialized) {
     try {

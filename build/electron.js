@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 const electron_is_dev_1 = __importDefault(require("electron-is-dev"));
-const typeorm_1 = require("typeorm");
 const fs_1 = __importDefault(require("fs"));
 const path = __importStar(require("path"));
 const database_1 = require("./config/database");
@@ -131,18 +130,15 @@ electron_1.ipcMain.handle("VALIDATE_CREDENTIALS", () => __awaiter(void 0, void 0
 }));
 electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        credentials.database = "database";
-        const connect = yield (0, database_1.ConnectionDB)(credentials);
+        const connect = yield (0, database_1.ConnectionDB)({
+            database: `${electron_1.app.getPath("userData")}/db_notas.sqlite`,
+        });
         console.log("File:electron.ts create credentials connect", connect.isInitialized);
         if (connect.isInitialized) {
             appDataSource = connect;
-            yield connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
+            // await connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
             const credentialsDB = {
-                host: credentials.host,
-                user: credentials.user,
-                password: credentials.pass,
-                port: credentials.port,
-                database: "db_notas",
+                database: `${electron_1.app.getPath("userData")}/db_notas.sqlite`,
             };
             try {
                 const ruta = electron_1.app.getPath("userData");
@@ -153,46 +149,40 @@ electron_1.ipcMain.handle("CREATE_CREDENTIALS_DB", (event, credentials) => __awa
                 });
                 const connectDB = connect.createQueryRunner();
                 yield connectDB.release();
+                return true;
             }
             catch (error) {
                 return false;
             }
         }
-        try {
-            const connectTwo = new typeorm_1.DataSource({
-                type: "mysql",
-                host: credentials.host,
-                port: credentials.port,
-                username: credentials.user,
-                password: credentials.pass,
-                database: "db_notas",
-                entities: [
-                    user_1.User,
-                    nota_1.Nota,
-                    anios_1.Anio,
-                    etapas_1.Etapas,
-                    alumnos_1.Alumno,
-                    periodo_1.Periodo,
-                    materias_1.Materia,
-                    secciones_1.Seccion,
-                    basicData_1.BasicData,
-                    documents_1.Documents,
-                    representante_1.Representante,
-                    recuperacion_Nota_1.RecuperacionNota,
-                ],
-                synchronize: true,
-                logging: false,
-                extra: {
-                    connectionLimit: 4000,
-                },
-            });
-            yield connectTwo.initialize();
-            appDataSource = connectTwo;
-        }
-        catch (error) {
-            console.log(error);
-            return false;
-        }
+        // try {
+        //   const connectTwo = await createConnection({
+        //     type: "sqlite",
+        //     database: `${app.getPath("userData")}/db_notas.sqlite`,
+        //     entities: [
+        //       User,
+        //       Nota,
+        //       Anio,
+        //       Etapas,
+        //       Alumno,
+        //       Periodo,
+        //       Materia,
+        //       Seccion,
+        //       BasicData,
+        //       Documents,
+        //       Representante,
+        //       RecuperacionNota,
+        //     ],
+        //     synchronize: true,
+        //     logging: false,
+        //   });
+        //   await connectTwo.initialize();
+        //   console.log(connectTwo.isInitialized);
+        //   appDataSource = connectTwo;
+        // } catch (error) {
+        //   console.log(error);
+        //   return false;
+        // }
         return true;
     }
     catch (error) {
@@ -1280,7 +1270,7 @@ electron_1.ipcMain.handle("GENERATE_RESPALDO", (event, args) => __awaiter(void 0
             yield fs_1.default.mkdirSync(pathRespaldo);
         }
         yield appDataSource.transaction((manager) => __awaiter(void 0, void 0, void 0, function* () {
-            const nameFileJsonWithDate = `${pathRespaldo}/respaldo-${(0, moment_1.default)().format("YYYY-MM-DD")}.json`;
+            const nameFileJsonWithDate = `${pathRespaldo}/Respaldo-${(0, moment_1.default)().format("YYYY-MM-DD-HH-mm")}.json`;
             const entities = appDataSource.entityMetadatas;
             const backup = entities.map((entity) => {
                 const repository = manager.getRepository(entity.name);
@@ -1334,10 +1324,24 @@ electron_1.ipcMain.handle("RESTORE_RESPALDO", (event, args) => __awaiter(void 0,
         const restoreName = args;
         const pathRespaldo = `${electron_1.app.getPath("documents")}/SistemaRespaldo`;
         const pathRestore = `${pathRespaldo}/${restoreName}`;
-        yield appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
-        yield appDataSource.query("CREATE DATABASE `db_notas`");
-        yield appDataSource.destroy();
-        appDataSource = yield (0, database_1.ConnectionDB)();
+        appDataSource.close();
+        //esperar a que se cierre la conexion
+        yield new Promise((resolve) => setTimeout(resolve, 1000));
+        // slqite no soporta el drop table asi que se elimina el archivo de la base de datos
+        const pathDB = `${electron_1.app.getPath("userData")}/db_notas.sqlite`;
+        yield fs_1.default.rm(pathDB, (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log("database eliminada");
+        });
+        // se crea la base de datos nuevamente
+        appDataSource = yield (0, database_1.ConnectionDB)({
+            database: `${electron_1.app.getPath("userData")}/db_notas.sqlite`,
+        });
+        // se crea la conexion a la base de datos
+        console.log("appDataSource", appDataSource.isInitialized);
         const data = JSON.parse(fs_1.default.readFileSync(pathRestore, "utf8"));
         const orderedKeys = [
             "Periodo",
@@ -1362,7 +1366,7 @@ electron_1.ipcMain.handle("RESTORE_RESPALDO", (event, args) => __awaiter(void 0,
             yield repository.save(data[entity]);
         }
         //@ts-ignore
-        new electron_1.Notification({
+        return new electron_1.Notification({
             title: "Sistema De Notas",
             body: "Respaldo restaurado con exito",
             icon: path.join(__dirname, "./img/logo.png"),

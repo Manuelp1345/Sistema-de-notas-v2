@@ -60,6 +60,8 @@ function CreateUser() {
     const navigate = (0, react_router_dom_1.useNavigate)();
     const createUser = () => __awaiter(this, void 0, void 0, function* () {
         //@ts-ignore
+        yield window.API.createCredentialsDB();
+        //@ts-ignore
         return yield window.API.createUserDB({
             nombre,
             apellido,

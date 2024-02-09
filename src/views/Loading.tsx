@@ -13,7 +13,7 @@ export const Loading = () => {
     console.log(credentials);
 
     if (!credentials) {
-      navigate("/setup");
+      navigate("/create-user");
     } else {
       navigate("/auth");
     }

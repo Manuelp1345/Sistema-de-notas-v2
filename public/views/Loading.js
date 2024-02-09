@@ -22,7 +22,7 @@ const Loading = () => {
         const credentials = yield window.API.getCredentialsDB();
         console.log(credentials);
         if (!credentials) {
-            navigate("/setup");
+            navigate("/create-user");
         }
         else {
             navigate("/auth");

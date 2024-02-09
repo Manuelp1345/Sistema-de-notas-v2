@@ -47,6 +47,9 @@ export function CreateUser() {
 
   const createUser = async () => {
     //@ts-ignore
+    await window.API.createCredentialsDB();
+
+    //@ts-ignore
     return await window.API.createUserDB({
       nombre,
       apellido,

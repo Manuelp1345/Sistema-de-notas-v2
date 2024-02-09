@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, Notification } from "electron";
 import electronIsDev from "electron-is-dev";
-import { DataSource } from "typeorm";
+import { createConnection, DataSource } from "typeorm";
 import fs from "fs";
 import * as path from "path";
 import { ConnectionDB } from "./config/database";
@@ -105,8 +105,9 @@ ipcMain.handle("VALIDATE_CREDENTIALS", async () => {
 
 ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
   try {
-    credentials.database = "database";
-    const connect = await ConnectionDB(credentials);
+    const connect = await ConnectionDB({
+      database: `${app.getPath("userData")}/db_notas.sqlite`,
+    });
 
     console.log(
       "File:electron.ts create credentials connect",
@@ -115,13 +116,9 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
     if (connect.isInitialized) {
       appDataSource = connect;
 
-      await connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
+      // await connect.query("CREATE DATABASE IF NOT EXISTS db_notas ");
       const credentialsDB: CredentialDB = {
-        host: credentials.host,
-        user: credentials.user,
-        password: credentials.pass,
-        port: credentials.port,
-        database: "db_notas",
+        database: `${app.getPath("userData")}/db_notas.sqlite`,
       };
 
       try {
@@ -136,45 +133,42 @@ ipcMain.handle("CREATE_CREDENTIALS_DB", async (event, credentials) => {
         );
         const connectDB = connect.createQueryRunner();
         await connectDB.release();
+
+        return true;
       } catch (error) {
         return false;
       }
     }
 
-    try {
-      const connectTwo = new DataSource({
-        type: "mysql",
-        host: credentials.host,
-        port: credentials.port,
-        username: credentials.user,
-        password: credentials.pass,
-        database: "db_notas",
-        entities: [
-          User,
-          Nota,
-          Anio,
-          Etapas,
-          Alumno,
-          Periodo,
-          Materia,
-          Seccion,
-          BasicData,
-          Documents,
-          Representante,
-          RecuperacionNota,
-        ],
-        synchronize: true,
-        logging: false,
-        extra: {
-          connectionLimit: 4000,
-        },
-      });
-      await connectTwo.initialize();
-      appDataSource = connectTwo;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
+    // try {
+    //   const connectTwo = await createConnection({
+    //     type: "sqlite",
+    //     database: `${app.getPath("userData")}/db_notas.sqlite`,
+    //     entities: [
+    //       User,
+    //       Nota,
+    //       Anio,
+    //       Etapas,
+    //       Alumno,
+    //       Periodo,
+    //       Materia,
+    //       Seccion,
+    //       BasicData,
+    //       Documents,
+    //       Representante,
+    //       RecuperacionNota,
+    //     ],
+    //     synchronize: true,
+    //     logging: false,
+    //   });
+    //   await connectTwo.initialize();
+    //   console.log(connectTwo.isInitialized);
+    //   appDataSource = connectTwo;
+    // } catch (error) {
+    //   console.log(error);
+    //   return false;
+    // }
+
     return true;
   } catch (error) {
     return false;
@@ -1466,13 +1460,29 @@ ipcMain.handle("RESTORE_RESPALDO", async (event, args) => {
     const pathRespaldo = `${app.getPath("documents")}/SistemaRespaldo`;
     const pathRestore = `${pathRespaldo}/${restoreName}`;
 
-    await appDataSource.query("DROP DATABASE IF EXISTS `db_notas`");
+    appDataSource.close();
 
-    await appDataSource.query("CREATE DATABASE `db_notas`");
+    //esperar a que se cierre la conexion
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    await appDataSource.destroy();
+    // slqite no soporta el drop table asi que se elimina el archivo de la base de datos
+    const pathDB = `${app.getPath("userData")}/db_notas.sqlite`;
+    await fs.rm(pathDB, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log("database eliminada");
+    });
 
-    appDataSource = await ConnectionDB();
+    // se crea la base de datos nuevamente
+    appDataSource = await ConnectionDB({
+      database: `${app.getPath("userData")}/db_notas.sqlite`,
+    });
+
+    // se crea la conexion a la base de datos
+
+    console.log("appDataSource", appDataSource.isInitialized);
 
     const data = JSON.parse(fs.readFileSync(pathRestore, "utf8"));
 
@@ -1503,7 +1513,7 @@ ipcMain.handle("RESTORE_RESPALDO", async (event, args) => {
     }
 
     //@ts-ignore
-    new Notification({
+    return new Notification({
       title: "Sistema De Notas",
       body: "Respaldo restaurado con exito",
       icon: path.join(__dirname, "./img/logo.png"),

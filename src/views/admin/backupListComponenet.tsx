@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   List,
   ListItem,
   ListItemText,
@@ -9,12 +10,15 @@ import React from "react";
 import { useState } from "react";
 import { CustomModal } from "../modals/customModal";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const BackupList = ({ refresh }) => {
   const [selectedBackup, setSelectedBackup] = useState(null);
   const [page, setPage] = useState(1);
   const [backups, setBackups] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const getBackups = async () => {
     //@ts-ignore
@@ -35,11 +39,13 @@ const BackupList = ({ refresh }) => {
   };
 
   const restoreBackup = async (backup) => {
+    setLoading(true);
     //add extension
     backup = backup + ".json";
     //@ts-ignore
     const result = await window.API.restoreBackup(backup);
     console.log(result);
+    navigate("/auth");
   };
 
   const itemsPerPage = 5;
@@ -88,12 +94,16 @@ const BackupList = ({ refresh }) => {
         ))}
       </List>
       <Button
-        disabled={!selectedBackup}
+        disabled={!selectedBackup || loading}
         onClick={handleOpen}
         variant="contained"
         color="primary"
       >
-        Aplicar respaldo: {selectedBackup}
+        {loading ? (
+          <CircularProgress size={24} />
+        ) : (
+          `Aplicar respaldo: ${selectedBackup}`
+        )}
       </Button>
       <div
         style={{

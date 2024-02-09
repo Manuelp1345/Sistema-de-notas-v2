@@ -63,6 +63,8 @@
     "react-router-dom": "^6.2.2",
     "react-scripts": "5.0.0",
     "reflect-metadata": "^0.1.13",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6",
     "sweetalert2": "^11.4.4",
     "typeorm": "^0.3.7",
     "web-vitals": "^2.1.4"
