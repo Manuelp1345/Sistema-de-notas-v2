@@ -45,6 +45,7 @@ const GlobalContext_1 = require("../../config/context/GlobalContext");
 const material_1 = require("@mui/material");
 const react_router_dom_1 = require("react-router-dom");
 const Logout_1 = __importDefault(require("@mui/icons-material/Logout"));
+const moment_1 = __importDefault(require("moment"));
 const data = [
     { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
     { name: "Page B", uv: 300, pv: 2400, amt: 2400 },
@@ -114,55 +115,95 @@ function Stats() {
             setSizeScreen(window.innerWidth);
         });
     }, []);
+    const yearOldAverage = () => {
+        const total = alumnos.map((alumno) => ({
+            name: `${alumno.firstName} ${alumno.Surname}`,
+            Edad: (0, moment_1.default)().diff(alumno.alumno.DatosPersonales.DateOfBirth, "years"),
+            año: alumno.alumno.DatosPersonales.DateOfBirth,
+        }));
+        console.log("total", total);
+        return total;
+    };
+    const genderCount = () => {
+        const female = alumnos.filter((alumno) => {
+            return alumno.alumno.DatosPersonales.sexo === "F";
+        }).length;
+        const male = alumnos.filter((alumno) => {
+            return alumno.alumno.DatosPersonales.sexo === "M";
+        }).length;
+        return [
+            {
+                name: "Femenino",
+                value: female,
+            },
+            {
+                name: "Masculino",
+                value: male,
+            },
+        ];
+    };
+    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+    const RADIAN = Math.PI / 180;
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, value, }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+        return ((0, jsx_runtime_1.jsx)("text", Object.assign({ x: x, y: y, fill: "white", textAnchor: x > cx ? "start" : "end", dominantBaseline: "central" }, { children: value })));
+    };
     console.log("alumnos", alumnos);
-    console.log("window.innerWidth", window.innerWidth);
-    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3, overflow: "auto !important" } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: {
+    return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: { flexGrow: 1, p: 3, overflow: "auto !important" } }, { children: [(0, jsx_runtime_1.jsx)(DrawerHeader, {}), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    flexDirection: "row",
-                    gap: 5,
-                }, variant: "h4", component: "div", gutterBottom: true }, { children: "Estadisticas" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                    flexDirection: "row",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 5,
-                } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Periodo" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Periodo", value: periodoSelected, onChange: (e) => setPeriodoSelected(e.target.value) }, { children: periodos.map((item) => {
-                                    return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.periodo }));
-                                }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "A\u00F1o" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "A\u00F1o", value: year, onChange: (e) => setYear(e.target.value), disabled: periodoSelected === -1 }, { children: aniosAndSecciones.map((item) => {
-                                    return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.anio }));
-                                }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Seccion" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Seccion", value: secciones, onChange: (e) => setSecciones(e.target.value), disabled: year === -1 }, { children: aniosAndSecciones
-                                    .filter((item) => item.id === year)
-                                    .map((item) => {
-                                    return item.secciones.map((seccion) => {
-                                        return ((0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: seccion.id }, { children: seccion.seccion })));
-                                    });
-                                }) }))] }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                    mt: 2,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: window.innerWidth < 1024 ? "column" : "row",
-                    gap: 5,
-                } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                            width: "50%",
+                    flexDirection: "column",
+                } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: {
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
-                            flexDirection: "column",
-                        } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Grafico De Genero" }), (0, jsx_runtime_1.jsx)(recharts_1.ResponsiveContainer, Object.assign({ width: "100%", height: "100%" }, { children: (0, jsx_runtime_1.jsxs)(recharts_1.BarChart, Object.assign({ width: 500, height: 300, data: data, margin: {
-                                        top: 5,
-                                        right: 30,
-                                        left: 20,
-                                        bottom: 5,
-                                    }, barSize: 20 }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.XAxis, { dataKey: "name", scale: "point", padding: { left: 10, right: 10 } }), (0, jsx_runtime_1.jsx)(recharts_1.YAxis, {}), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {}), (0, jsx_runtime_1.jsx)(recharts_1.Legend, {}), (0, jsx_runtime_1.jsx)(recharts_1.CartesianGrid, { strokeDasharray: "3 3" }), (0, jsx_runtime_1.jsx)(recharts_1.Bar, { dataKey: "pv", fill: "#8884d8", background: { fill: "#eee" } })] })) }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
-                            width: "50%",
+                            flexDirection: "row",
+                            gap: 5,
+                        }, variant: "h4", component: "div", gutterBottom: true }, { children: "Estadisticas" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            flexDirection: "row",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
-                            flexDirection: "column",
-                        } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Promedio De edad" }), (0, jsx_runtime_1.jsxs)(recharts_1.LineChart, Object.assign({ width: 600, height: 300, data: data, margin: { top: 5, right: 20, bottom: 5, left: 0 } }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.Line, { type: "monotone", dataKey: "uv", stroke: "#8884d8" }), (0, jsx_runtime_1.jsx)(recharts_1.CartesianGrid, { stroke: "#ccc", strokeDasharray: "5 5" }), (0, jsx_runtime_1.jsx)(recharts_1.XAxis, { dataKey: "name" }), (0, jsx_runtime_1.jsx)(recharts_1.YAxis, {}), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {})] }))] }))] })), user.user.role === "USER" && ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            gap: 5,
+                            width: "100%",
+                        } }, { children: [(0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Periodo" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Periodo", value: periodoSelected, onChange: (e) => setPeriodoSelected(e.target.value) }, { children: periodos.map((item) => {
+                                            return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.periodo }));
+                                        }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "A\u00F1o" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "A\u00F1o", value: year, onChange: (e) => setYear(e.target.value), disabled: periodoSelected === -1 }, { children: aniosAndSecciones.map((item) => {
+                                            return (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: item.id }, { children: item.anio }));
+                                        }) }))] })), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { m: 1, minWidth: 120, width: "33.3%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, { children: "Seccion" }), (0, jsx_runtime_1.jsx)(material_1.Select, Object.assign({ label: "Seccion", value: secciones, onChange: (e) => setSecciones(e.target.value), disabled: year === -1 }, { children: aniosAndSecciones
+                                            .filter((item) => item.id === year)
+                                            .map((item) => {
+                                            return item.secciones.map((seccion) => {
+                                                return ((0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: seccion.id }, { children: seccion.seccion })));
+                                            });
+                                        }) }))] }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                            mt: 2,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: window.innerWidth < 1024 ? "column" : "row",
+                            gap: 5,
+                        } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                    width: "50%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    flexDirection: "column",
+                                } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Grafico de Genero" }), (0, jsx_runtime_1.jsxs)(recharts_1.PieChart, Object.assign({ width: 600, height: 400 }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.Pie, Object.assign({ data: genderCount(), cx: "51%", cy: "40%", labelLine: false, label: renderCustomizedLabel, outerRadius: 120, fill: "#8884d8", dataKey: "value" }, { children: genderCount().map((entry, index) => ((0, jsx_runtime_1.jsx)(recharts_1.Cell, { fill: COLORS[index % COLORS.length] }, `cell-${index}`))) })), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {})] }))] })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                    width: "50%",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    flexDirection: "column",
+                                } }, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, { children: "Promedio de edad" }), (0, jsx_runtime_1.jsxs)(recharts_1.LineChart, Object.assign({ width: 500, height: 300, data: yearOldAverage(), margin: {
+                                            top: 5,
+                                            right: 30,
+                                            left: 20,
+                                            bottom: 5,
+                                        } }, { children: [(0, jsx_runtime_1.jsx)(recharts_1.CartesianGrid, { strokeDasharray: "3 3" }), (0, jsx_runtime_1.jsx)(recharts_1.XAxis, { dataKey: "name" }), (0, jsx_runtime_1.jsx)(recharts_1.YAxis, {}), (0, jsx_runtime_1.jsx)(recharts_1.Tooltip, {}), (0, jsx_runtime_1.jsx)(recharts_1.Legend, {}), (0, jsx_runtime_1.jsx)(recharts_1.Line, { type: "natural", dataKey: "Edad", stroke: "#8884d8", activeDot: { r: 8 } })] }))] }))] }))] })), user.user.role === "USER" && ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",

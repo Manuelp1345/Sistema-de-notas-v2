@@ -289,7 +289,7 @@ export default function Stats() {
               flexDirection: "column",
             }}
           >
-            <Typography>Grafico De Genero</Typography>
+            <Typography>Grafico de Genero</Typography>
             <PieChart width={600} height={400}>
               <Pie
                 data={genderCount()}
@@ -320,7 +320,7 @@ export default function Stats() {
               flexDirection: "column",
             }}
           >
-            <Typography>Promedio De edad</Typography>
+            <Typography>Promedio de edad</Typography>
             <LineChart
               width={500}
               height={300}
