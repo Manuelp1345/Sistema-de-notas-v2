@@ -51,6 +51,10 @@ const createAnio = async (anio) => {
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
 };
 
+const createDataFake = async () => {
+  return await ipcRenderer.invoke("GENERATE_FAKE_DATA");
+};
+
 const imgLogin = async () => {
   const html = document.querySelector("html");
 
@@ -91,6 +95,9 @@ const getNotas = async (data) => {
 };
 
 const gradeAlumnos = async (data) => {
+  await generateBackup({
+    automatic: true,
+  });
   return await ipcRenderer.invoke("GRADE_ALUMNOS", data);
 };
 
@@ -110,8 +117,8 @@ const getUsers = async () => {
   return await ipcRenderer.invoke("GET_USERS");
 };
 
-const generateBackup = async () => {
-  return await ipcRenderer.invoke("GENERATE_RESPALDO");
+const generateBackup = async (data) => {
+  return await ipcRenderer.invoke("GENERATE_RESPALDO", data);
 };
 
 const getBackup = async () => {
@@ -182,6 +189,7 @@ const API = {
   updateUser,
   getAlumnosGraduados,
   deleteUser,
+  createDataFake,
 };
 
 contextBridge.exposeInMainWorld("API", API);

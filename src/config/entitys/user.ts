@@ -15,7 +15,7 @@ export class User extends BaseEntity {
   readonly id!: string;
 
   @Column({ type: "text" })
-  contraseña!: string;
+  clave!: string;
 
   @Column({ type: "text" })
   role!: string;

@@ -147,18 +147,21 @@ const Alumno = (): JSX.Element => {
     address: alumno.alumnoId.alumno.DatosPersonales.address,
     municipality: alumno.alumnoId.alumno.DatosPersonales.municipality,
     state: alumno.alumnoId.alumno.DatosPersonales.state,
-    cedula: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.cedula),
+    cedula: Boolean(
+      alumno.alumnoId.alumno.DatosPersonales?.Documents?.cedula || false
+    ),
     pasaporte: Boolean(
-      alumno.alumnoId.alumno.DatosPersonales.Documents.pasaporte
+      alumno.alumnoId.alumno.DatosPersonales?.Documents?.pasaporte || false
     ),
     partidaDeNacimiento: Boolean(
-      alumno.alumnoId.alumno.DatosPersonales.Documents.partida_nacimiento
+      alumno.alumnoId.alumno.DatosPersonales?.Documents?.partida_nacimiento ||
+        false
     ),
     fotos: Boolean(
-      alumno.alumnoId.alumno.DatosPersonales.Documents.fotos_carnet
+      alumno.alumnoId.alumno.DatosPersonales?.Documents?.fotos_carnet || false
     ),
     notasEscolares: Boolean(
-      alumno.alumnoId.alumno.DatosPersonales.Documents.notas_escuela
+      alumno.alumnoId.alumno.DatosPersonales?.Documents?.notas_escuela || false
     ),
     observacion: alumno.alumnoId.alumno.observacion,
     condicion: alumno.alumnoId.alumno.condicion,

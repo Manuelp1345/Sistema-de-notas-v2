@@ -22,7 +22,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: "text" }),
     __metadata("design:type", String)
-], User.prototype, "contrase\u00F1a", void 0);
+], User.prototype, "clave", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "text" }),
     __metadata("design:type", String)

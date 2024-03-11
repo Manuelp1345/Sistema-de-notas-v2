@@ -23,6 +23,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Home() {
   const { user } = React.useContext<any>(GlobalContext);
   const navigate = useNavigate();
+  const update = async () => {
+    //@ts-ignore
+    await window.API.createDataFake();
+  };
   return (
     <Box
       className="animate__animated animate__fadeInRight"
@@ -38,6 +42,8 @@ export default function Home() {
           locale={esLocale}
         />
       </Box>
+      <Button onClick={update}>generar data</Button>
+
       <Typography paragraph>
         ¡Bienvenido al sistema de notas automatizado para el área administrativa
         de la U.E Jose Enrique Arias! Este sistema en línea ha sido diseñado

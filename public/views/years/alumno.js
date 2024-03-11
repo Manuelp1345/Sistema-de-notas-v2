@@ -50,7 +50,7 @@ const steps = [
     "Datos Academicos",
 ];
 const Alumno = () => {
-    var _a;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     const { id } = (0, react_router_dom_1.useParams)();
     const navigate = (0, react_router_dom_1.useNavigate)();
     const handleClickOpen = () => setOpenSeccionAnio(true);
@@ -109,11 +109,12 @@ const Alumno = () => {
         address: alumno.alumnoId.alumno.DatosPersonales.address,
         municipality: alumno.alumnoId.alumno.DatosPersonales.municipality,
         state: alumno.alumnoId.alumno.DatosPersonales.state,
-        cedula: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.cedula),
-        pasaporte: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.pasaporte),
-        partidaDeNacimiento: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.partida_nacimiento),
-        fotos: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.fotos_carnet),
-        notasEscolares: Boolean(alumno.alumnoId.alumno.DatosPersonales.Documents.notas_escuela),
+        cedula: Boolean(((_b = (_a = alumno.alumnoId.alumno.DatosPersonales) === null || _a === void 0 ? void 0 : _a.Documents) === null || _b === void 0 ? void 0 : _b.cedula) || false),
+        pasaporte: Boolean(((_d = (_c = alumno.alumnoId.alumno.DatosPersonales) === null || _c === void 0 ? void 0 : _c.Documents) === null || _d === void 0 ? void 0 : _d.pasaporte) || false),
+        partidaDeNacimiento: Boolean(((_f = (_e = alumno.alumnoId.alumno.DatosPersonales) === null || _e === void 0 ? void 0 : _e.Documents) === null || _f === void 0 ? void 0 : _f.partida_nacimiento) ||
+            false),
+        fotos: Boolean(((_h = (_g = alumno.alumnoId.alumno.DatosPersonales) === null || _g === void 0 ? void 0 : _g.Documents) === null || _h === void 0 ? void 0 : _h.fotos_carnet) || false),
+        notasEscolares: Boolean(((_k = (_j = alumno.alumnoId.alumno.DatosPersonales) === null || _j === void 0 ? void 0 : _j.Documents) === null || _k === void 0 ? void 0 : _k.notas_escuela) || false),
         observacion: alumno.alumnoId.alumno.observacion,
         condicion: alumno.alumnoId.alumno.condicion,
         grupoEstable: alumno.alumnoId.alumno.grupoEstable,
@@ -486,11 +487,11 @@ const Alumno = () => {
         console.log(response);
     });
     const updateAnioAndSeccion = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _b;
+        var _m;
         console.log("new anio", newAnio);
         console.log("new seccion", newSeccion);
-        const seccionId = (_b = aniosAndSecciones
-            .find((anio) => anio.numberAnio === newAnio)) === null || _b === void 0 ? void 0 : _b.secciones.find((seccion) => seccion.seccion === newSeccion);
+        const seccionId = (_m = aniosAndSecciones
+            .find((anio) => anio.numberAnio === newAnio)) === null || _m === void 0 ? void 0 : _m.secciones.find((seccion) => seccion.seccion === newSeccion);
         const anioId = aniosAndSecciones.find((anio) => anio.numberAnio === newAnio);
         console.log(seccionId, "seccionId");
         const data = {
@@ -1012,8 +1013,8 @@ const Alumno = () => {
                                                     setNewSeccion(e.target.value);
                                                 } }, { children: 
                                                 //@ts-ignore
-                                                (_a = aniosAndSecciones
-                                                    .find((anio) => anio.numberAnio === newAnio)) === null || _a === void 0 ? void 0 : _a.secciones.map((seccion) => {
+                                                (_l = aniosAndSecciones
+                                                    .find((anio) => anio.numberAnio === newAnio)) === null || _l === void 0 ? void 0 : _l.secciones.map((seccion) => {
                                                     return ((0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: seccion.seccion }, { children: seccion.seccion })));
                                                 }) }))] })) }))] }))] })) }))] })));
 };
