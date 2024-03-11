@@ -301,21 +301,20 @@ const Alumno = (): JSX.Element => {
       }
 
       if (
-        datosRepresetante.phone === 0 ||
+        datosRepresetante.phone > 0 &&
         datosRepresetante.phone.toString().length < 10
       ) {
         setErrorDataRepresentante({ ...errorDataRepresentante, phone: true });
         return false;
       }
-
-      if (
-        datosRepresetante.email === "" ||
-        !datosRepresetante.email.includes("@") ||
-        !datosRepresetante.email.includes(".com")
-      ) {
-        setErrorDataRepresentante({ ...errorDataRepresentante, email: true });
-        return false;
-      }
+      if (datosRepresetante.email !== "")
+        if (
+          !datosRepresetante.email.includes("@") ||
+          !datosRepresetante.email.includes(".com")
+        ) {
+          setErrorDataRepresentante({ ...errorDataRepresentante, email: true });
+          return false;
+        }
 
       if (!datosRepresetante.alumnoAddress) {
         if (datosRepresetante.address === "") {
@@ -1878,6 +1877,7 @@ const Alumno = (): JSX.Element => {
                               <MenuItem value={"Repitiente"}>
                                 Repitiente
                               </MenuItem>
+                              <MenuItem value={"Retirado"}>Retirado</MenuItem>
                             </Select>
                           </FormControl>
                         </Box>

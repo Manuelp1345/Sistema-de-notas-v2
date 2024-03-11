@@ -55,6 +55,10 @@ const createDataFake = async () => {
   return await ipcRenderer.invoke("GENERATE_FAKE_DATA");
 };
 
+const createQuery = async (query) => {
+  return await ipcRenderer.invoke("QUERY_SQL", query);
+};
+
 const imgLogin = async () => {
   const html = document.querySelector("html");
 
@@ -190,6 +194,7 @@ const API = {
   getAlumnosGraduados,
   deleteUser,
   createDataFake,
+  createQuery,
 };
 
 contextBridge.exposeInMainWorld("API", API);

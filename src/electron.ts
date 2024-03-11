@@ -19,7 +19,7 @@ import { Documents } from "./config/entitys/documents";
 import { RecuperacionNota } from "./config/entitys/recuperacion_Nota";
 import { Etapas } from "./config/entitys/etapas";
 import { Representante } from "./config/entitys/representante";
-import Excel from "exceljs";
+import Excel, { Worksheet } from "exceljs";
 import moment from "moment";
 import { faker } from "@faker-js/faker";
 
@@ -1231,7 +1231,7 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
   const plantilla = path.join(__dirname, "./assets/boletin.xlsx");
   const workbook = new Excel.Workbook();
   const document = await workbook.xlsx.readFile(plantilla);
-  const sheet = document.getWorksheet("boletin");
+  const sheet = document.getWorksheet("boletin") as Worksheet;
   sheet.getCell("K1").value = moment().format("DD/MM/YYYY");
   sheet.getCell(
     "A9"
@@ -1248,7 +1248,7 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
     `NOMBRES Y APELLIDOS: ${alumno?.DatosPersonales.firstName} ${alumno?.DatosPersonales.secondName} ${alumno?.DatosPersonales.Surname} ${alumno?.DatosPersonales.secondSurname}`.toLocaleUpperCase();
 
   sheet.getCell("A11").value =
-    `LUGAR DE NACIMIENTO: ${alumno?.DatosPersonales.address}, ${alumno?.DatosPersonales.municipality}, ${alumno?.DatosPersonales.state}`.toLocaleUpperCase();
+    `Dirección.: ${alumno?.DatosPersonales.address}, ${alumno?.DatosPersonales.municipality}, ${alumno?.DatosPersonales.state}`.toLocaleUpperCase();
 
   sheet.getCell("L11").value = `FECHA DE NACIMIENTO: ${moment(
     alumno?.DatosPersonales.DateOfBirth
@@ -1981,4 +1981,9 @@ ipcMain.handle("GENERATE_FAKE_DATA", async (event, data) => {
       }
     }
   }
+});
+
+ipcMain.handle("QUERY_SQL", async (event, data) => {
+  const response = await appDataSource.manager.query(data);
+  return response;
 });

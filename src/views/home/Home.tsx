@@ -1,15 +1,19 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-
+import { House } from "@mui/icons-material";
+import SchoolIcon from "@mui/icons-material/School";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import LogoutIcon from "@mui/icons-material/Logout";
 import Typography from "@mui/material/Typography";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import esLocale from "@fullcalendar/core/locales/es";
 import { GlobalContext } from "../../config/context/GlobalContext";
-import { Button } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import LogoutIcon from "@mui/icons-material/Logout";
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -23,6 +27,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Home() {
   const { user } = React.useContext<any>(GlobalContext);
   const navigate = useNavigate();
+  const buttons = [
+    "Años",
+    "Graduados",
+    "Administración",
+    "Estadisticas",
+    "Salir",
+  ];
   const update = async () => {
     //@ts-ignore
     await window.API.createDataFake();
@@ -31,18 +42,19 @@ export default function Home() {
     <Box
       className="animate__animated animate__fadeInRight"
       component="main"
-      sx={{ flexGrow: 1, p: 3, overflow: "auto !important" }}
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        overflow: "auto !important",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
     >
       <DrawerHeader />
-      <Box>
-        <FullCalendar
-          height={"27rem"}
-          plugins={[dayGridPlugin]}
-          initialView="dayGridMonth"
-          locale={esLocale}
-        />
-      </Box>
-      <Button onClick={update}>generar data</Button>
+
+      {/*     <Button onClick={update}>generar data</Button> */}
 
       <Typography paragraph>
         ¡Bienvenido al sistema de notas automatizado para el área administrativa
@@ -57,6 +69,84 @@ export default function Home() {
         sistema de notas automatizado!
       </Typography>
 
+      <Box
+        sx={{
+          width: "50%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 5,
+          mt: 5,
+        }}
+      >
+        {buttons.map((button, index) => (
+          <Button
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              width: "10rem",
+              height: "10rem",
+
+              backgroundColor: "primary.main",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "primary.dark",
+              },
+            }}
+            //@ts-ignore
+            onClick={() =>
+              //@ts-ignore
+              (index === 0 && user.user.role !== "USER" && navigate("/anos")) ||
+              //@ts-ignore
+
+              (index === 1 &&
+                user.user.role !== "USER" &&
+                navigate("/search")) ||
+              //@ts-ignore
+
+              (index === 2 &&
+                user.user.role !== "USER" &&
+                navigate("/admin")) ||
+              //@ts-ignore
+              (index === 3 && navigate("/stats")) ||
+              //@ts-ignore
+              (index === 4 && navigate("/logout"))
+            }
+          >
+            {index === 0 && user.user.role !== "USER" && (
+              <Tooltip title={`Años`} arrow placement="right">
+                <DateRangeIcon />
+              </Tooltip>
+            )}
+            {index === 1 && user.user.role !== "USER" && (
+              <Tooltip title={`Graduados`} arrow placement="right">
+                <SchoolIcon />
+              </Tooltip>
+            )}
+            {index === 2 && user.user.role !== "USER" && (
+              <Tooltip title={`Administración`} arrow placement="right">
+                <AdminPanelSettingsIcon />
+              </Tooltip>
+            )}
+            {index === 3 && (
+              <Tooltip title={`stats`} arrow placement="right">
+                <QueryStatsIcon />
+              </Tooltip>
+            )}
+            {index === 4 && (
+              <Tooltip title={`Salir`} arrow placement="right">
+                <LogoutIcon />
+              </Tooltip>
+            )}
+            {button}
+          </Button>
+        ))}
+      </Box>
+
       {user.user.role === "USER" && (
         <Box
           sx={{
@@ -68,6 +158,14 @@ export default function Home() {
             gap: 5,
           }}
         >
+          <Box>
+            <FullCalendar
+              height={"27rem"}
+              plugins={[dayGridPlugin]}
+              initialView="dayGridMonth"
+              locale={esLocale}
+            />
+          </Box>
           <Button variant="contained">Generar Consulta</Button>
           <Button onClick={() => navigate("/logout")} variant="contained">
             <LogoutIcon /> Salir del sistema

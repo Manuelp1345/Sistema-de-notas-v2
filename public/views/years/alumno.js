@@ -217,17 +217,17 @@ const Alumno = () => {
                 setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { filiacion: true }));
                 return false;
             }
-            if (datosRepresetante.phone === 0 ||
+            if (datosRepresetante.phone > 0 &&
                 datosRepresetante.phone.toString().length < 10) {
                 setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { phone: true }));
                 return false;
             }
-            if (datosRepresetante.email === "" ||
-                !datosRepresetante.email.includes("@") ||
-                !datosRepresetante.email.includes(".com")) {
-                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: true }));
-                return false;
-            }
+            if (datosRepresetante.email !== "")
+                if (!datosRepresetante.email.includes("@") ||
+                    !datosRepresetante.email.includes(".com")) {
+                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: true }));
+                    return false;
+                }
             if (!datosRepresetante.alumnoAddress) {
                 if (datosRepresetante.address === "") {
                     setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { address: true }));
@@ -935,7 +935,7 @@ const Alumno = () => {
                                                                                 //@ts-ignore
                                                                                 grupoEstable: e.target.value }));
                                                                             setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { grupoEstable: false }));
-                                                                        } }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { width: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ error: errorDataAlumno.condicion, labelId: "demo-simple-select-label", id: "demo-simple-select", value: datosAlumno.condicion, label: "Condicion", onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" }))] }))] }))] })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Documentos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                                                                        } }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, Object.assign({ sx: { width: "100%" } }, { children: [(0, jsx_runtime_1.jsx)(material_1.InputLabel, Object.assign({ id: "demo-simple-select-label" }, { children: "Condicion" })), (0, jsx_runtime_1.jsxs)(material_1.Select, Object.assign({ error: errorDataAlumno.condicion, labelId: "demo-simple-select-label", id: "demo-simple-select", value: datosAlumno.condicion, label: "Condicion", onChange: handleChange }, { children: [(0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Nuevo Ingreso" }, { children: "Nuevo Ingreso" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Regular" }, { children: "Regular" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Repitiente" }, { children: "Repitiente" })), (0, jsx_runtime_1.jsx)(material_1.MenuItem, Object.assign({ value: "Retirado" }, { children: "Retirado" }))] }))] }))] })), (0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ textAlign: "center", width: "100%", fontWeight: "bold" }, { children: "Documentos" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                                                                     display: "flex",
                                                                     justifyContent: "center",
                                                                     gap: "1rem",

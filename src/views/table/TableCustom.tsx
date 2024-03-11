@@ -22,7 +22,9 @@ function CustomToolbar() {
       }}
     >
       <Box sx={{ gap: "1rem", display: "flex" }}>
+        {/* @ts-ignore */}
         <GridToolbarColumnsButton sx={{ color: "black" }} />
+        {/* @ts-ignore */}
         <GridToolbarFilterButton sx={{ color: "black" }} />
       </Box>
       <GridToolbarExport sx={{ color: "black" }} />
@@ -37,14 +39,10 @@ export const TableCustom = ({
   handleClick,
   handleDobleClick,
   toolbar,
-  handleEditCell = (params, oldCell) => {
-    console.log("edit", params);
-  },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  handleEditCell = (params, oldCell) => {},
 }): JSX.Element => {
   const handleCellEdit = (newCell, oldCell) => {
-    console.log("new", newCell);
-    console.log("old", oldCell);
-
     const alert = () => {
       return Swal.fire({
         title: "Nota Invalida ( 1 - 20 )",

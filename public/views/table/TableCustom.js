@@ -18,12 +18,10 @@ function CustomToolbar() {
         } }, { children: [(0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: { gap: "1rem", display: "flex" } }, { children: [(0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarColumnsButton, { sx: { color: "black" } }), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarFilterButton, { sx: { color: "black" } })] })), (0, jsx_runtime_1.jsx)(x_data_grid_1.GridToolbarExport, { sx: { color: "black" } })] })));
 }
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, toolbar, handleEditCell = (params, oldCell) => {
-    console.log("edit", params);
-}, }) => {
+const TableCustom = ({ rows, columns, loading, handleClick, handleDobleClick, toolbar, 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+handleEditCell = (params, oldCell) => { }, }) => {
     const handleCellEdit = (newCell, oldCell) => {
-        console.log("new", newCell);
-        console.log("old", oldCell);
         const alert = () => {
             return sweetalert2_1.default.fire({
                 title: "Nota Invalida ( 1 - 20 )",

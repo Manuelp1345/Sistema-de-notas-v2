@@ -1177,7 +1177,7 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     sheet.getCell("F10").value =
         `NOMBRES Y APELLIDOS: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname} ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}`.toLocaleUpperCase();
     sheet.getCell("A11").value =
-        `LUGAR DE NACIMIENTO: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.address}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.municipality}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.state}`.toLocaleUpperCase();
+        `Dirección.: ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.address}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.municipality}, ${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.state}`.toLocaleUpperCase();
     sheet.getCell("L11").value = `FECHA DE NACIMIENTO: ${(0, moment_1.default)(alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.DateOfBirth).format("DD/MM/YYYY")}`;
     let currentRow = 14;
     let promedioMomentoOne = 0;
@@ -1798,5 +1798,9 @@ electron_1.ipcMain.handle("GENERATE_FAKE_DATA", (event, data) => __awaiter(void 
             }
         }
     }
+}));
+electron_1.ipcMain.handle("QUERY_SQL", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield appDataSource.manager.query(data);
+    return response;
 }));
 //# sourceMappingURL=electron.js.map

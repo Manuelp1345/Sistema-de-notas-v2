@@ -238,7 +238,7 @@ const Seccion = () => {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { state: true }));
                 return false;
             }
-            if (datosAlumno.phone === 0 || datosAlumno.phone.toString().length < 10) {
+            if (datosAlumno.phone > 0 || datosAlumno.phone.toString().length < 10) {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { phone: true }));
                 return false;
             }
@@ -246,12 +246,12 @@ const Seccion = () => {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { sexo: true }));
                 return false;
             }
-            if (datosAlumno.email === "" ||
-                !datosAlumno.email.includes("@") ||
-                !datosAlumno.email.includes(".com")) {
-                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { email: true }));
-                return false;
-            }
+            if (datosAlumno.email !== "")
+                if (!datosAlumno.email.includes("@") ||
+                    !datosAlumno.email.includes(".com")) {
+                    setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { email: true }));
+                    return false;
+                }
             if (datosAlumno.fechaNacimiento === null ||
                 (0, moment_1.default)(datosAlumno.fechaNacimiento).toDate() === (0, moment_1.default)().toDate()) {
                 console.log(datosAlumno.fechaNacimiento);
@@ -283,17 +283,17 @@ const Seccion = () => {
                 setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { filiacion: true }));
                 return false;
             }
-            if (datosRepresetante.phone === 0 ||
+            if (datosRepresetante.phone > 0 &&
                 datosRepresetante.phone.toString().length < 10) {
                 setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { phone: true }));
                 return false;
             }
-            if (datosRepresetante.email === "" ||
-                !datosRepresetante.email.includes("@") ||
-                !datosRepresetante.email.includes(".com")) {
-                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: true }));
-                return false;
-            }
+            if (datosRepresetante.email !== "")
+                if (!datosRepresetante.email.includes("@") ||
+                    !datosRepresetante.email.includes(".com")) {
+                    setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { email: true }));
+                    return false;
+                }
             if (!datosRepresetante.alumnoAddress) {
                 if (datosRepresetante.address === "") {
                     setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { address: true }));

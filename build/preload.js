@@ -52,6 +52,12 @@ const insertAlumno = (data) => __awaiter(void 0, void 0, void 0, function* () {
 const createAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("INSERT_AÑOS", anio);
 });
+const createDataFake = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GENERATE_FAKE_DATA");
+});
+const createQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("QUERY_SQL", query);
+});
 const imgLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     const html = document.querySelector("html");
     html.style.backgroundImage = `url("./img/background.jpg")`;
@@ -84,6 +90,9 @@ const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_NOTAS", data);
 });
 const gradeAlumnos = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    yield generateBackup({
+        automatic: true,
+    });
     return yield ipcRenderer.invoke("GRADE_ALUMNOS", data);
 });
 const getAlumnoByDni = (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -98,8 +107,8 @@ const generarBoletin = (data) => __awaiter(void 0, void 0, void 0, function* () 
 const getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_USERS");
 });
-const generateBackup = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield ipcRenderer.invoke("GENERATE_RESPALDO");
+const generateBackup = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("GENERATE_RESPALDO", data);
 });
 const getBackup = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GET_RESPALDOS");
@@ -161,6 +170,8 @@ const API = {
     updateUser,
     getAlumnosGraduados,
     deleteUser,
+    createDataFake,
+    createQuery,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map

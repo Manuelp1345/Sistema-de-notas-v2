@@ -32,19 +32,6 @@ import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import moment from "moment";
 
-const data = [
-  { name: "Page A", uv: 400, pv: 2400, amt: 2400 },
-  { name: "Page B", uv: 300, pv: 2400, amt: 2400 },
-  { name: "Page C", uv: 200, pv: 2400, amt: 2400 },
-  { name: "Page D", uv: 278, pv: 2400, amt: 2400 },
-  { name: "Page E", uv: 189, pv: 2400, amt: 2400 },
-  { name: "Page F", uv: 239, pv: 2400, amt: 2400 },
-  { name: "Page G", uv: 349, pv: 2400, amt: 2400 },
-  { name: "Page H", uv: 349, pv: 2400, amt: 2400 },
-  { name: "Page I", uv: 349, pv: 2400, amt: 2400 },
-  { name: "Page J", uv: 349, pv: 2400, amt: 2400 },
-];
-
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -64,37 +51,94 @@ export default function Stats() {
   const [periodos, setPeriodos] = React.useState<any>([]);
   const [periodoSelected, setPeriodoSelected] = React.useState<any>(-1);
   const [sizeScreen, setSizeScreen] = React.useState<any>(window.innerWidth);
+  const [maxNote, setMaxNote] = React.useState<any>({
+    value: 20,
+    name: "",
+  });
+  const [minNote, setMinNote] = React.useState<any>({
+    value: 20,
+    name: "",
+  });
   const navigate = useNavigate();
 
   const getAniosAndSecciones = async () => {
     //@ts-ignore
-    const response = await window.API.getAniosAndSecciones(periodo.periodo.id);
+    const response = await window.API.getAniosAndSecciones(periodoSelected);
+    const alumnosPeriodo = await queryToDataBase(
+      `SELECT
+      *,
+          SUM(nota.nota) AS total_notas,
+          AVG(nota.nota) AS promedio_nota
+      FROM anio
+      INNER JOIN etapas ON anio.id = etapas.anioId
+      INNER JOIN alumno on etapas.alumnoId = alumno.id
+      INNER JOIN nota on nota.alumnoId = alumno.id
+	    INNER JOIN seccion on etapas.seccioneId = seccion.id
+      INNER JOIN basic_data on basic_data.id = alumno.datosPersonalesId
+      WHERE anio.periodoId=${periodoSelected}
+      GROUP BY alumno.id;`
+    );
+
+    const findMAxNote = alumnosPeriodo.map((alumno: any) => {
+      return {
+        name: `${alumno.firstName} ${alumno.Surname} | C.I ${alumno.dni} | ${alumno.anio} ${alumno.seccion}`,
+        value: alumno.promedio_nota,
+      };
+    });
+    const maxNoteValue = Math.max(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+    const minNoteValue = Math.min(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+    setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
+    setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
+
+    setAlumnos(alumnosPeriodo);
     setAniosAndSecciones(response);
   };
 
   const getAlumno = async () => {
-    // @ts-ignore
-    const findSecciones = await window.API.getAlumno(secciones);
-
-    console.log("findSecciones", findSecciones);
-
-    setAlumnos(
-      findSecciones.map((alumno) => {
-        alumno.firstName =
-          `${alumno.alumno.DatosPersonales.firstName}`.toLocaleUpperCase();
-        alumno.secondName =
-          `${alumno.alumno.DatosPersonales.secondName}`.toLocaleUpperCase();
-        alumno.Surname =
-          `${alumno.alumno.DatosPersonales.Surname}`.toLocaleUpperCase();
-        alumno.secondSurname =
-          `${alumno.alumno.DatosPersonales.secondSurname}`.toLocaleUpperCase();
-        alumno.dni = alumno.alumno.DatosPersonales.dni;
-        return alumno;
-      })
+    const alumnosPeriodo = await queryToDataBase(
+      `SELECT
+      *,
+          SUM(nota.nota) AS total_notas,
+          AVG(nota.nota) AS promedio_nota
+      FROM anio
+      INNER JOIN etapas ON anio.id = etapas.anioId
+      INNER JOIN alumno on etapas.alumnoId = alumno.id
+	    INNER JOIN seccion on etapas.seccioneId = seccion.id
+      INNER JOIN nota on nota.alumnoId = alumno.id
+      INNER JOIN basic_data on basic_data.id = alumno.datosPersonalesId
+      WHERE anio.periodoId=${periodoSelected} AND etapas.anioId=${year} AND etapas.seccioneId=${secciones}
+      GROUP BY alumno.id;`
     );
 
+    console.log("alumnosPeriodo", alumnosPeriodo);
+    const findMAxNote = alumnosPeriodo.map((alumno: any) => {
+      return {
+        name: `${alumno.firstName} ${alumno.Surname} | C.I ${alumno.dni} | ${alumno.anio} ${alumno.seccion}`,
+        value: alumno.promedio_nota,
+      };
+    });
+    const maxNoteValue = Math.max(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+    const minNoteValue = Math.min(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+
+    setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
+    setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
+
+    setAlumnos(alumnosPeriodo);
+  };
+
+  const queryToDataBase = async (query) => {
     // @ts-ignore
-    return findSecciones;
+    const response = await window.API.createQuery(query);
+    console.log("responseQeury", response);
+    return response;
   };
 
   const getPeriodos = async (filter: any) => {
@@ -104,12 +148,57 @@ export default function Stats() {
     return data[0];
   };
 
+  const getAlumnosAnio = async () => {
+    const alumnosPeriodo = await queryToDataBase(
+      `SELECT
+      *,
+          SUM(nota.nota) AS total_notas,
+          AVG(nota.nota) AS promedio_nota
+      FROM anio
+      INNER JOIN etapas ON anio.id = etapas.anioId
+      INNER JOIN alumno on etapas.alumnoId = alumno.id
+      INNER JOIN nota on nota.alumnoId = alumno.id
+	    INNER JOIN seccion on etapas.seccioneId = seccion.id
+      INNER JOIN basic_data on basic_data.id = alumno.datosPersonalesId
+      WHERE anio.periodoId=${periodoSelected} AND etapas.anioId=${year}
+      GROUP BY alumno.id;`
+    );
+    const findMAxNote = alumnosPeriodo.map((alumno: any) => {
+      return {
+        name: `${alumno.firstName} ${alumno.Surname} | C.I ${alumno.dni} | ${alumno.anio} ${alumno.seccion}`,
+        value: alumno.promedio_nota,
+      };
+    });
+    const maxNoteValue = Math.max(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+    const minNoteValue = Math.min(
+      ...findMAxNote.map((item: any) => item.value)
+    );
+
+    setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
+    setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
+
+    setAlumnos(alumnosPeriodo);
+  };
+
   React.useEffect(() => {
     if (secciones !== -1) getAlumno();
   }, [secciones]);
+  React.useEffect(() => {
+    setSecciones(-1);
+
+    if (year !== -1) {
+      getAlumnosAnio();
+    }
+  }, [year]);
 
   React.useEffect(() => {
-    if (periodoSelected !== -1) getAniosAndSecciones();
+    setSecciones(-1);
+    setYear(-1);
+    if (periodoSelected !== -1) {
+      getAniosAndSecciones();
+    }
   }, [periodoSelected]);
 
   React.useEffect(() => {
@@ -125,8 +214,15 @@ export default function Stats() {
   const yearOldAverage = () => {
     const total = alumnos.map((alumno: any) => ({
       name: `${alumno.firstName} ${alumno.Surname}`,
-      Edad: moment().diff(alumno.alumno.DatosPersonales.DateOfBirth, "years"),
-      año: alumno.alumno.DatosPersonales.DateOfBirth,
+      Edad: moment().diff(
+        alumno?.alumno
+          ? alumno?.alumno.DatosPersonales.DateOfBirth
+          : alumno.DateOfBirth,
+        "years"
+      ),
+      año: alumno?.alumno
+        ? alumno.alumno.DatosPersonales.DateOfBirth
+        : alumno.DateOfBirth,
     }));
 
     console.log("total", total);
@@ -136,10 +232,14 @@ export default function Stats() {
 
   const genderCount = () => {
     const female = alumnos.filter((alumno: any) => {
-      return alumno.alumno.DatosPersonales.sexo === "F";
+      return alumno.alumno
+        ? alumno?.alumno.DatosPersonales.sexo === "F"
+        : alumno.sexo === "F";
     }).length;
     const male = alumnos.filter((alumno: any) => {
-      return alumno.alumno.DatosPersonales.sexo === "M";
+      return alumno.alumno
+        ? alumno.alumno.DatosPersonales.sexo === "M"
+        : alumno.sexo === "M";
     }).length;
 
     return [
@@ -191,7 +291,6 @@ export default function Stats() {
       sx={{ flexGrow: 1, p: 3, overflow: "auto !important" }}
     >
       <DrawerHeader />
-
       <Box
         sx={{
           display: "flex",
@@ -270,101 +369,114 @@ export default function Stats() {
             </Select>
           </FormControl>
         </Box>
-        <Box
-          sx={{
-            mt: 2,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: window.innerWidth < 1024 ? "column" : "row",
-            gap: 5,
-          }}
-        >
-          <Box
-            sx={{
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <Typography>Grafico de Genero</Typography>
-            <PieChart width={600} height={400}>
-              <Pie
-                data={genderCount()}
-                cx="51%"
-                cy="40%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {genderCount().map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </Box>
-          <Box
-            sx={{
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <Typography>Promedio de edad</Typography>
-            <LineChart
-              width={500}
-              height={300}
-              data={yearOldAverage()}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 5,
+        {periodoSelected !== -1 && (
+          <>
+            <Typography
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                mt: 2,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="natural"
-                dataKey="Edad"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </Box>
-        </Box>
+              Total de Alumnos: {alumnos.length}
+            </Typography>
+            <Typography
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              Mayor promedio de Nota: {maxNote.value.toFixed(2)} {maxNote.name}
+            </Typography>
+            <Typography
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              Menor promedio de Nota: {minNote.value.toFixed(2)} {minNote.name}
+            </Typography>
+            <Box
+              sx={{
+                mt: 2,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: window.innerWidth < 1024 ? "column" : "row",
+                gap: 5,
+              }}
+            >
+              <Box
+                sx={{
+                  width: "50%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography>Grafico de Genero</Typography>
+                <PieChart width={600} height={400}>
+                  <Pie
+                    data={genderCount()}
+                    cx="51%"
+                    cy="40%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={120}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {genderCount().map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </Box>
+              <Box
+                sx={{
+                  width: "50%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography>Promedio de edad</Typography>
+                <LineChart
+                  width={500}
+                  height={300}
+                  data={yearOldAverage()}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="natural"
+                    dataKey="Edad"
+                    stroke="#8884d8"
+                    activeDot={{ r: 8 }}
+                  />
+                </LineChart>
+              </Box>
+            </Box>
+          </>
+        )}
       </Box>
-
-      {user.user.role === "USER" && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "row",
-            mt: 2,
-            gap: 5,
-          }}
-        >
-          <Button variant="contained">Generar Consulta</Button>
-          <Button onClick={() => navigate("/logout")} variant="contained">
-            <LogoutIcon /> Salir del sistema
-          </Button>
-        </Box>
-      )}
     </Box>
   );
 }

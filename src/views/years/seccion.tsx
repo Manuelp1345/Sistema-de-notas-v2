@@ -320,7 +320,7 @@ const Seccion = () => {
         return false;
       }
 
-      if (datosAlumno.phone === 0 || datosAlumno.phone.toString().length < 10) {
+      if (datosAlumno.phone > 0 || datosAlumno.phone.toString().length < 10) {
         setErrorDataAlumno({ ...errorDataAlumno, phone: true });
         return false;
       }
@@ -329,14 +329,14 @@ const Seccion = () => {
         setErrorDataAlumno({ ...errorDataAlumno, sexo: true });
         return false;
       }
-      if (
-        datosAlumno.email === "" ||
-        !datosAlumno.email.includes("@") ||
-        !datosAlumno.email.includes(".com")
-      ) {
-        setErrorDataAlumno({ ...errorDataAlumno, email: true });
-        return false;
-      }
+      if (datosAlumno.email !== "")
+        if (
+          !datosAlumno.email.includes("@") ||
+          !datosAlumno.email.includes(".com")
+        ) {
+          setErrorDataAlumno({ ...errorDataAlumno, email: true });
+          return false;
+        }
 
       if (
         datosAlumno.fechaNacimiento === null ||
@@ -388,21 +388,20 @@ const Seccion = () => {
       }
 
       if (
-        datosRepresetante.phone === 0 ||
+        datosRepresetante.phone > 0 &&
         datosRepresetante.phone.toString().length < 10
       ) {
         setErrorDataRepresentante({ ...errorDataRepresentante, phone: true });
         return false;
       }
-
-      if (
-        datosRepresetante.email === "" ||
-        !datosRepresetante.email.includes("@") ||
-        !datosRepresetante.email.includes(".com")
-      ) {
-        setErrorDataRepresentante({ ...errorDataRepresentante, email: true });
-        return false;
-      }
+      if (datosRepresetante.email !== "")
+        if (
+          !datosRepresetante.email.includes("@") ||
+          !datosRepresetante.email.includes(".com")
+        ) {
+          setErrorDataRepresentante({ ...errorDataRepresentante, email: true });
+          return false;
+        }
 
       if (!datosRepresetante.alumnoAddress) {
         if (datosRepresetante.address === "") {

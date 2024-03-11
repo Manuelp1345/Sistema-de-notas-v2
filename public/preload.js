@@ -55,6 +55,9 @@ const createAnio = (anio) => __awaiter(void 0, void 0, void 0, function* () {
 const createDataFake = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield ipcRenderer.invoke("GENERATE_FAKE_DATA");
 });
+const createQuery = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ipcRenderer.invoke("QUERY_SQL", query);
+});
 const imgLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     const html = document.querySelector("html");
     html.style.backgroundImage = `url("./img/background.jpg")`;
@@ -168,6 +171,7 @@ const API = {
     getAlumnosGraduados,
     deleteUser,
     createDataFake,
+    createQuery,
 };
 contextBridge.exposeInMainWorld("API", API);
 //# sourceMappingURL=preload.js.map
