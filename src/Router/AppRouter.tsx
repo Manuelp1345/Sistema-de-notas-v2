@@ -22,6 +22,7 @@ const AppRouter = () => {
         <Route path="/create-user" element={<CreateUser />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/stats" element={<Dashboard element="stats" />} />
+        <Route path="/bitacora" element={<Dashboard element="bitacora" />} />
       </Routes>
     </HashRouter>
   );

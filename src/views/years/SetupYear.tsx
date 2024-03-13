@@ -109,7 +109,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
     let deleteAnio;
     try {
       //@ts-ignore
-      deleteAnio = await window.API.deleteAnio(idAnioDelete.id);
+      deleteAnio = await window.API.deleteAnio({
+        id: idAnioDelete.id,
+        usuario: user.email,
+        name: idAnioDelete.anio,
+      });
     } catch (error) {
       Swal.fire({
         title: `Error al borrar ${idAnioDelete.anio}`,
@@ -138,10 +142,13 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
     });
   };
 
+  const user = JSON.parse(localStorage.getItem("token") || "{}");
+
   const insertPeriodo = async (periodo: any) => {
     const dataPeriodo = {
       periodo: periodo,
       estado: true,
+      usuario: user.email,
     };
     // @ts-ignore
     const data = await window.API.insertPeriodo(dataPeriodo);
@@ -172,6 +179,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
     const data = await window.API.gradeAlumnos({
       periodo: periodoId,
       newPeriodo,
+      usuario: user.email,
     });
     console.log(data);
     if (data) {
@@ -498,7 +506,11 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
         openDialog={openAddAnio}
         handleCloseDialog={handleCloseAddAnio}
         handledConfirm={async () => {
-          await insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
+          await insertAnio({
+            anio: value.anio,
+            numberAnio: value.numberAnio,
+            usuario: user.email,
+          });
           handleCloseAddAnio();
         }}
       >

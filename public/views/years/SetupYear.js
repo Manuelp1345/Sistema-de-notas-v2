@@ -116,7 +116,11 @@ const SetupYear = ({ idPeriodo }) => {
         let deleteAnio;
         try {
             //@ts-ignore
-            deleteAnio = yield window.API.deleteAnio(idAnioDelete.id);
+            deleteAnio = yield window.API.deleteAnio({
+                id: idAnioDelete.id,
+                usuario: user.email,
+                name: idAnioDelete.anio,
+            });
         }
         catch (error) {
             sweetalert2_1.default.fire({
@@ -143,10 +147,12 @@ const SetupYear = ({ idPeriodo }) => {
             timer: 1500,
         });
     });
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
     const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* () {
         const dataPeriodo = {
             periodo: periodo,
             estado: true,
+            usuario: user.email,
         };
         // @ts-ignore
         const data = yield window.API.insertPeriodo(dataPeriodo);
@@ -172,6 +178,7 @@ const SetupYear = ({ idPeriodo }) => {
         const data = yield window.API.gradeAlumnos({
             periodo: periodoId,
             newPeriodo,
+            usuario: user.email,
         });
         console.log(data);
         if (data) {
@@ -323,7 +330,11 @@ const SetupYear = ({ idPeriodo }) => {
                                     }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
                                         setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
                                     }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
+                    yield insertAnio({
+                        anio: value.anio,
+                        numberAnio: value.numberAnio,
+                        usuario: user.email,
+                    });
                     handleCloseAddAnio();
                 }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue un nuevo a\u00F1o, no podr\u00E1 editarlo. Adem\u00E1s, solo se podr\u00E1 borrar si no est\u00E1 actualmente en uso.", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar un nuevo a\u00F1o?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
                             gap: 2,

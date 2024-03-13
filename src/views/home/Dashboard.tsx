@@ -33,6 +33,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import { GlobalContext } from "../../config/context/GlobalContext";
 import Stats from "../stats/Stats";
 import { Periodo } from "../../config/entitys/periodo";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import Bitacora from "../bitacora/Bitacora";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme) => ({
@@ -202,6 +204,7 @@ export default function Dashboard({ element }: { element: string }) {
             "Graduados",
             "Administración",
             "Estadisticas",
+            "Bitacora",
             "Salir",
           ].map(
             (text, index) =>
@@ -216,6 +219,7 @@ export default function Dashboard({ element }: { element: string }) {
                       user.user.role !== "USER" &&
                       index === 1) ||
                     (element === "stats" && index === 4) ||
+                    (element === "bitacora" && index === 5) ||
                     (element === "search" &&
                       user.user.role !== "USER" &&
                       index === 2) ||
@@ -247,7 +251,9 @@ export default function Dashboard({ element }: { element: string }) {
                     //@ts-ignore
                     (index === 4 && navigate("/stats")) ||
                     //@ts-ignore
-                    (index === 5 && navigate("/logout"))
+                    (index === 5 && navigate("/Bitacora")) ||
+                    //@ts-ignore
+                    (index === 6 && navigate("/logout"))
                   }
                   key={text}
                 >
@@ -273,11 +279,16 @@ export default function Dashboard({ element }: { element: string }) {
                       </Tooltip>
                     )}
                     {index === 4 && (
-                      <Tooltip title={`stats`} arrow placement="right">
+                      <Tooltip title={`Estadisticas`} arrow placement="right">
                         <QueryStatsIcon />
                       </Tooltip>
                     )}
                     {index === 5 && (
+                      <Tooltip title={`Bitacora`} arrow placement="right">
+                        <PendingActionsIcon />
+                      </Tooltip>
+                    )}
+                    {index === 6 && (
                       <Tooltip title={`Salir`} arrow placement="right">
                         <LogoutIcon />
                       </Tooltip>
@@ -298,6 +309,7 @@ export default function Dashboard({ element }: { element: string }) {
       {element === "alumno" && <Alumno />}
       {element === "admin" && <Admin />}
       {element === "stats" && <Stats />}
+      {element === "bitacora" && <Bitacora />}
     </Box>
   );
 }

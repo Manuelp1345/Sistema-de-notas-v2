@@ -22,8 +22,13 @@ const getAnios = async (id) => {
 const getAnio = async (id) => {
   return await ipcRenderer.invoke("GET_AÑO", id);
 };
-const deleteAnio = async (id) => {
-  return await ipcRenderer.invoke("DELETE_AÑO", id);
+const deleteAnio = async (data) => {
+  await addBitacora({
+    accion: "Eliminar",
+    descripcion: `Se elimino el año ${data.name}`,
+    usuario: data.usuario,
+  });
+  return await ipcRenderer.invoke("DELETE_AÑO", data.id);
 };
 
 const getSecciones = async (id) => {
@@ -34,6 +39,11 @@ const getSeccion = async (id) => {
 };
 
 const insertSeccion = async (seccion) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto la seccion ${seccion.nombre}`,
+    usuario: seccion.usuario,
+  });
   return await ipcRenderer.invoke("INSERT_SECCION", seccion);
 };
 
@@ -41,13 +51,28 @@ const getAreas = async (id) => {
   return await ipcRenderer.invoke("GET_AREAS", id);
 };
 const insertArea = async (area) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto el area ${area.nombre}`,
+    usuario: area.usuario,
+  });
   return await ipcRenderer.invoke("INSERT_AREA", area);
 };
 const insertAlumno = async (data) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto el alumno ${data.dni}`,
+    usuario: data.usuario,
+  });
   return await ipcRenderer.invoke("INSERT_ALUMNO", data);
 };
 
 const createAnio = async (anio) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto el año ${anio.anio}`,
+    usuario: anio.usuario,
+  });
   return await ipcRenderer.invoke("INSERT_AÑOS", anio);
 };
 
@@ -87,10 +112,20 @@ const getAlumno = async (filter) => {
 };
 
 const insertPeriodo = async (periodo) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto el periodo ${periodo.periodo}`,
+    usuario: periodo.usuario,
+  });
   return await ipcRenderer.invoke("INSER_PERIODO", periodo);
 };
 
 const setNota = async (data) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inserto la nota ${data.nota} al alumno ${data.alumno}`,
+    usuario: data.usuario,
+  });
   return await ipcRenderer.invoke("SET_NOTA", data);
 };
 
@@ -99,6 +134,11 @@ const getNotas = async (data) => {
 };
 
 const gradeAlumnos = async (data) => {
+  await addBitacora({
+    accion: "Insertar",
+    descripcion: `Se inicio el proceso de graduar a los alumnos`,
+    usuario: data.usuario,
+  });
   await generateBackup({
     automatic: true,
   });
@@ -134,6 +174,11 @@ const restoreBackup = async (data) => {
 };
 
 const updateAlumno = async (data) => {
+  await addBitacora({
+    accion: "Actualizar",
+    descripcion: `Se actualizo al alumno ${data.dni}`,
+    usuario: data.usuario,
+  });
   return await ipcRenderer.invoke("UPDATE_ALUMNO", data);
 };
 
@@ -142,6 +187,11 @@ const getAniosAndSecciones = async (id) => {
 };
 
 const updateAlumnoSeccionAndAnio = async (data) => {
+  await addBitacora({
+    accion: "Actualizar",
+    descripcion: `Se actualizo al alumno ${data.dni} el año o seccion `,
+    usuario: data.usuario,
+  });
   return await ipcRenderer.invoke("UPDATE_ALUMNO_SECCION_AND_ANIO", data);
 };
 
@@ -155,6 +205,13 @@ const getAlumnosGraduados = async (data) => {
 
 const deleteUser = async (data) => {
   return await ipcRenderer.invoke("DELETE_USER", data);
+};
+
+const addBitacora = async (data) => {
+  return await ipcRenderer.invoke("ADD_BITACORA", data);
+};
+const getBitacora = async (data) => {
+  return await ipcRenderer.invoke("GET_BITACORA", data);
 };
 
 const API = {
@@ -195,6 +252,7 @@ const API = {
   deleteUser,
   createDataFake,
   createQuery,
+  getBitacora,
 };
 
 contextBridge.exposeInMainWorld("API", API);

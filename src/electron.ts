@@ -21,7 +21,8 @@ import { Etapas } from "./config/entitys/etapas";
 import { Representante } from "./config/entitys/representante";
 import Excel, { Worksheet } from "exceljs";
 import moment from "moment";
-import { faker } from "@faker-js/faker";
+import { Bitacora } from "./config/entitys/bitacora";
+// import { faker } from "@faker-js/faker";
 
 let appDataSource: DataSource;
 function createWindow() {
@@ -255,16 +256,28 @@ ipcMain.handle("LOGIN", async (event, user) => {
     },
   });
 
-  console.log(userJson);
   if (userJson) {
     if (
       userJson.clave ===
       //@ts-ignore
       crypto.createHash("sha256").update(user.password).digest("hex")
     ) {
-      return userJson;
+      //register login on bitacora
+      const bitacora = new Bitacora();
+      bitacora.accion = "Inicio de sesion";
+      bitacora.fecha = moment().format("YYYY-MM-DD");
+      bitacora.hora = moment().format("HH:mm:ss");
+      bitacora.descripcion = "Inicio de sesion exitoso";
+      bitacora.usuario = user.email;
+
+      return {
+        id: userJson.id,
+        role: userJson.role,
+        email: user.email,
+      };
     }
   }
+
   //@ts-ignore
 
   new Notification({
@@ -1809,181 +1822,205 @@ ipcMain.handle("DELETE_USER", async (event, data) => {
 });
 
 // generar datos fake para pruebas
-ipcMain.handle("GENERATE_FAKE_DATA", async (event, data) => {
-  faker.seed(1234567);
-  const getPeriodo: Periodo = (await appDataSource.manager
-    .getRepository(Periodo)
-    .findOne({
-      where: {
-        id: "1",
-      },
-    })) as Periodo;
+// ipcMain.handle("GENERATE_FAKE_DATA", async (event, data) => {
+//   faker.seed(1234567);
+//   const getPeriodo: Periodo = (await appDataSource.manager
+//     .getRepository(Periodo)
+//     .findOne({
+//       where: {
+//         id: "1",
+//       },
+//     })) as Periodo;
 
-  const letraSecciones = ["A", "B", "C", "D", "E"];
-  const anios = [
-    "Primer año",
-    "Segundo año",
-    "Tercer año",
-    "Cuarto año",
-    "Quinto año",
-  ];
+//   const letraSecciones = ["A", "B", "C", "D", "E"];
+//   const anios = [
+//     "Primer año",
+//     "Segundo año",
+//     "Tercer año",
+//     "Cuarto año",
+//     "Quinto año",
+//   ];
 
-  // create anios and secciones
-  for (let i = 0; i < 5; i++) {
-    const anio = appDataSource.manager.getRepository(Anio).create({
-      anio: anios[i],
-      numberAnio: i + 1,
-      periodo: getPeriodo,
-    });
-    await appDataSource.manager.getRepository(Anio).save(anio);
+//   // create anios and secciones
+//   for (let i = 0; i < 5; i++) {
+//     const anio = appDataSource.manager.getRepository(Anio).create({
+//       anio: anios[i],
+//       numberAnio: i + 1,
+//       periodo: getPeriodo,
+//     });
+//     await appDataSource.manager.getRepository(Anio).save(anio);
 
-    // create materias
-    const materias = ["Matematicas", "Ingles", "Biologia", "Fisica", "Quimica"];
-    const materiasDB: Materia[] = [];
-    for (const materia of materias) {
-      const materiaDB = appDataSource.manager.getRepository(Materia).create({
-        nombre: materia,
-        anio: anio,
-      });
-      await appDataSource.manager.getRepository(Materia).save(materiaDB);
-      materiasDB.push(materiaDB);
-    }
-    for (let j = 0; j < 5; j++) {
-      const seccion = appDataSource.manager.getRepository(Seccion).create({
-        seccion: letraSecciones[j],
-        anio: anio,
-      });
-      await appDataSource.manager.getRepository(Seccion).save(seccion);
-      for (let j = 0; j < 25; j++) {
-        const datosRepresentante = appDataSource.manager
-          .getRepository(BasicData)
-          .create({
-            dni: `${faker.number.int({
-              min: 5000000,
-              max: 9999999,
-            })}`,
-            firstName: faker.name.firstName(),
-            secondName: faker.name.firstName(),
-            Surname: faker.name.lastName(),
-            secondSurname: faker.name.lastName(),
-            email: faker.internet.email(),
-            Phone: "4121234567",
-            address: faker.address.streetAddress(),
-            state: faker.address.state(),
-            municipality: faker.address.city(),
-          });
-        await appDataSource.manager
-          .getRepository(BasicData)
-          .save(datosRepresentante);
-        const representante = appDataSource.manager
-          .getRepository(Representante)
-          .create({
-            parentesco: j % 2 === 0 ? "Madre" : "Padre",
-            DatosPersonales: datosRepresentante,
-          });
-        await appDataSource.manager
-          .getRepository(Representante)
-          .save(representante);
+//     // create materias
+//     const materias = ["Matematicas", "Ingles", "Biologia", "Fisica", "Quimica"];
+//     const materiasDB: Materia[] = [];
+//     for (const materia of materias) {
+//       const materiaDB = appDataSource.manager.getRepository(Materia).create({
+//         nombre: materia,
+//         anio: anio,
+//       });
+//       await appDataSource.manager.getRepository(Materia).save(materiaDB);
+//       materiasDB.push(materiaDB);
+//     }
+//     for (let j = 0; j < 5; j++) {
+//       const seccion = appDataSource.manager.getRepository(Seccion).create({
+//         seccion: letraSecciones[j],
+//         anio: anio,
+//       });
+//       await appDataSource.manager.getRepository(Seccion).save(seccion);
+//       for (let j = 0; j < 25; j++) {
+//         const datosRepresentante = appDataSource.manager
+//           .getRepository(BasicData)
+//           .create({
+//             dni: `${faker.number.int({
+//               min: 5000000,
+//               max: 9999999,
+//             })}`,
+//             firstName: faker.name.firstName(),
+//             secondName: faker.name.firstName(),
+//             Surname: faker.name.lastName(),
+//             secondSurname: faker.name.lastName(),
+//             email: faker.internet.email(),
+//             Phone: "4121234567",
+//             address: faker.address.streetAddress(),
+//             state: faker.address.state(),
+//             municipality: faker.address.city(),
+//           });
+//         await appDataSource.manager
+//           .getRepository(BasicData)
+//           .save(datosRepresentante);
+//         const representante = appDataSource.manager
+//           .getRepository(Representante)
+//           .create({
+//             parentesco: j % 2 === 0 ? "Madre" : "Padre",
+//             DatosPersonales: datosRepresentante,
+//           });
+//         await appDataSource.manager
+//           .getRepository(Representante)
+//           .save(representante);
 
-        const document = appDataSource.manager.getRepository(Documents).create({
-          cedula: true,
-          pasaporte: true,
-          partida_nacimiento: true,
-          fotos_carnet: true,
-          notas_escuela: true,
-        });
+//         const document = appDataSource.manager.getRepository(Documents).create({
+//           cedula: true,
+//           pasaporte: true,
+//           partida_nacimiento: true,
+//           fotos_carnet: true,
+//           notas_escuela: true,
+//         });
 
-        await appDataSource.manager.getRepository(Documents).save(document);
+//         await appDataSource.manager.getRepository(Documents).save(document);
 
-        const datosAlumno = appDataSource.manager
-          .getRepository(BasicData)
-          .create({
-            dni: `${faker.number.int({
-              min: 1000000,
-              max: 5000000,
-            })}`,
-            firstName: faker.name.firstName(),
-            secondName: faker.name.firstName(),
-            Surname: faker.name.lastName(),
-            secondSurname: faker.name.lastName(),
-            email: faker.internet.email(),
-            sexo: j % 2 === 0 ? "F" : "M",
-            Phone: "4121234567",
-            address: faker.address.streetAddress(),
-            state: faker.address.state(),
-            municipality: faker.address.city(),
-            DateOfBirth: `${faker.date.birthdate({
-              min: 2007,
-              max: 2015,
-            })}`,
-            city: faker.address.city(),
-            Documents: document,
-          });
+//         const datosAlumno = appDataSource.manager
+//           .getRepository(BasicData)
+//           .create({
+//             dni: `${faker.number.int({
+//               min: 1000000,
+//               max: 5000000,
+//             })}`,
+//             firstName: faker.name.firstName(),
+//             secondName: faker.name.firstName(),
+//             Surname: faker.name.lastName(),
+//             secondSurname: faker.name.lastName(),
+//             email: faker.internet.email(),
+//             sexo: j % 2 === 0 ? "F" : "M",
+//             Phone: "4121234567",
+//             address: faker.address.streetAddress(),
+//             state: faker.address.state(),
+//             municipality: faker.address.city(),
+//             DateOfBirth: `${faker.date.birthdate({
+//               min: 2007,
+//               max: 2015,
+//             })}`,
+//             city: faker.address.city(),
+//             Documents: document,
+//           });
 
-        await appDataSource.manager.getRepository(BasicData).save(datosAlumno);
+//         await appDataSource.manager.getRepository(BasicData).save(datosAlumno);
 
-        const alumno = appDataSource.manager.getRepository(Alumno).create({
-          observacion: "a",
-          condicion: "Regular",
-          grupoEstable: "a",
-          DatosPersonales: datosAlumno,
-          representante: representante,
-        });
+//         const alumno = appDataSource.manager.getRepository(Alumno).create({
+//           observacion: "a",
+//           condicion: "Regular",
+//           grupoEstable: "a",
+//           DatosPersonales: datosAlumno,
+//           representante: representante,
+//         });
 
-        await appDataSource.manager.getRepository(Alumno).save(alumno);
+//         await appDataSource.manager.getRepository(Alumno).save(alumno);
 
-        const etapa = appDataSource.manager.getRepository(Etapas).create({
-          anio: anio,
-          seccione: seccion,
-          alumno: alumno,
-        });
-        await appDataSource.manager.getRepository(Etapas).save(etapa);
+//         const etapa = appDataSource.manager.getRepository(Etapas).create({
+//           anio: anio,
+//           seccione: seccion,
+//           alumno: alumno,
+//         });
+//         await appDataSource.manager.getRepository(Etapas).save(etapa);
 
-        for (const materia of materiasDB) {
-          const notas = [
-            {
-              nota: faker.number.float({
-                min: 0,
-                max: 20,
-                fractionDigits: 2,
-              }),
-              momento: "1",
-            },
-            {
-              nota: faker.number.float({
-                min: 0,
-                max: 20,
-                fractionDigits: 2,
-              }),
-              momento: "2",
-            },
-            {
-              nota: faker.number.float({
-                min: 0,
-                max: 20,
-                fractionDigits: 2,
-              }),
-              momento: "3",
-            },
-          ];
+//         for (const materia of materiasDB) {
+//           const notas = [
+//             {
+//               nota: faker.number.float({
+//                 min: 0,
+//                 max: 20,
+//                 fractionDigits: 2,
+//               }),
+//               momento: "1",
+//             },
+//             {
+//               nota: faker.number.float({
+//                 min: 0,
+//                 max: 20,
+//                 fractionDigits: 2,
+//               }),
+//               momento: "2",
+//             },
+//             {
+//               nota: faker.number.float({
+//                 min: 0,
+//                 max: 20,
+//                 fractionDigits: 2,
+//               }),
+//               momento: "3",
+//             },
+//           ];
 
-          for (const nota of notas) {
-            const notaDB = appDataSource.manager.getRepository(Nota).create({
-              nota: `${nota.nota}`,
-              momento: nota.momento,
-              materia: materia,
-              alumno: alumno,
-              anio: anio,
-            });
-            await appDataSource.manager.getRepository(Nota).save(notaDB);
-          }
-        }
-      }
-    }
-  }
-});
+//           for (const nota of notas) {
+//             const notaDB = appDataSource.manager.getRepository(Nota).create({
+//               nota: `${nota.nota}`,
+//               momento: nota.momento,
+//               materia: materia,
+//               alumno: alumno,
+//               anio: anio,
+//             });
+//             await appDataSource.manager.getRepository(Nota).save(notaDB);
+//           }
+//         }
+//       }
+//     }
+//   }
+// });
 
 ipcMain.handle("QUERY_SQL", async (event, data) => {
   const response = await appDataSource.manager.query(data);
   return response;
+});
+
+ipcMain.handle("ADD_BITACORA", async (event, data) => {
+  const bitacora = appDataSource.manager.getRepository(Bitacora).create({
+    accion: data.accion,
+    usuario: data.usuario,
+    descripcion: data.descripcion,
+    fecha: moment().format("YYYY-MM-DD"),
+    hora: moment().format("HH:mm"),
+  });
+
+  await appDataSource.manager.getRepository(Bitacora).save(bitacora);
+});
+
+ipcMain.handle("GET_BITACORA", async (event, data) => {
+  const bitacoras = await appDataSource.manager.getRepository(Bitacora).find({
+    order: {
+      id: "DESC",
+    },
+    take: 100,
+    skip: data,
+  });
+
+  return bitacoras;
 });

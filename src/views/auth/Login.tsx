@@ -83,7 +83,7 @@ const Login = () => {
       console.log(credentials);
       if (credentials) {
         user.setUser(credentials);
-        localStorage.setItem("token", credentials);
+        localStorage.setItem("token", JSON.stringify(credentials));
         navigate("/Home");
       } else {
         handleClick();

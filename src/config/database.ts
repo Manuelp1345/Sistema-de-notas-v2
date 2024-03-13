@@ -14,6 +14,7 @@ import { Representante } from "./entitys/representante";
 import { Nota } from "./entitys/nota";
 import { RecuperacionNota } from "./entitys/recuperacion_Nota";
 import { Etapas } from "./entitys/etapas";
+import { Bitacora } from "./entitys/bitacora";
 
 const ruta = app.getPath("userData") + "/database.json";
 
@@ -52,6 +53,7 @@ export const ConnectionDB = async (
       Documents,
       Representante,
       RecuperacionNota,
+      Bitacora,
     ],
     synchronize: true,
     logging: true,
