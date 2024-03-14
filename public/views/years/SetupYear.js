@@ -352,7 +352,7 @@ const SetupYear = ({ idPeriodo }) => {
                                                         .add(1, "year")
                                                         .format("YYYY") }));
                                                 return sweetalert2_1.default.fire({
-                                                    title: "El año inicial no puede ser mayor al año final del periodo",
+                                                    title: "El año inicial no puede ser mayor al año final del periodo anterior",
                                                     icon: "error",
                                                     showConfirmButton: false,
                                                     timer: 1500,
@@ -401,7 +401,7 @@ const SetupYear = ({ idPeriodo }) => {
                                                         .add(1, "year")
                                                         .format("YYYY") }));
                                                 return sweetalert2_1.default.fire({
-                                                    title: "El año inicial no puede ser mayor al año final del periodo",
+                                                    title: "El año inicial no puede ser mayor al año final del periodo anteior",
                                                     icon: "error",
                                                     showConfirmButton: false,
                                                     timer: 1500,

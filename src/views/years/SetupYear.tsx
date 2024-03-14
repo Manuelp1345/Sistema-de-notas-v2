@@ -515,7 +515,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
                     });
                     return Swal.fire({
                       title:
-                        "El año inicial no puede ser mayor al año final del periodo",
+                        "El año inicial no puede ser mayor al año final del periodo anterior",
                       icon: "error",
                       showConfirmButton: false,
                       timer: 1500,
@@ -647,7 +647,7 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
                     });
                     return Swal.fire({
                       title:
-                        "El año inicial no puede ser mayor al año final del periodo",
+                        "El año inicial no puede ser mayor al año final del periodo anteior",
                       icon: "error",
                       showConfirmButton: false,
                       timer: 1500,
