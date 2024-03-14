@@ -1011,7 +1011,7 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         let promedio = 0;
         let recuperacionCount = 0;
         let materiaCount = 0;
-        console.log(alumno.Etapas);
+
         const estapaReprobada = await transaction
           .getRepository(Etapas)
           .findOne({
@@ -1025,9 +1025,11 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
               anio: true,
             },
           });
-
+        console.log(
+          "estapaReprobada",
+          estapaReprobada && estapaReprobada.anio.id
+        );
         if (estapaReprobada) {
-          console.log("Estapa Reprobada", estapaReprobada);
           const notasAlumno = await transaction.getRepository(Nota).find({
             where: {
               alumno: {
@@ -1042,9 +1044,9 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           for (const notas of notasAlumno) {
             let notaCount = 0;
             let promedioMateria = 0;
-
             const notaMomentoOne = alumno.notas.find(
-              (nota) => nota.materia.id === notas.id && nota.momento === "1"
+              (nota) =>
+                nota.materia.id === notas.materia.id && nota.momento === "1"
             );
             if (notaMomentoOne) {
               if (notaMomentoOne.recuperacion.length > 0) {
@@ -1055,7 +1057,8 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
               notaCount++;
             }
             const notaMomentoTwo = alumno.notas.find(
-              (nota) => nota.materia.id === notas.id && nota.momento === "2"
+              (nota) =>
+                nota.materia.id === notas.materia.id && nota.momento === "2"
             );
             if (notaMomentoTwo) {
               if (notaMomentoTwo.recuperacion.length > 0) {
@@ -1067,7 +1070,8 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
             }
 
             const notaMomentoThree = alumno.notas.find(
-              (nota) => nota.materia.id === notas.id && nota.momento === "3"
+              (nota) =>
+                nota.materia.id === notas.materia.id && nota.momento === "3"
             );
             if (notaMomentoThree) {
               if (notaMomentoThree.recuperacion.length > 0) {
@@ -1083,6 +1087,15 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
 
             if (promedioFInal < 10) recuperacionCount++;
           }
+        }
+
+        if (recuperacionCount === 0) {
+          await transaction.getRepository(Etapas).update(
+            { id: estapaReprobada?.id },
+            {
+              estado: "Aprobado",
+            }
+          );
         }
 
         for (const materia of materias) {

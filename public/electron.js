@@ -988,7 +988,6 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
-                console.log(alumno.Etapas);
                 const estapaReprobada = yield transaction
                     .getRepository(etapas_1.Etapas)
                     .findOne({
@@ -1002,8 +1001,8 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                         anio: true,
                     },
                 });
+                console.log("estapaReprobada", estapaReprobada && estapaReprobada.anio.id);
                 if (estapaReprobada) {
-                    console.log("Estapa Reprobada", estapaReprobada);
                     const notasAlumno = yield transaction.getRepository(nota_1.Nota).find({
                         where: {
                             alumno: {
@@ -1018,7 +1017,7 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     for (const notas of notasAlumno) {
                         let notaCount = 0;
                         let promedioMateria = 0;
-                        const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "1");
+                        const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "1");
                         if (notaMomentoOne) {
                             if (notaMomentoOne.recuperacion.length > 0) {
                                 promedioMateria += Number(notaMomentoOne.recuperacion[0].Nota);
@@ -1028,7 +1027,7 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                             }
                             notaCount++;
                         }
-                        const notaMomentoTwo = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "2");
+                        const notaMomentoTwo = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "2");
                         if (notaMomentoTwo) {
                             if (notaMomentoTwo.recuperacion.length > 0) {
                                 promedioMateria += Number(notaMomentoTwo.recuperacion[0].Nota);
@@ -1038,7 +1037,7 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                             }
                             notaCount++;
                         }
-                        const notaMomentoThree = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "3");
+                        const notaMomentoThree = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "3");
                         if (notaMomentoThree) {
                             if (notaMomentoThree.recuperacion.length > 0) {
                                 promedioMateria += Number(notaMomentoThree.recuperacion[0].Nota);
@@ -1052,6 +1051,11 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                         if (promedioFInal < 10)
                             recuperacionCount++;
                     }
+                }
+                if (recuperacionCount === 0) {
+                    yield transaction.getRepository(etapas_1.Etapas).update({ id: estapaReprobada === null || estapaReprobada === void 0 ? void 0 : estapaReprobada.id }, {
+                        estado: "Aprobado",
+                    });
                 }
                 for (const materia of materias) {
                     let notaCount = 0;
