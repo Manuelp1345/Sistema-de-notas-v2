@@ -62,7 +62,7 @@ const Alumno = () => {
     const [skipped, setSkipped] = (0, react_2.useState)(new Set());
     const [loading, setloading] = react_1.default.useState(true);
     const [activeStep, setActiveStep] = react_1.default.useState(0);
-    const [existAlumno, setExistAlumno] = (0, react_2.useState)(false);
+    const [existAlumno, setExistAlumno] = (0, react_2.useState)();
     const [currentYear, setCurrentYear] = react_1.default.useState(0);
     const [aniosAndSecciones, setAniosAndSecciones] = (0, react_2.useState)([]);
     const { areas, alumno } = (0, react_2.useContext)(GlobalContext_1.GlobalContext);
@@ -71,6 +71,7 @@ const Alumno = () => {
     const [updateAlumno, setUpdateAlumno] = (0, react_2.useState)(false);
     const [newAnio, setNewAnio] = (0, react_2.useState)(0);
     const [newSeccion, setNewSeccion] = (0, react_2.useState)("");
+    console.log("ALUMNO ID", alumno);
     const [errorDataAlumno, setErrorDataAlumno] = (0, react_2.useState)({
         dni: false,
         firstName: false,
@@ -156,7 +157,10 @@ const Alumno = () => {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { surname: true }));
                 return false;
             }
-            if (datosAlumno.dni === "" || existAlumno) {
+            console.log(existAlumno, "existAlumno");
+            if (datosAlumno.dni === "" ||
+                // @ts-ignore
+                (existAlumno && existAlumno.id !== alumno.alumnoId.alumno.id)) {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: true }));
                 return false;
             }
@@ -308,6 +312,7 @@ const Alumno = () => {
     const validateDniAlumno = (dni) => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
         const response = yield window.API.getAlumnoByDni(dni);
+        console.log(response);
         setExistAlumno(response);
         return response;
     });
@@ -776,7 +781,8 @@ const Alumno = () => {
                                                                             setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: false }));
                                                                         }), onKeyUp: () => __awaiter(void 0, void 0, void 0, function* () {
                                                                             const response = yield validateDniAlumno(datosAlumno.dni);
-                                                                            setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: response }));
+                                                                            if (response.id !== alumno.alumnoId.alumno.id)
+                                                                                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { dni: response }));
                                                                         }), label: "Cedula /Pasaporte /Cedula Escolar", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosAlumno.address, error: errorDataAlumno.address, helperText: errorDataAlumno.address &&
                                                                             'El campo "Direccion" es obligatorio', onChange: (e) => {
                                                                             setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { address: e.target.value }));

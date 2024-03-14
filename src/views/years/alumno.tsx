@@ -98,7 +98,7 @@ const Alumno = (): JSX.Element => {
   const [skipped, setSkipped] = useState(new Set());
   const [loading, setloading] = React.useState(true);
   const [activeStep, setActiveStep] = React.useState(0);
-  const [existAlumno, setExistAlumno] = useState(false);
+  const [existAlumno, setExistAlumno] = useState();
   const [currentYear, setCurrentYear] = React.useState(0);
   const [aniosAndSecciones, setAniosAndSecciones] = useState<Anio[]>([]);
   const { areas, alumno } = useContext(GlobalContext);
@@ -107,7 +107,7 @@ const Alumno = (): JSX.Element => {
   const [updateAlumno, setUpdateAlumno] = useState(false);
   const [newAnio, setNewAnio] = useState(0);
   const [newSeccion, setNewSeccion] = useState("");
-
+  console.log("ALUMNO ID", alumno);
   const [errorDataAlumno, setErrorDataAlumno] = useState({
     dni: false,
     firstName: false,
@@ -212,8 +212,12 @@ const Alumno = (): JSX.Element => {
         setErrorDataAlumno({ ...errorDataAlumno, surname: true });
         return false;
       }
-
-      if (datosAlumno.dni === "" || existAlumno) {
+      console.log(existAlumno, "existAlumno");
+      if (
+        datosAlumno.dni === "" ||
+        // @ts-ignore
+        (existAlumno && existAlumno.id !== alumno.alumnoId.alumno.id)
+      ) {
         setErrorDataAlumno({ ...errorDataAlumno, dni: true });
         return false;
       }
@@ -424,7 +428,7 @@ const Alumno = (): JSX.Element => {
   const validateDniAlumno = async (dni: string) => {
     //@ts-ignore
     const response = await window.API.getAlumnoByDni(dni);
-
+    console.log(response);
     setExistAlumno(response);
 
     return response;
@@ -1295,10 +1299,11 @@ const Alumno = (): JSX.Element => {
                               const response = await validateDniAlumno(
                                 datosAlumno.dni
                               );
-                              setErrorDataAlumno({
-                                ...errorDataAlumno,
-                                dni: response,
-                              });
+                              if (response.id !== alumno.alumnoId.alumno.id)
+                                setErrorDataAlumno({
+                                  ...errorDataAlumno,
+                                  dni: response,
+                                });
                             }}
                             label="Cedula /Pasaporte /Cedula Escolar"
                             variant="standard"

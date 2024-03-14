@@ -1164,7 +1164,7 @@ electron_1.ipcMain.handle("GET_ALUMNO_BY_DNI", (event, data) => __awaiter(void 0
         });
         if (!alumno)
             return false;
-        return true;
+        return alumno;
     }
     catch (error) {
         console.log(error);

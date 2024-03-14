@@ -1231,7 +1231,7 @@ ipcMain.handle("GET_ALUMNO_BY_DNI", async (event, data) => {
 
     if (!alumno) return false;
 
-    return true;
+    return alumno;
   } catch (error) {
     console.log(error);
   }
