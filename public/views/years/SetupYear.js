@@ -176,13 +176,23 @@ const SetupYear = ({ idPeriodo }) => {
         setLoading(false);
     });
     const gradeAlumnos = (periodoId, newPeriodo) => __awaiter(void 0, void 0, void 0, function* () {
+        //Modal de carga
+        sweetalert2_1.default.fire({
+            title: "Cargando...",
+            showConfirmButton: false,
+            showCancelButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            willOpen: () => {
+                sweetalert2_1.default.showLoading();
+            },
+        });
         // @ts-ignore
         const data = yield window.API.gradeAlumnos({
             periodo: periodoId,
             newPeriodo,
             usuario: user.email,
         });
-        console.log(data);
         if (data) {
             sweetalert2_1.default.fire({
                 title: "Alumnos Grados",

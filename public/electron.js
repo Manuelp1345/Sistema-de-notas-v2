@@ -1226,21 +1226,10 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             recuperacion: true,
         },
     });
-    console.log("notas", notas);
     const materias = [];
     notas.forEach((nota) => {
         if (!materias.find((materia) => materia.id === nota.materia.id))
             materias.push(nota.materia);
-    });
-    //ordernar materias alfabeticamente
-    materias.sort((a, b) => {
-        if (a.nombre < b.nombre) {
-            return -1;
-        }
-        if (a.nombre > b.nombre) {
-            return 1;
-        }
-        return 0;
     });
     let currentMomento = 1;
     notas.forEach((nota) => {

@@ -1300,24 +1300,11 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
     },
   });
 
-  console.log("notas", notas);
-
   const materias: Materia[] = [];
 
   notas.forEach((nota) => {
     if (!materias.find((materia) => materia.id === nota.materia.id))
       materias.push(nota.materia);
-  });
-
-  //ordernar materias alfabeticamente
-  materias.sort((a, b) => {
-    if (a.nombre < b.nombre) {
-      return -1;
-    }
-    if (a.nombre > b.nombre) {
-      return 1;
-    }
-    return 0;
   });
 
   let currentMomento = 1;

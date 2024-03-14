@@ -175,13 +175,24 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
   };
 
   const gradeAlumnos = async (periodoId, newPeriodo) => {
+    //Modal de carga
+    Swal.fire({
+      title: "Cargando...",
+      showConfirmButton: false,
+      showCancelButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
     // @ts-ignore
     const data = await window.API.gradeAlumnos({
       periodo: periodoId,
       newPeriodo,
       usuario: user.email,
     });
-    console.log(data);
+
     if (data) {
       Swal.fire({
         title: "Alumnos Grados",
