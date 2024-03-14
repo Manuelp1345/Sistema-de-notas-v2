@@ -19,6 +19,7 @@ const react_2 = require("react");
 const customModal_1 = require("../modals/customModal");
 const moment_1 = __importDefault(require("moment"));
 const react_router_dom_1 = require("react-router-dom");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const BackupList = ({ refresh }) => {
     const [selectedBackup, setSelectedBackup] = (0, react_2.useState)(null);
     const [page, setPage] = (0, react_2.useState)(1);
@@ -42,12 +43,24 @@ const BackupList = ({ refresh }) => {
         setBackups(backups);
     });
     const restoreBackup = (backup) => __awaiter(void 0, void 0, void 0, function* () {
+        //Modal de carga
+        sweetalert2_1.default.fire({
+            title: "Cargando...",
+            showConfirmButton: false,
+            showCancelButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            willOpen: () => {
+                sweetalert2_1.default.showLoading();
+            },
+        });
         setLoading(true);
         //add extension
         backup = backup + ".json";
         //@ts-ignore
         const result = yield window.API.restoreBackup(backup);
         console.log(result);
+        sweetalert2_1.default.close();
         navigate("/auth");
     });
     const itemsPerPage = 5;

@@ -54,6 +54,7 @@ function Stats() {
     const [alumnos, setAlumnos] = React.useState([]);
     const [periodos, setPeriodos] = React.useState([]);
     const [periodoSelected, setPeriodoSelected] = React.useState(-1);
+    const [mediaDeNotas, setMediaDeNotas] = React.useState(0);
     const [sizeScreen, setSizeScreen] = React.useState(window.innerWidth);
     const [maxNote, setMaxNote] = React.useState({
         value: 20,
@@ -89,6 +90,8 @@ function Stats() {
         const minNoteValue = Math.min(...findMAxNote.map((item) => item.value));
         setMaxNote(findMAxNote.find((item) => item.value === maxNoteValue));
         setMinNote(findMAxNote.find((item) => item.value === minNoteValue));
+        const mediaDeNotasW = alumnosPeriodo.reduce((acc, item) => acc + item.promedio_nota, 0);
+        setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
         setAlumnos(alumnosPeriodo);
         setAniosAndSecciones(response);
     });
@@ -105,6 +108,8 @@ function Stats() {
       INNER JOIN basic_data on basic_data.id = alumno.datosPersonalesId
       WHERE anio.periodoId=${periodoSelected} AND etapas.anioId=${year} AND etapas.seccioneId=${secciones}
       GROUP BY alumno.id;`);
+        if (alumnosPeriodo.length === 0)
+            return;
         console.log("alumnosPeriodo", alumnosPeriodo);
         const findMAxNote = alumnosPeriodo.map((alumno) => {
             return {
@@ -114,6 +119,8 @@ function Stats() {
         });
         const maxNoteValue = Math.max(...findMAxNote.map((item) => item.value));
         const minNoteValue = Math.min(...findMAxNote.map((item) => item.value));
+        const mediaDeNotasW = alumnosPeriodo.reduce((acc, item) => acc + item.promedio_nota, 0);
+        setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
         setMaxNote(findMAxNote.find((item) => item.value === maxNoteValue));
         setMinNote(findMAxNote.find((item) => item.value === minNoteValue));
         setAlumnos(alumnosPeriodo);
@@ -143,6 +150,9 @@ function Stats() {
       INNER JOIN basic_data on basic_data.id = alumno.datosPersonalesId
       WHERE anio.periodoId=${periodoSelected} AND etapas.anioId=${year}
       GROUP BY alumno.id;`);
+        if (alumnosPeriodo.length === 0) {
+            return;
+        }
         const findMAxNote = alumnosPeriodo.map((alumno) => {
             return {
                 name: `${alumno.firstName} ${alumno.Surname} | C.I ${alumno.dni} | ${alumno.anio} ${alumno.seccion}`,
@@ -151,6 +161,8 @@ function Stats() {
         });
         const maxNoteValue = Math.max(...findMAxNote.map((item) => item.value));
         const minNoteValue = Math.min(...findMAxNote.map((item) => item.value));
+        const mediaDeNotasW = alumnosPeriodo.reduce((acc, item) => acc + item.promedio_nota, 0);
+        setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
         setMaxNote(findMAxNote.find((item) => item.value === maxNoteValue));
         setMinNote(findMAxNote.find((item) => item.value === minNoteValue));
         setAlumnos(alumnosPeriodo);
@@ -235,7 +247,7 @@ function Stats() {
                             alignItems: "center",
                             flexDirection: "row",
                             gap: 5,
-                        }, variant: "h4", component: "div", gutterBottom: true }, { children: "Estadisticas" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
+                        }, variant: "h4", component: "div", gutterBottom: true }, { children: "Estad\u00EDsticas" })), (0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ sx: {
                             flexDirection: "row",
                             display: "flex",
                             justifyContent: "center",
@@ -257,6 +269,10 @@ function Stats() {
                                     textAlign: "center",
                                     mt: 2,
                                 } }, { children: ["Total de Alumnos: ", alumnos.length] })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: {
+                                    width: "100%",
+                                    textAlign: "center",
+                                    mt: 2,
+                                } }, { children: ["Promedio de Notas: ", mediaDeNotas.toFixed(2)] })), (0, jsx_runtime_1.jsxs)(Typography_1.default, Object.assign({ sx: {
                                     width: "100%",
                                     textAlign: "center",
                                     mt: 2,

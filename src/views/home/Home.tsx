@@ -69,83 +69,91 @@ export default function Home() {
         sistema de notas automatizado!
       </Typography>
 
-      <Box
-        sx={{
-          width: "50%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: 5,
-          mt: 5,
-        }}
-      >
-        {buttons.map((button, index) => (
-          <Button
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              width: "10rem",
-              height: "10rem",
+      <Typography variant="h6">
+        Espera a que un administrador te habilite para poder acceder al sistema
+      </Typography>
 
-              backgroundColor: "primary.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "primary.dark",
-              },
-            }}
-            //@ts-ignore
-            onClick={() =>
-              //@ts-ignore
-              (index === 0 && user.user.role !== "USER" && navigate("/anos")) ||
-              //@ts-ignore
+      {user.user.role !== "USER" && (
+        <Box
+          sx={{
+            width: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 5,
+            mt: 5,
+          }}
+        >
+          {buttons.map((button, index) => (
+            <Button
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                width: "10rem",
+                height: "10rem",
 
-              (index === 1 &&
-                user.user.role !== "USER" &&
-                navigate("/search")) ||
+                backgroundColor: "primary.main",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "primary.dark",
+                },
+              }}
               //@ts-ignore
+              onClick={() =>
+                //@ts-ignore
+                (index === 0 &&
+                  user.user.role !== "USER" &&
+                  navigate("/anos")) ||
+                //@ts-ignore
 
-              (index === 2 &&
-                user.user.role !== "USER" &&
-                navigate("/admin")) ||
-              //@ts-ignore
-              (index === 3 && navigate("/stats")) ||
-              //@ts-ignore
-              (index === 4 && navigate("/logout"))
-            }
-          >
-            {index === 0 && user.user.role !== "USER" && (
-              <Tooltip title={`Años`} arrow placement="right">
-                <DateRangeIcon />
-              </Tooltip>
-            )}
-            {index === 1 && user.user.role !== "USER" && (
-              <Tooltip title={`Graduados`} arrow placement="right">
-                <SchoolIcon />
-              </Tooltip>
-            )}
-            {index === 2 && user.user.role !== "USER" && (
-              <Tooltip title={`Administración`} arrow placement="right">
-                <AdminPanelSettingsIcon />
-              </Tooltip>
-            )}
-            {index === 3 && (
-              <Tooltip title={`stats`} arrow placement="right">
-                <QueryStatsIcon />
-              </Tooltip>
-            )}
-            {index === 4 && (
-              <Tooltip title={`Salir`} arrow placement="right">
-                <LogoutIcon />
-              </Tooltip>
-            )}
-            {button}
-          </Button>
-        ))}
-      </Box>
+                (index === 1 &&
+                  user.user.role !== "USER" &&
+                  navigate("/search")) ||
+                //@ts-ignore
+
+                (index === 2 &&
+                  user.user.role !== "USER" &&
+                  navigate("/admin")) ||
+                //@ts-ignore
+                (index === 3 && navigate("/stats")) ||
+                //@ts-ignore
+                (index === 4 && navigate("/logout"))
+              }
+            >
+              {index === 0 && user.user.role !== "USER" && (
+                <Tooltip title={`Años`} arrow placement="right">
+                  <DateRangeIcon />
+                </Tooltip>
+              )}
+              {index === 1 && user.user.role !== "USER" && (
+                <Tooltip title={`Graduados`} arrow placement="right">
+                  <SchoolIcon />
+                </Tooltip>
+              )}
+              {index === 2 && user.user.role !== "USER" && (
+                <Tooltip title={`Administración`} arrow placement="right">
+                  <AdminPanelSettingsIcon />
+                </Tooltip>
+              )}
+              {index === 3 && (
+                <Tooltip title={`stats`} arrow placement="right">
+                  <QueryStatsIcon />
+                </Tooltip>
+              )}
+              {index === 4 && (
+                <Tooltip title={`Salir`} arrow placement="right">
+                  <LogoutIcon />
+                </Tooltip>
+              )}
+              {button}
+            </Button>
+          ))}
+        </Box>
+      )}
 
       {user.user.role === "USER" && (
         <Box
@@ -158,15 +166,7 @@ export default function Home() {
             gap: 5,
           }}
         >
-          <Box>
-            <FullCalendar
-              height={"27rem"}
-              plugins={[dayGridPlugin]}
-              initialView="dayGridMonth"
-              locale={esLocale}
-            />
-          </Box>
-          <Button variant="contained">Generar Consulta</Button>
+          {/* <Button variant="contained">Generar Consulta</Button> */}
           <Button onClick={() => navigate("/logout")} variant="contained">
             <LogoutIcon /> Salir del sistema
           </Button>

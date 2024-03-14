@@ -11,6 +11,7 @@ import { useState } from "react";
 import { CustomModal } from "../modals/customModal";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const BackupList = ({ refresh }) => {
   const [selectedBackup, setSelectedBackup] = useState(null);
@@ -39,12 +40,25 @@ const BackupList = ({ refresh }) => {
   };
 
   const restoreBackup = async (backup) => {
+    //Modal de carga
+    Swal.fire({
+      title: "Cargando...",
+      showConfirmButton: false,
+      showCancelButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
     setLoading(true);
     //add extension
     backup = backup + ".json";
     //@ts-ignore
     const result = await window.API.restoreBackup(backup);
     console.log(result);
+
+    Swal.close();
     navigate("/auth");
   };
 

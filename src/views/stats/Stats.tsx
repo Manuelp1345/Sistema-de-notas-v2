@@ -50,6 +50,7 @@ export default function Stats() {
   const [alumnos, setAlumnos] = React.useState<any>([]);
   const [periodos, setPeriodos] = React.useState<any>([]);
   const [periodoSelected, setPeriodoSelected] = React.useState<any>(-1);
+  const [mediaDeNotas, setMediaDeNotas] = React.useState<any>(0);
   const [sizeScreen, setSizeScreen] = React.useState<any>(window.innerWidth);
   const [maxNote, setMaxNote] = React.useState<any>({
     value: 20,
@@ -93,6 +94,11 @@ export default function Stats() {
     );
     setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
     setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
+    const mediaDeNotasW = alumnosPeriodo.reduce(
+      (acc: any, item: any) => acc + item.promedio_nota,
+      0
+    );
+    setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
 
     setAlumnos(alumnosPeriodo);
     setAniosAndSecciones(response);
@@ -114,6 +120,8 @@ export default function Stats() {
       GROUP BY alumno.id;`
     );
 
+    if (alumnosPeriodo.length === 0) return;
+
     console.log("alumnosPeriodo", alumnosPeriodo);
     const findMAxNote = alumnosPeriodo.map((alumno: any) => {
       return {
@@ -127,6 +135,11 @@ export default function Stats() {
     const minNoteValue = Math.min(
       ...findMAxNote.map((item: any) => item.value)
     );
+    const mediaDeNotasW = alumnosPeriodo.reduce(
+      (acc: any, item: any) => acc + item.promedio_nota,
+      0
+    );
+    setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
 
     setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
     setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
@@ -163,6 +176,10 @@ export default function Stats() {
       WHERE anio.periodoId=${periodoSelected} AND etapas.anioId=${year}
       GROUP BY alumno.id;`
     );
+
+    if (alumnosPeriodo.length === 0) {
+      return;
+    }
     const findMAxNote = alumnosPeriodo.map((alumno: any) => {
       return {
         name: `${alumno.firstName} ${alumno.Surname} | C.I ${alumno.dni} | ${alumno.anio} ${alumno.seccion}`,
@@ -175,6 +192,11 @@ export default function Stats() {
     const minNoteValue = Math.min(
       ...findMAxNote.map((item: any) => item.value)
     );
+    const mediaDeNotasW = alumnosPeriodo.reduce(
+      (acc: any, item: any) => acc + item.promedio_nota,
+      0
+    );
+    setMediaDeNotas(mediaDeNotasW / alumnosPeriodo.length);
 
     setMaxNote(findMAxNote.find((item: any) => item.value === maxNoteValue));
     setMinNote(findMAxNote.find((item: any) => item.value === minNoteValue));
@@ -311,7 +333,7 @@ export default function Stats() {
           component="div"
           gutterBottom
         >
-          Estadisticas
+          Estadísticas
         </Typography>
 
         <Box
@@ -387,6 +409,15 @@ export default function Stats() {
                 mt: 2,
               }}
             >
+              Promedio de Notas: {mediaDeNotas.toFixed(2)}
+            </Typography>
+            <Typography
+              sx={{
+                width: "100%",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
               Mayor promedio de Nota: {maxNote.value.toFixed(2)} {maxNote.name}
             </Typography>
             <Typography
@@ -398,6 +429,7 @@ export default function Stats() {
             >
               Menor promedio de Nota: {minNote.value.toFixed(2)} {minNote.name}
             </Typography>
+
             <Box
               sx={{
                 mt: 2,
