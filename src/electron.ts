@@ -973,25 +973,21 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
       });
 
       const alumnos = await transaction.getRepository(Alumno).find({
-        where: [
-          {
-            Etapas: {
-              anio: {
-                periodo: {
-                  id: data.periodo,
-                },
+        where: {
+          Etapas: {
+            anio: {
+              periodo: {
+                id: data.periodo,
               },
             },
           },
-        ],
-
+        },
         relations: {
           notas: {
             materia: true,
             recuperacion: true,
           },
           Etapas: {
-            estado: true,
             anio: {
               periodo: true,
             },
@@ -1006,7 +1002,6 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
           },
         },
       });
-      console.log("ALUMNOS", alumnos);
 
       for (const alumno of alumnos) {
         if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
@@ -1021,21 +1016,12 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         );
 
         if (estapaReprobada) {
+          console.log("Estapa Reprobada", estapaReprobada);
           const materiasAlumno = estapaReprobada[0].notas;
           for (const notas of materiasAlumno) {
-            const curseMateria = await transaction
-              .getRepository(Materia)
-              .findOne({
-                where: {
-                  id: notas.materia.id,
-                },
-              });
-            if (!curseMateria) continue;
             let notaCount = 0;
             let promedioMateria = 0;
 
-            if (!curseMateria) continue;
-            materiaCount++;
             const notaMomentoOne = alumno.notas.find(
               (nota) => nota.materia.id === notas.id && nota.momento === "1"
             );
@@ -1073,10 +1059,6 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
               notaCount++;
             }
             const promedioFInal = promedioMateria / notaCount;
-
-            console.log("promedio Materia", promedioFInal);
-
-            promedio += promedioFInal;
 
             if (promedioFInal < 10) recuperacionCount++;
           }
@@ -1142,15 +1124,14 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         const oldAnioAlumno = alumno.Etapas.find(
           (etapa) => etapa.anio.periodo.id === data.periodo
         );
-
+        // @ts-ignore
+        delete alumno.Etapas;
         if (!oldAnioAlumno)
           throw new Error("No se encontro el anio del alumno");
 
         let newAnioAlumno;
 
         if (notaFinal >= 10 && recuperacionCount <= 2) {
-          // @ts-ignore
-          delete alumno.Etapas;
           alumno.condicion = "Regular";
           await transaction.getRepository(Alumno).save(alumno);
           const newAnio = oldAnioAlumno.anio.numberAnio + 1;

@@ -952,24 +952,21 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 },
             });
             const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
-                where: [
-                    {
-                        Etapas: {
-                            anio: {
-                                periodo: {
-                                    id: data.periodo,
-                                },
+                where: {
+                    Etapas: {
+                        anio: {
+                            periodo: {
+                                id: data.periodo,
                             },
                         },
                     },
-                ],
+                },
                 relations: {
                     notas: {
                         materia: true,
                         recuperacion: true,
                     },
                     Etapas: {
-                        estado: true,
                         anio: {
                             periodo: true,
                         },
@@ -984,7 +981,6 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     },
                 },
             });
-            console.log("ALUMNOS", alumnos);
             for (const alumno of alumnos) {
                 if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
                     continue;
@@ -993,22 +989,11 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 let materiaCount = 0;
                 const estapaReprobada = alumno.Etapas.find((etapa) => etapa.estado === "Reprobado");
                 if (estapaReprobada) {
+                    console.log("Estapa Reprobada", estapaReprobada);
                     const materiasAlumno = estapaReprobada[0].notas;
                     for (const notas of materiasAlumno) {
-                        const curseMateria = yield transaction
-                            .getRepository(materias_1.Materia)
-                            .findOne({
-                            where: {
-                                id: notas.materia.id,
-                            },
-                        });
-                        if (!curseMateria)
-                            continue;
                         let notaCount = 0;
                         let promedioMateria = 0;
-                        if (!curseMateria)
-                            continue;
-                        materiaCount++;
                         const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "1");
                         if (notaMomentoOne) {
                             if (notaMomentoOne.recuperacion.length > 0) {
@@ -1040,8 +1025,6 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                             notaCount++;
                         }
                         const promedioFInal = promedioMateria / notaCount;
-                        console.log("promedio Materia", promedioFInal);
-                        promedio += promedioFInal;
                         if (promedioFInal < 10)
                             recuperacionCount++;
                     }
@@ -1094,12 +1077,12 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 const notaFinal = promedio;
                 console.log("nota final", notaFinal);
                 const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
+                // @ts-ignore
+                delete alumno.Etapas;
                 if (!oldAnioAlumno)
                     throw new Error("No se encontro el anio del alumno");
                 let newAnioAlumno;
                 if (notaFinal >= 10 && recuperacionCount <= 2) {
-                    // @ts-ignore
-                    delete alumno.Etapas;
                     alumno.condicion = "Regular";
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     const newAnio = oldAnioAlumno.anio.numberAnio + 1;

@@ -56,7 +56,7 @@ export const ConnectionDB = async (
       Bitacora,
     ],
     synchronize: true,
-    logging: true,
+    logging: false,
   });
 
   console.log("dataBase connection", connection);

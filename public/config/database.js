@@ -64,7 +64,7 @@ const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function
             bitacora_1.Bitacora,
         ],
         synchronize: true,
-        logging: true,
+        logging: false,
     });
     console.log("dataBase connection", connection);
     if (!connection.isInitialized) {
