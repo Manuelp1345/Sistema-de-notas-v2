@@ -21,6 +21,10 @@ __decorate([
     __metadata("design:type", String)
 ], Etapas.prototype, "id", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "varchar", length: 50, nullable: false, default: "Aprobado" }),
+    __metadata("design:type", String)
+], Etapas.prototype, "estado", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => alumnos_1.Alumno, (alumno) => alumno.Etapas, {
         nullable: false,
     }),

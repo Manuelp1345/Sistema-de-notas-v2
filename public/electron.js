@@ -952,21 +952,24 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 },
             });
             const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
-                where: {
-                    Etapas: {
-                        anio: {
-                            periodo: {
-                                id: data.periodo,
+                where: [
+                    {
+                        Etapas: {
+                            anio: {
+                                periodo: {
+                                    id: data.periodo,
+                                },
                             },
                         },
                     },
-                },
+                ],
                 relations: {
                     notas: {
                         materia: true,
                         recuperacion: true,
                     },
                     Etapas: {
+                        estado: true,
                         anio: {
                             periodo: true,
                         },
@@ -988,6 +991,61 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
+                const estapaReprobada = alumno.Etapas.find((etapa) => etapa.estado === "Reprobado");
+                if (estapaReprobada) {
+                    const materiasAlumno = estapaReprobada[0].notas;
+                    for (const notas of materiasAlumno) {
+                        const curseMateria = yield transaction
+                            .getRepository(materias_1.Materia)
+                            .findOne({
+                            where: {
+                                id: notas.materia.id,
+                            },
+                        });
+                        if (!curseMateria)
+                            continue;
+                        let notaCount = 0;
+                        let promedioMateria = 0;
+                        if (!curseMateria)
+                            continue;
+                        materiaCount++;
+                        const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "1");
+                        if (notaMomentoOne) {
+                            if (notaMomentoOne.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoOne.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoOne.nota);
+                            }
+                            notaCount++;
+                        }
+                        const notaMomentoTwo = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "2");
+                        if (notaMomentoTwo) {
+                            if (notaMomentoTwo.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoTwo.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoTwo.nota);
+                            }
+                            notaCount++;
+                        }
+                        const notaMomentoThree = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "3");
+                        if (notaMomentoThree) {
+                            if (notaMomentoThree.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoThree.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoThree.nota);
+                            }
+                            notaCount++;
+                        }
+                        const promedioFInal = promedioMateria / notaCount;
+                        console.log("promedio Materia", promedioFInal);
+                        promedio += promedioFInal;
+                        if (promedioFInal < 10)
+                            recuperacionCount++;
+                    }
+                }
                 for (const materia of materias) {
                     let notaCount = 0;
                     let promedioMateria = 0;
@@ -1038,10 +1096,10 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
                 if (!oldAnioAlumno)
                     throw new Error("No se encontro el anio del alumno");
-                // @ts-ignore
-                delete alumno.Etapas;
                 let newAnioAlumno;
-                if (notaFinal > 9 && recuperacionCount < 2) {
+                if (notaFinal >= 10 && recuperacionCount <= 2) {
+                    // @ts-ignore
+                    delete alumno.Etapas;
                     alumno.condicion = "Regular";
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     const newAnio = oldAnioAlumno.anio.numberAnio + 1;
@@ -1049,6 +1107,11 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 }
                 else {
                     alumno.condicion = "Repitiente";
+                    if (oldAnioAlumno) {
+                        yield transaction.getRepository(etapas_1.Etapas).update({ id: oldAnioAlumno.id }, {
+                            estado: "Reprobado",
+                        });
+                    }
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     newAnioAlumno = newAnios.find((anio) => anio.numberAnio === oldAnioAlumno.anio.numberAnio);
                 }
@@ -1267,7 +1330,7 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     const reponseDialog = yield electron_1.dialog.showSaveDialog({
         title: "Guardar archivo",
         //@ts-ignore
-        defaultPath: `${electron_1.app.getPath("documents")}/boletin-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}.xlsx`,
+        defaultPath: `${electron_1.app.getPath("documents")}/${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}.xlsx`,
         filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
     });
     if (reponseDialog.canceled)

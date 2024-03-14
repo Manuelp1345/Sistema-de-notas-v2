@@ -54,7 +54,7 @@ const insertArea = async (area) => {
   await addBitacora({
     accion: "Insertar",
     descripcion: `Se inserto el area ${area.nombre}`,
-    usuario: area.usuario,
+    usuario: "area.usuario",
   });
   return await ipcRenderer.invoke("INSERT_AREA", area);
 };
@@ -124,7 +124,7 @@ const setNota = async (data) => {
   await addBitacora({
     accion: "Insertar",
     descripcion: `Se inserto la nota ${data.nota} al alumno ${data.alumno}`,
-    usuario: data.usuario,
+    usuario: "data.usuario",
   });
   return await ipcRenderer.invoke("SET_NOTA", data);
 };

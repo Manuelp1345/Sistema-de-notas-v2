@@ -4,6 +4,7 @@ import {
   BaseEntity,
   JoinColumn,
   ManyToOne,
+  Column,
 } from "typeorm";
 import { Alumno } from "./alumnos";
 import { Anio } from "./anios";
@@ -13,6 +14,9 @@ import { Seccion } from "./secciones";
 export class Etapas extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: string;
+
+  @Column({ type: "varchar", length: 50, nullable: false, default: "Aprobado" })
+  estado!: string;
 
   @ManyToOne(() => Alumno, (alumno) => alumno.Etapas, {
     nullable: false,

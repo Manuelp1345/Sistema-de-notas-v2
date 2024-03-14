@@ -57,7 +57,7 @@ const insertArea = (area) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Insertar",
         descripcion: `Se inserto el area ${area.nombre}`,
-        usuario: area.usuario,
+        usuario: "area.usuario",
     });
     return yield ipcRenderer.invoke("INSERT_AREA", area);
 });
@@ -117,7 +117,7 @@ const setNota = (data) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Insertar",
         descripcion: `Se inserto la nota ${data.nota} al alumno ${data.alumno}`,
-        usuario: data.usuario,
+        usuario: "data.usuario",
     });
     return yield ipcRenderer.invoke("SET_NOTA", data);
 });
