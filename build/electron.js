@@ -56,6 +56,7 @@ const etapas_1 = require("./config/entitys/etapas");
 const representante_1 = require("./config/entitys/representante");
 const exceljs_1 = __importDefault(require("exceljs"));
 const moment_1 = __importDefault(require("moment"));
+const bitacora_1 = require("./config/entitys/bitacora");
 // import { faker } from "@faker-js/faker";
 let appDataSource;
 function createWindow() {
@@ -264,12 +265,22 @@ electron_1.ipcMain.handle("LOGIN", (event, user) => __awaiter(void 0, void 0, vo
             },
         },
     });
-    console.log(userJson);
     if (userJson) {
         if (userJson.clave ===
             //@ts-ignore
             crypto_1.default.createHash("sha256").update(user.password).digest("hex")) {
-            return userJson;
+            //register login on bitacora
+            const bitacora = new bitacora_1.Bitacora();
+            bitacora.accion = "Inicio de sesion";
+            bitacora.fecha = (0, moment_1.default)().format("YYYY-MM-DD");
+            bitacora.hora = (0, moment_1.default)().format("HH:mm:ss");
+            bitacora.descripcion = "Inicio de sesion exitoso";
+            bitacora.usuario = user.email;
+            return {
+                id: userJson.id,
+                role: userJson.role,
+                email: user.email,
+            };
         }
     }
     //@ts-ignore
@@ -970,13 +981,80 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                     },
                 },
             });
-            console.log("ALUMNOS", alumnos);
             for (const alumno of alumnos) {
                 if (alumno.condicion === "Graduado" || alumno.condicion === "Retirado")
                     continue;
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
+                const estapaReprobada = yield transaction
+                    .getRepository(etapas_1.Etapas)
+                    .findOne({
+                    where: {
+                        alumno: {
+                            id: alumno.id,
+                        },
+                        estado: "Reprobado",
+                    },
+                    relations: {
+                        anio: true,
+                    },
+                });
+                if (estapaReprobada) {
+                    const notasAlumno = yield transaction.getRepository(nota_1.Nota).find({
+                        where: {
+                            alumno: {
+                                id: alumno.id,
+                            },
+                            anio: {
+                                id: estapaReprobada.anio.id,
+                            },
+                        },
+                        relations: ["materia"],
+                    });
+                    for (const notas of notasAlumno) {
+                        let notaCount = 0;
+                        let promedioMateria = 0;
+                        const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "1");
+                        if (notaMomentoOne) {
+                            if (notaMomentoOne.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoOne.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoOne.nota);
+                            }
+                            notaCount++;
+                        }
+                        const notaMomentoTwo = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "2");
+                        if (notaMomentoTwo) {
+                            if (notaMomentoTwo.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoTwo.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoTwo.nota);
+                            }
+                            notaCount++;
+                        }
+                        const notaMomentoThree = alumno.notas.find((nota) => nota.materia.id === notas.materia.id && nota.momento === "3");
+                        if (notaMomentoThree) {
+                            if (notaMomentoThree.recuperacion.length > 0) {
+                                promedioMateria += Number(notaMomentoThree.recuperacion[0].Nota);
+                            }
+                            else {
+                                promedioMateria += Number(notaMomentoThree.nota);
+                            }
+                            notaCount++;
+                        }
+                        const promedioFInal = promedioMateria / notaCount;
+                        if (promedioFInal < 10)
+                            recuperacionCount++;
+                    }
+                }
+                if (recuperacionCount === 0) {
+                    yield transaction.getRepository(etapas_1.Etapas).update({ id: estapaReprobada === null || estapaReprobada === void 0 ? void 0 : estapaReprobada.id }, {
+                        estado: "Aprobado",
+                    });
+                }
                 for (const materia of materias) {
                     let notaCount = 0;
                     let promedioMateria = 0;
@@ -1025,12 +1103,12 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 const notaFinal = promedio;
                 console.log("nota final", notaFinal);
                 const oldAnioAlumno = alumno.Etapas.find((etapa) => etapa.anio.periodo.id === data.periodo);
-                if (!oldAnioAlumno)
-                    throw new Error("No se encontro el anio del alumno");
                 // @ts-ignore
                 delete alumno.Etapas;
+                if (!oldAnioAlumno)
+                    throw new Error("No se encontro el anio del alumno");
                 let newAnioAlumno;
-                if (notaFinal > 9 && recuperacionCount < 2) {
+                if (notaFinal >= 10 && recuperacionCount <= 2) {
                     alumno.condicion = "Regular";
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     const newAnio = oldAnioAlumno.anio.numberAnio + 1;
@@ -1038,6 +1116,11 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 }
                 else {
                     alumno.condicion = "Repitiente";
+                    if (oldAnioAlumno) {
+                        yield transaction.getRepository(etapas_1.Etapas).update({ id: oldAnioAlumno.id }, {
+                            estado: "Reprobado",
+                        });
+                    }
                     yield transaction.getRepository(alumnos_1.Alumno).save(alumno);
                     newAnioAlumno = newAnios.find((anio) => anio.numberAnio === oldAnioAlumno.anio.numberAnio);
                 }
@@ -1081,7 +1164,7 @@ electron_1.ipcMain.handle("GET_ALUMNO_BY_DNI", (event, data) => __awaiter(void 0
         });
         if (!alumno)
             return false;
-        return true;
+        return alumno;
     }
     catch (error) {
         console.log(error);
@@ -1143,21 +1226,10 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
             recuperacion: true,
         },
     });
-    console.log("notas", notas);
     const materias = [];
     notas.forEach((nota) => {
         if (!materias.find((materia) => materia.id === nota.materia.id))
             materias.push(nota.materia);
-    });
-    //ordernar materias alfabeticamente
-    materias.sort((a, b) => {
-        if (a.nombre < b.nombre) {
-            return -1;
-        }
-        if (a.nombre > b.nombre) {
-            return 1;
-        }
-        return 0;
     });
     let currentMomento = 1;
     notas.forEach((nota) => {
@@ -1256,7 +1328,7 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     const reponseDialog = yield electron_1.dialog.showSaveDialog({
         title: "Guardar archivo",
         //@ts-ignore
-        defaultPath: `${electron_1.app.getPath("documents")}/boletin.xlsx`,
+        defaultPath: `${electron_1.app.getPath("documents")}/${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}.xlsx`,
         filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
     });
     if (reponseDialog.canceled)
@@ -1802,5 +1874,25 @@ electron_1.ipcMain.handle("DELETE_USER", (event, data) => __awaiter(void 0, void
 electron_1.ipcMain.handle("QUERY_SQL", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield appDataSource.manager.query(data);
     return response;
+}));
+electron_1.ipcMain.handle("ADD_BITACORA", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const bitacora = appDataSource.manager.getRepository(bitacora_1.Bitacora).create({
+        accion: data.accion,
+        usuario: data.usuario,
+        descripcion: data.descripcion,
+        fecha: (0, moment_1.default)().format("YYYY-MM-DD"),
+        hora: (0, moment_1.default)().format("HH:mm"),
+    });
+    yield appDataSource.manager.getRepository(bitacora_1.Bitacora).save(bitacora);
+}));
+electron_1.ipcMain.handle("GET_BITACORA", (event, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const bitacoras = yield appDataSource.manager.getRepository(bitacora_1.Bitacora).find({
+        order: {
+            id: "DESC",
+        },
+        take: 100,
+        skip: data,
+    });
+    return bitacoras;
 }));
 //# sourceMappingURL=electron.js.map

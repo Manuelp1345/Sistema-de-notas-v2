@@ -253,12 +253,15 @@ const Seccion = () => {
   const isStepSkipped = (step) => {
     return skipped.has(step);
   };
+  const user = JSON.parse(localStorage.getItem("token") || "{}");
 
   const insertAlumno = async () => {
     const data = {
       seccion: secciones.id,
       alumno: datosAlumno,
       representante: datosRepresetante,
+      usuario: user.email,
+      dni: datosAlumno.dni,
     };
     //@ts-ignore
     const response = await window.API.insertAlumno(data);
@@ -317,11 +320,6 @@ const Seccion = () => {
 
       if (datosAlumno.state === "") {
         setErrorDataAlumno({ ...errorDataAlumno, state: true });
-        return false;
-      }
-
-      if (datosAlumno.phone > 0 || datosAlumno.phone.toString().length < 10) {
-        setErrorDataAlumno({ ...errorDataAlumno, phone: true });
         return false;
       }
 
@@ -387,13 +385,6 @@ const Seccion = () => {
         return false;
       }
 
-      if (
-        datosRepresetante.phone > 0 &&
-        datosRepresetante.phone.toString().length < 10
-      ) {
-        setErrorDataRepresentante({ ...errorDataRepresentante, phone: true });
-        return false;
-      }
       if (datosRepresetante.email !== "")
         if (
           !datosRepresetante.email.includes("@") ||
@@ -1012,6 +1003,7 @@ const Seccion = () => {
                               'El campo "Telefono" es obligatorio'
                             }
                             onChange={(e) => {
+                              if (e.target.value.length > 11) return;
                               setDatosAlumno({
                                 ...datosAlumno,
                                 phone: Number(e.target.value),
@@ -1278,6 +1270,7 @@ const Seccion = () => {
                               'El campo "Telefono" es obligatorio'
                             }
                             onChange={(e) => {
+                              if (e.target.value.length > 11) return;
                               setDatosRepresetante({
                                 ...datosRepresetante,
                                 //@ts-ignore

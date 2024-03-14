@@ -5,6 +5,7 @@ import { Button, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { blue } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const CssTextField = styled(TextField)({
   "& label.Mui-focused": {
@@ -60,6 +61,13 @@ export function CreateUser() {
   };
 
   const handledClick = async () => {
+    if (!correo.includes("@") && !correo.includes(".")) {
+      return Swal.fire({
+        title: "Error",
+        text: "Correo invalido",
+        icon: "error",
+      });
+    }
     if (nombre !== "" && correo !== "" && password !== "" && correo !== "") {
       const credentials = await createUser();
       console.log(credentials);

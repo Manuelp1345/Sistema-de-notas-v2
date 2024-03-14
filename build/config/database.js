@@ -28,6 +28,7 @@ const representante_1 = require("./entitys/representante");
 const nota_1 = require("./entitys/nota");
 const recuperacion_Nota_1 = require("./entitys/recuperacion_Nota");
 const etapas_1 = require("./entitys/etapas");
+const bitacora_1 = require("./entitys/bitacora");
 const ruta = electron_1.app.getPath("userData") + "/database.json";
 const file = () => __awaiter(void 0, void 0, void 0, function* () {
     let file;
@@ -60,9 +61,10 @@ const ConnectionDB = (credentials) => __awaiter(void 0, void 0, void 0, function
             documents_1.Documents,
             representante_1.Representante,
             recuperacion_Nota_1.RecuperacionNota,
+            bitacora_1.Bitacora,
         ],
         synchronize: true,
-        logging: true,
+        logging: false,
     });
     console.log("dataBase connection", connection);
     if (!connection.isInitialized) {

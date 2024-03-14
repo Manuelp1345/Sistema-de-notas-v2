@@ -392,6 +392,8 @@ const Alumno = (): JSX.Element => {
       seccion: alumno.alumnoId.seccione.id,
       alumno: datosAlumno,
       representante: datosRepresetante,
+      usuario: user.email,
+      dni: alumno.alumnoId.alumno.DatosPersonales.dni,
     };
 
     console.log(data);
@@ -433,6 +435,8 @@ const Alumno = (): JSX.Element => {
 
     return response;
   };
+
+  const user = JSON.parse(localStorage.getItem("token") || "{}");
 
   const getNotas = async (data) => {
     // @ts-ignore
@@ -487,9 +491,13 @@ const Alumno = (): JSX.Element => {
       data.momento = "3";
       data.rp = true;
     }
-
+    console.log("data", data);
     // @ts-ignore
     data.alumnoId = alumno.alumnoId.alumno.id;
+    data.alumno = `${datosAlumno.firsName.toUpperCase()} ${datosAlumno.firsName.toUpperCase()} ${
+      datosAlumno.dni
+    }`;
+    data.usuario = user.email;
 
     delete data.firstName;
 
@@ -682,6 +690,7 @@ const Alumno = (): JSX.Element => {
       etapa: alumno.alumnoId.id,
       seccion: seccionId?.id,
       anio: anioId,
+      usuario: user.email,
     };
     console.log(data);
 

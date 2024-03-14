@@ -20,6 +20,7 @@ const react_1 = require("react");
 const react_router_dom_1 = require("react-router-dom");
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const react_2 = require("react");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const CssTextField = (0, styled_1.default)(material_1.TextField)({
     "& label.Mui-focused": {
         color: "black",
@@ -85,13 +86,13 @@ const Register = () => {
         }
         if (correo === "") {
             setError(Object.assign(Object.assign({}, error), { correo: true }));
-            if (correo.includes("@")) {
-                setError(Object.assign(Object.assign({}, error), { correo: true }));
-            }
-            if (correo.includes(".")) {
-                setError(Object.assign(Object.assign({}, error), { correo: true }));
-            }
             return true;
+        }
+        if (!correo.includes("@")) {
+            setError(Object.assign(Object.assign({}, error), { correo: true }));
+        }
+        if (!correo.includes(".")) {
+            setError(Object.assign(Object.assign({}, error), { correo: true }));
         }
         if (password === "") {
             setError(Object.assign(Object.assign({}, error), { password: true }));
@@ -121,6 +122,13 @@ const Register = () => {
         });
     });
     const handledClick = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!correo.includes("@") && !correo.includes(".")) {
+            return sweetalert2_1.default.fire({
+                title: "Error",
+                text: "Correo invalido",
+                icon: "error",
+            });
+        }
         if (error.correo === false &&
             error.password === false &&
             error.password2 === false &&

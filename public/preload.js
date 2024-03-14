@@ -45,7 +45,7 @@ const getSeccion = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const insertSeccion = (seccion) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Insertar",
-        descripcion: `Se inserto la seccion ${seccion.nombre}`,
+        descripcion: `Se inserto la seccion ${seccion.seccion}`,
         usuario: seccion.usuario,
     });
     return yield ipcRenderer.invoke("INSERT_SECCION", seccion);
@@ -56,8 +56,8 @@ const getAreas = (id) => __awaiter(void 0, void 0, void 0, function* () {
 const insertArea = (area) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Insertar",
-        descripcion: `Se inserto el area ${area.nombre}`,
-        usuario: "area.usuario",
+        descripcion: `Se inserto el area ${area.area}`,
+        usuario: area.usuario,
     });
     return yield ipcRenderer.invoke("INSERT_AREA", area);
 });
@@ -116,8 +116,8 @@ const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* (
 const setNota = (data) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Insertar",
-        descripcion: `Se inserto la nota ${data.nota} al alumno ${data.alumno}`,
-        usuario: "data.usuario",
+        descripcion: `Se inserto la nota ${data.nota} (${data.nombre}) al alumno ${data.alumno}`,
+        usuario: data.usuario,
     });
     return yield ipcRenderer.invoke("SET_NOTA", data);
 });
@@ -170,7 +170,7 @@ const getAniosAndSecciones = (id) => __awaiter(void 0, void 0, void 0, function*
 const updateAlumnoSeccionAndAnio = (data) => __awaiter(void 0, void 0, void 0, function* () {
     yield addBitacora({
         accion: "Actualizar",
-        descripcion: `Se actualizo al alumno ${data.dni} el año o seccion `,
+        descripcion: `Se actualizo al alumno ${data.alumno.dni} el año o seccion `,
         usuario: data.usuario,
     });
     return yield ipcRenderer.invoke("UPDATE_ALUMNO_SECCION_AND_ANIO", data);

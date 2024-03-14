@@ -51,9 +51,11 @@ const customModal_1 = require("../modals/customModal");
 const DatePicker_1 = require("@mui/x-date-pickers/DatePicker");
 const AdapterMoment_1 = require("@mui/x-date-pickers/AdapterMoment");
 const x_date_pickers_1 = require("@mui/x-date-pickers");
+const moment_1 = __importDefault(require("moment"));
 const Grade_1 = __importDefault(require("@mui/icons-material/Grade"));
 const DrawerHeader = (0, styles_1.styled)("div")(({ theme }) => (Object.assign({ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: theme.spacing(0, 1) }, theme.mixins.toolbar)));
 const SetupYear = ({ idPeriodo }) => {
+    var _a, _b;
     const [periodos, setPeriodos] = (0, react_1.useState)([]);
     const [periodo, setPeriodo] = (0, react_1.useState)();
     const [anios, setAnios] = (0, react_1.useState)([]);
@@ -116,7 +118,11 @@ const SetupYear = ({ idPeriodo }) => {
         let deleteAnio;
         try {
             //@ts-ignore
-            deleteAnio = yield window.API.deleteAnio(idAnioDelete.id);
+            deleteAnio = yield window.API.deleteAnio({
+                id: idAnioDelete.id,
+                usuario: user.email,
+                name: idAnioDelete.anio,
+            });
         }
         catch (error) {
             sweetalert2_1.default.fire({
@@ -143,10 +149,12 @@ const SetupYear = ({ idPeriodo }) => {
             timer: 1500,
         });
     });
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
     const insertPeriodo = (periodo) => __awaiter(void 0, void 0, void 0, function* () {
         const dataPeriodo = {
             periodo: periodo,
             estado: true,
+            usuario: user.email,
         };
         // @ts-ignore
         const data = yield window.API.insertPeriodo(dataPeriodo);
@@ -168,12 +176,23 @@ const SetupYear = ({ idPeriodo }) => {
         setLoading(false);
     });
     const gradeAlumnos = (periodoId, newPeriodo) => __awaiter(void 0, void 0, void 0, function* () {
+        //Modal de carga
+        sweetalert2_1.default.fire({
+            title: "Cargando...",
+            showConfirmButton: false,
+            showCancelButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            willOpen: () => {
+                sweetalert2_1.default.showLoading();
+            },
+        });
         // @ts-ignore
         const data = yield window.API.gradeAlumnos({
             periodo: periodoId,
             newPeriodo,
+            usuario: user.email,
         });
-        console.log(data);
         if (data) {
             sweetalert2_1.default.fire({
                 title: "Alumnos Grados",
@@ -207,6 +226,16 @@ const SetupYear = ({ idPeriodo }) => {
             yield getData();
         }))();
     }, []);
+    React.useEffect(() => {
+        console.log(periodo, "periodo");
+        if (openAddPeriodo && periodo) {
+            // @ts-ignore
+            const splitPeriodo = periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ");
+            const yearOne = Number(splitPeriodo[0]) + 1;
+            const yearTwo = Number(splitPeriodo[1]) + 1;
+            setValue((prev) => (Object.assign(Object.assign({}, prev), { yearOne: yearOne.toString(), yearTwo: yearTwo.toString() })));
+        }
+    }, [openAddPeriodo]);
     return ((0, jsx_runtime_1.jsxs)(Box_1.default, Object.assign({ className: "animate__animated animate__fadeInRight", component: "main", sx: {
             flexGrow: 1,
             p: 4,
@@ -315,15 +344,44 @@ const SetupYear = ({ idPeriodo }) => {
                                 ] })] }))] })), (0, jsx_runtime_1.jsx)(customModal_1.CustomModal, Object.assign({ btnText: "Eliminar", color: "red", tittle: "Alerta", openDialog: openDeleteAnio, handleCloseDialog: handleCloseDeleteAnio, handledConfirm: handledDeleteAnio }, { children: (0, jsx_runtime_1.jsxs)(DialogContentText_1.default, { children: ["Confirma que desea eliminar ", idAnioDelete.anio] }) })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "primary", tittle: "Agregar Periodo", openDialog: openAddPeriodo, handleCloseDialog: handleCloseAddPeriodo, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield insertPeriodo(`${value.yearOne} - ${value.yearTwo}`);
                     handleCloseAddPeriodo();
-                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?"] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
                             gap: 2,
                             mt: 2,
-                        } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
-                                        setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
-                                        setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
-                    yield insertAnio({ anio: value.anio, numberAnio: value.numberAnio });
+                            px: 4,
+                        } }, { children: (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "A\u00F1o Inicial", value: value === null || value === void 0 ? void 0 : value.yearOne, 
+                                        //@ts-ignore
+                                        minDate: (_a = (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY")) === null || _a === void 0 ? void 0 : _a.toDate(), onChange: (newValue) => {
+                                            if (Number(
+                                            //@ts-ignore
+                                            (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY").format("YYYY")) > Number(newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY"))) {
+                                                setValue(Object.assign(Object.assign({}, value), { 
+                                                    //@ts-ignore
+                                                    yearOne: (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY").format("YYYY"), yearTwo: 
+                                                    //@ts-ignore
+                                                    (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY")
+                                                        .add(1, "year")
+                                                        .format("YYYY") }));
+                                                return sweetalert2_1.default.fire({
+                                                    title: "El año inicial no puede ser mayor al año final del periodo anterior",
+                                                    icon: "error",
+                                                    showConfirmButton: false,
+                                                    timer: 1500,
+                                                });
+                                            }
+                                            setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY"), yearTwo: (Number(newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY")) + 1).toString() }));
+                                        }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsxs)(material_1.Typography, Object.assign({ sx: {
+                                        mt: 2,
+                                    } }, { children: [(0, jsx_runtime_1.jsx)("span", Object.assign({ style: {
+                                                fontWeight: "bold",
+                                            } }, { children: "El nuevo periodo ser\u00E1 el siguiente:" })), " ", value.yearOne &&
+                                            value.yearOne !== "" &&
+                                            value.yearOne !== "Invalid date" &&
+                                            `${value.yearOne} - ${value.yearTwo}`] }))] }) }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "Primary", tittle: "Agregar Año", openDialog: openAddAnio, handleCloseDialog: handleCloseAddAnio, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
+                    yield insertAnio({
+                        anio: value.anio,
+                        numberAnio: value.numberAnio,
+                        usuario: user.email,
+                    });
                     handleCloseAddAnio();
                 }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Atenci\u00F3n! Una vez que agregue un nuevo a\u00F1o, no podr\u00E1 editarlo. Adem\u00E1s, solo se podr\u00E1 borrar si no est\u00E1 actualmente en uso.", (0, jsx_runtime_1.jsx)("br", {}), " \u00BFDesea continuar con la acci\u00F3n de agregar un nuevo a\u00F1o?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
                             gap: 2,
@@ -335,14 +393,39 @@ const SetupYear = ({ idPeriodo }) => {
                                 } })] }))] })), (0, jsx_runtime_1.jsxs)(customModal_1.CustomModal, Object.assign({ btnText: "Agregar", color: "primary", tittle: "Agrega el nuevo periodo", openDialog: openAddPeriodoGrade, handleCloseDialog: handleCloseAddPeriodoGrade, handledConfirm: () => __awaiter(void 0, void 0, void 0, function* () {
                     yield gradeAlumnos(idPeriodo, `${value.yearOne} - ${value.yearTwo}`);
                     handleCloseAddPeriodoGrade();
-                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?\""] }), (0, jsx_runtime_1.jsxs)(material_1.FormGroup, Object.assign({ sx: {
+                }) }, { children: [(0, jsx_runtime_1.jsxs)(material_1.Typography, { children: ["\"\u00A1Advertencia! Una vez que ingrese un nuevo periodo, no podr\u00E1 editarlo ni eliminarlo. ", (0, jsx_runtime_1.jsx)("br", {}), " Aseg\u00FArese de verificar cuidadosamente la informaci\u00F3n antes de guardar. \u00BFDesea continuar?\""] }), (0, jsx_runtime_1.jsx)(material_1.FormGroup, Object.assign({ sx: {
                             gap: 2,
                             mt: 2,
-                        } }, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Desde", value: value === null || value === void 0 ? void 0 : value.yearOne, onChange: (newValue) => {
-                                        setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "Hasta", value: value === null || value === void 0 ? void 0 : value.yearTwo, onChange: (newValue) => {
-                                        setValue(Object.assign(Object.assign({}, value), { yearTwo: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY") }));
-                                    }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) }))] }))] }))] })));
+                            px: 4,
+                        } }, { children: (0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(x_date_pickers_1.LocalizationProvider, Object.assign({ dateAdapter: AdapterMoment_1.AdapterMoment }, { children: (0, jsx_runtime_1.jsx)(DatePicker_1.DatePicker, { views: ["year"], label: "A\u00F1o Inicial", value: value === null || value === void 0 ? void 0 : value.yearOne, 
+                                        //@ts-ignore
+                                        minDate: (_b = (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY")) === null || _b === void 0 ? void 0 : _b.toDate(), onChange: (newValue) => {
+                                            if (Number(
+                                            //@ts-ignore
+                                            (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY").format("YYYY")) > Number(newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY"))) {
+                                                setValue(Object.assign(Object.assign({}, value), { 
+                                                    //@ts-ignore
+                                                    yearOne: (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY").format("YYYY"), yearTwo: 
+                                                    //@ts-ignore
+                                                    (0, moment_1.default)(periodo === null || periodo === void 0 ? void 0 : periodo.split(" - ")[1], "YYYY")
+                                                        .add(1, "year")
+                                                        .format("YYYY") }));
+                                                return sweetalert2_1.default.fire({
+                                                    title: "El año inicial no puede ser mayor al año final del periodo anteior",
+                                                    icon: "error",
+                                                    showConfirmButton: false,
+                                                    timer: 1500,
+                                                });
+                                            }
+                                            setValue(Object.assign(Object.assign({}, value), { yearOne: newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY"), yearTwo: (Number(newValue === null || newValue === void 0 ? void 0 : newValue.format("YYYY")) + 1).toString() }));
+                                        }, renderInput: (params) => (0, jsx_runtime_1.jsx)(material_1.TextField, Object.assign({}, params)) }) })), (0, jsx_runtime_1.jsxs)(material_1.Typography, Object.assign({ sx: {
+                                        mt: 2,
+                                    } }, { children: [(0, jsx_runtime_1.jsx)("span", Object.assign({ style: {
+                                                fontWeight: "bold",
+                                            } }, { children: "El nuevo periodo ser\u00E1 el siguiente:" })), " ", value.yearOne &&
+                                            value.yearOne !== "" &&
+                                            value.yearOne !== "Invalid date" &&
+                                            `${value.yearOne} - ${value.yearTwo}`] }))] }) }))] }))] })));
 };
 exports.default = SetupYear;
 //# sourceMappingURL=SetupYear.js.map

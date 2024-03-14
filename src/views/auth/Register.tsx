@@ -75,14 +75,13 @@ const Register = () => {
     }
     if (correo === "") {
       setError({ ...error, correo: true });
-      if (correo.includes("@")) {
-        setError({ ...error, correo: true });
-      }
-      if (correo.includes(".")) {
-        setError({ ...error, correo: true });
-      }
-
       return true;
+    }
+    if (!correo.includes("@")) {
+      setError({ ...error, correo: true });
+    }
+    if (!correo.includes(".")) {
+      setError({ ...error, correo: true });
     }
     if (password === "") {
       setError({ ...error, password: true });
@@ -114,6 +113,13 @@ const Register = () => {
   };
 
   const handledClick = async () => {
+    if (!correo.includes("@") && !correo.includes(".")) {
+      return Swal.fire({
+        title: "Error",
+        text: "Correo invalido",
+        icon: "error",
+      });
+    }
     if (
       error.correo === false &&
       error.password === false &&

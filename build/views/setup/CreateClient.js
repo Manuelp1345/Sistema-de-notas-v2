@@ -21,6 +21,7 @@ const material_1 = require("@mui/material");
 const styles_1 = require("@mui/material/styles");
 const colors_1 = require("@mui/material/colors");
 const react_router_dom_1 = require("react-router-dom");
+const sweetalert2_1 = __importDefault(require("sweetalert2"));
 const CssTextField = (0, styles_1.styled)(material_1.TextField)({
     "& label.Mui-focused": {
         color: "white",
@@ -71,6 +72,13 @@ function CreateUser() {
         });
     });
     const handledClick = () => __awaiter(this, void 0, void 0, function* () {
+        if (!correo.includes("@") && !correo.includes(".")) {
+            return sweetalert2_1.default.fire({
+                title: "Error",
+                text: "Correo invalido",
+                icon: "error",
+            });
+        }
         if (nombre !== "" && correo !== "" && password !== "" && correo !== "") {
             const credentials = yield createUser();
             console.log(credentials);

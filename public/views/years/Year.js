@@ -45,6 +45,7 @@ const Year = () => {
     const handleCloseAddArea = () => {
         setOpenAddArea(false);
     };
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
     const [letter, setLetter] = react_1.default.useState("");
     const handleChange = (event) => {
         setLetter(event.target.value);
@@ -83,7 +84,11 @@ const Year = () => {
     });
     const insertSeccion = (seccion) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
-        const data = yield window.API.insertSeccion({ seccion, anio: id });
+        const data = yield window.API.insertSeccion({
+            seccion,
+            anio: id,
+            usuario: user.email,
+        });
         if (data) {
             getData();
             sweetalert2_1.default.fire({
@@ -97,7 +102,11 @@ const Year = () => {
     });
     const insertArea = (nombre) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
-        const data = yield window.API.insertArea({ area: nombre, anio: id });
+        const data = yield window.API.insertArea({
+            area: nombre,
+            anio: id,
+            usuario: user.email,
+        });
         if (data) {
             getData();
             sweetalert2_1.default.fire({

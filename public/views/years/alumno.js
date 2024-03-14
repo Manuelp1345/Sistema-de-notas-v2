@@ -284,6 +284,8 @@ const Alumno = () => {
             seccion: alumno.alumnoId.seccione.id,
             alumno: datosAlumno,
             representante: datosRepresetante,
+            usuario: user.email,
+            dni: alumno.alumnoId.alumno.DatosPersonales.dni,
         };
         console.log(data);
         //@ts-ignore
@@ -316,6 +318,7 @@ const Alumno = () => {
         setExistAlumno(response);
         return response;
     });
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
     const getNotas = (data) => __awaiter(void 0, void 0, void 0, function* () {
         // @ts-ignore
         const resnotas = yield window.API.getNotas(data);
@@ -363,8 +366,11 @@ const Alumno = () => {
             data.momento = "3";
             data.rp = true;
         }
+        console.log("data", data);
         // @ts-ignore
         data.alumnoId = alumno.alumnoId.alumno.id;
+        data.alumno = `${datosAlumno.firsName.toUpperCase()} ${datosAlumno.firsName.toUpperCase()} ${datosAlumno.dni}`;
+        data.usuario = user.email;
         delete data.firstName;
         console.log("data", data);
         // @ts-ignore
@@ -506,6 +512,7 @@ const Alumno = () => {
             etapa: alumno.alumnoId.id,
             seccion: seccionId === null || seccionId === void 0 ? void 0 : seccionId.id,
             anio: anioId,
+            usuario: user.email,
         };
         console.log(data);
         // @ts-ignore

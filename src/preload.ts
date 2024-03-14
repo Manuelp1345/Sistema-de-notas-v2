@@ -41,7 +41,7 @@ const getSeccion = async (id) => {
 const insertSeccion = async (seccion) => {
   await addBitacora({
     accion: "Insertar",
-    descripcion: `Se inserto la seccion ${seccion.nombre}`,
+    descripcion: `Se inserto la seccion ${seccion.seccion}`,
     usuario: seccion.usuario,
   });
   return await ipcRenderer.invoke("INSERT_SECCION", seccion);
@@ -53,8 +53,8 @@ const getAreas = async (id) => {
 const insertArea = async (area) => {
   await addBitacora({
     accion: "Insertar",
-    descripcion: `Se inserto el area ${area.nombre}`,
-    usuario: "area.usuario",
+    descripcion: `Se inserto el area ${area.area}`,
+    usuario: area.usuario,
   });
   return await ipcRenderer.invoke("INSERT_AREA", area);
 };
@@ -123,8 +123,8 @@ const insertPeriodo = async (periodo) => {
 const setNota = async (data) => {
   await addBitacora({
     accion: "Insertar",
-    descripcion: `Se inserto la nota ${data.nota} al alumno ${data.alumno}`,
-    usuario: "data.usuario",
+    descripcion: `Se inserto la nota ${data.nota} (${data.nombre}) al alumno ${data.alumno}`,
+    usuario: data.usuario,
   });
   return await ipcRenderer.invoke("SET_NOTA", data);
 };
@@ -189,7 +189,7 @@ const getAniosAndSecciones = async (id) => {
 const updateAlumnoSeccionAndAnio = async (data) => {
   await addBitacora({
     accion: "Actualizar",
-    descripcion: `Se actualizo al alumno ${data.dni} el año o seccion `,
+    descripcion: `Se actualizo al alumno ${data.alumno.dni} el año o seccion `,
     usuario: data.usuario,
   });
   return await ipcRenderer.invoke("UPDATE_ALUMNO_SECCION_AND_ANIO", data);

@@ -70,6 +70,8 @@ const search_1 = __importDefault(require("../years/search"));
 const School_1 = __importDefault(require("@mui/icons-material/School"));
 const GlobalContext_1 = require("../../config/context/GlobalContext");
 const Stats_1 = __importDefault(require("../stats/Stats"));
+const PendingActions_1 = __importDefault(require("@mui/icons-material/PendingActions"));
+const Bitacora_1 = __importDefault(require("../bitacora/Bitacora"));
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -156,6 +158,7 @@ function Dashboard({ element }) {
                             "Graduados",
                             "Administración",
                             "Estadisticas",
+                            "Bitacora",
                             "Salir",
                         ].map((text, index) => user.user.role !== "USER" && ((0, jsx_runtime_1.jsxs)(ListItem_1.default, Object.assign({ button: true, selected: (element === "home" &&
                                 user.user.role !== "USER" &&
@@ -164,6 +167,7 @@ function Dashboard({ element }) {
                                     user.user.role !== "USER" &&
                                     index === 1) ||
                                 (element === "stats" && index === 4) ||
+                                (element === "bitacora" && index === 5) ||
                                 (element === "search" &&
                                     user.user.role !== "USER" &&
                                     index === 2) ||
@@ -191,7 +195,9 @@ function Dashboard({ element }) {
                                 //@ts-ignore
                                 (index === 4 && navigate("/stats")) ||
                                 //@ts-ignore
-                                (index === 5 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `inicio`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(icons_material_1.House, {}) }))), index === 1 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Años`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(DateRange_1.default, {}) }))), index === 2 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Graduados`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(School_1.default, {}) }))), index === 3 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Administración`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}) }))), index === 4 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `stats`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(QueryStats_1.default, {}) }))), index === 5 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Salir`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(Logout_1.default, {}) })))] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPeriodo: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {}), element === "seccion" && (0, jsx_runtime_1.jsx)(seccion_1.default, {}), element === "search" && (0, jsx_runtime_1.jsx)(search_1.default, {}), element === "alumno" && (0, jsx_runtime_1.jsx)(alumno_1.default, {}), element === "admin" && (0, jsx_runtime_1.jsx)(Admin_1.default, {}), element === "stats" && (0, jsx_runtime_1.jsx)(Stats_1.default, {})] })));
+                                (index === 5 && navigate("/Bitacora")) ||
+                                //@ts-ignore
+                                (index === 6 && navigate("/logout")) }, { children: [(0, jsx_runtime_1.jsxs)(ListItemIcon_1.default, { children: [index === 0 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `inicio`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(icons_material_1.House, {}) }))), index === 1 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Años`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(DateRange_1.default, {}) }))), index === 2 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Graduados`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(School_1.default, {}) }))), index === 3 && user.user.role !== "USER" && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Administración`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(AdminPanelSettings_1.default, {}) }))), index === 4 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Estadisticas`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(QueryStats_1.default, {}) }))), index === 5 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Bitacora`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(PendingActions_1.default, {}) }))), index === 6 && ((0, jsx_runtime_1.jsx)(material_1.Tooltip, Object.assign({ title: `Salir`, arrow: true, placement: "right" }, { children: (0, jsx_runtime_1.jsx)(Logout_1.default, {}) })))] }), (0, jsx_runtime_1.jsx)(ListItemText_1.default, { primary: text })] }), text))) }), (0, jsx_runtime_1.jsx)(Divider_1.default, {})] })), element === "home" && (0, jsx_runtime_1.jsx)(Home_1.default, {}), element === "anos" && (0, jsx_runtime_1.jsx)(SetupYear_1.default, { idPeriodo: periodo.id }), element === "Year" && (0, jsx_runtime_1.jsx)(Year_1.default, {}), element === "seccion" && (0, jsx_runtime_1.jsx)(seccion_1.default, {}), element === "search" && (0, jsx_runtime_1.jsx)(search_1.default, {}), element === "alumno" && (0, jsx_runtime_1.jsx)(alumno_1.default, {}), element === "admin" && (0, jsx_runtime_1.jsx)(Admin_1.default, {}), element === "stats" && (0, jsx_runtime_1.jsx)(Stats_1.default, {}), element === "bitacora" && (0, jsx_runtime_1.jsx)(Bitacora_1.default, {})] })));
 }
 exports.default = Dashboard;
 //# sourceMappingURL=Dashboard.js.map

@@ -184,11 +184,14 @@ const Seccion = () => {
     const isStepSkipped = (step) => {
         return skipped.has(step);
     };
+    const user = JSON.parse(localStorage.getItem("token") || "{}");
     const insertAlumno = () => __awaiter(void 0, void 0, void 0, function* () {
         const data = {
             seccion: secciones.id,
             alumno: datosAlumno,
             representante: datosRepresetante,
+            usuario: user.email,
+            dni: datosAlumno.dni,
         };
         //@ts-ignore
         const response = yield window.API.insertAlumno(data);
@@ -238,10 +241,6 @@ const Seccion = () => {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { state: true }));
                 return false;
             }
-            if (datosAlumno.phone > 0 || datosAlumno.phone.toString().length < 10) {
-                setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { phone: true }));
-                return false;
-            }
             if (datosAlumno.sexo === "select") {
                 setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { sexo: true }));
                 return false;
@@ -281,11 +280,6 @@ const Seccion = () => {
             }
             if (datosRepresetante.filiacion === "") {
                 setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { filiacion: true }));
-                return false;
-            }
-            if (datosRepresetante.phone > 0 &&
-                datosRepresetante.phone.toString().length < 10) {
-                setErrorDataRepresentante(Object.assign(Object.assign({}, errorDataRepresentante), { phone: true }));
                 return false;
             }
             if (datosRepresetante.email !== "")
@@ -569,6 +563,8 @@ const Seccion = () => {
                                                                             setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { email: false }));
                                                                         }, label: "Correo", variant: "standard" }), (0, jsx_runtime_1.jsx)(material_1.TextField, { value: Number(datosAlumno.phone), error: errorDataAlumno.phone, helperText: errorDataAlumno.phone &&
                                                                             'El campo "Telefono" es obligatorio', onChange: (e) => {
+                                                                            if (e.target.value.length > 11)
+                                                                                return;
                                                                             setDatosAlumno(Object.assign(Object.assign({}, datosAlumno), { phone: Number(e.target.value) }));
                                                                             setErrorDataAlumno(Object.assign(Object.assign({}, errorDataAlumno), { phone: false }));
                                                                         }, label: "Telefono", variant: "standard" }), (0, jsx_runtime_1.jsxs)(material_1.FormControl, { children: [(0, jsx_runtime_1.jsx)(Typography_1.default, Object.assign({ sx: { color: "gray" } }, { children: "Fechan de nacimiento" })), (0, jsx_runtime_1.jsx)(material_1.Input, { type: "Date", error: errorDataAlumno.fechaNacimiento, onBlur: (e) => {
@@ -645,6 +641,8 @@ const Seccion = () => {
                                                                     width: "100%",
                                                                 } }, { children: [(0, jsx_runtime_1.jsx)(material_1.TextField, { value: datosRepresetante.phone, error: errorDataRepresentante.phone, helperText: errorDataRepresentante.phone &&
                                                                             'El campo "Telefono" es obligatorio', onChange: (e) => {
+                                                                            if (e.target.value.length > 11)
+                                                                                return;
                                                                             setDatosRepresetante(Object.assign(Object.assign({}, datosRepresetante), { 
                                                                                 //@ts-ignore
                                                                                 phone: e.target.value }));

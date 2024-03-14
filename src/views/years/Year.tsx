@@ -58,6 +58,8 @@ const Year = (): JSX.Element => {
     setOpenAddArea(false);
   };
 
+  const user = JSON.parse(localStorage.getItem("token") || "{}");
+
   const [letter, setLetter] = React.useState("");
 
   const handleChange = (event) => {
@@ -103,7 +105,11 @@ const Year = (): JSX.Element => {
 
   const insertSeccion = async (seccion) => {
     // @ts-ignore
-    const data = await window.API.insertSeccion({ seccion, anio: id });
+    const data = await window.API.insertSeccion({
+      seccion,
+      anio: id,
+      usuario: user.email,
+    });
 
     if (data) {
       getData();
@@ -118,7 +124,11 @@ const Year = (): JSX.Element => {
   };
   const insertArea = async (nombre) => {
     // @ts-ignore
-    const data = await window.API.insertArea({ area: nombre, anio: id });
+    const data = await window.API.insertArea({
+      area: nombre,
+      anio: id,
+      usuario: user.email,
+    });
 
     if (data) {
       getData();
