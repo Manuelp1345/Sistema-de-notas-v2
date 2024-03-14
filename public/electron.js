@@ -953,6 +953,7 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
             });
             const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
                 where: {
+                    id: "1",
                     Etapas: {
                         anio: {
                             periodo: {
@@ -987,11 +988,34 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                 let promedio = 0;
                 let recuperacionCount = 0;
                 let materiaCount = 0;
-                const estapaReprobada = alumno.Etapas.find((etapa) => etapa.estado === "Reprobado");
+                console.log(alumno.Etapas);
+                const estapaReprobada = yield transaction
+                    .getRepository(etapas_1.Etapas)
+                    .findOne({
+                    where: {
+                        alumno: {
+                            id: alumno.id,
+                        },
+                        estado: "Reprobado",
+                    },
+                    relations: {
+                        anio: true,
+                    },
+                });
                 if (estapaReprobada) {
                     console.log("Estapa Reprobada", estapaReprobada);
-                    const materiasAlumno = estapaReprobada[0].notas;
-                    for (const notas of materiasAlumno) {
+                    const notasAlumno = yield transaction.getRepository(nota_1.Nota).find({
+                        where: {
+                            alumno: {
+                                id: alumno.id,
+                            },
+                            anio: {
+                                id: estapaReprobada.anio.id,
+                            },
+                        },
+                        relations: ["materia"],
+                    });
+                    for (const notas of notasAlumno) {
                         let notaCount = 0;
                         let promedioMateria = 0;
                         const notaMomentoOne = alumno.notas.find((nota) => nota.materia.id === notas.id && nota.momento === "1");

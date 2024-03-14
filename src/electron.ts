@@ -974,6 +974,7 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
 
       const alumnos = await transaction.getRepository(Alumno).find({
         where: {
+          id: "1",
           Etapas: {
             anio: {
               periodo: {
@@ -1010,15 +1011,35 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
         let promedio = 0;
         let recuperacionCount = 0;
         let materiaCount = 0;
-
-        const estapaReprobada = alumno.Etapas.find(
-          (etapa) => etapa.estado === "Reprobado"
-        );
+        console.log(alumno.Etapas);
+        const estapaReprobada = await transaction
+          .getRepository(Etapas)
+          .findOne({
+            where: {
+              alumno: {
+                id: alumno.id,
+              },
+              estado: "Reprobado",
+            },
+            relations: {
+              anio: true,
+            },
+          });
 
         if (estapaReprobada) {
           console.log("Estapa Reprobada", estapaReprobada);
-          const materiasAlumno = estapaReprobada[0].notas;
-          for (const notas of materiasAlumno) {
+          const notasAlumno = await transaction.getRepository(Nota).find({
+            where: {
+              alumno: {
+                id: alumno.id,
+              },
+              anio: {
+                id: estapaReprobada.anio.id,
+              },
+            },
+            relations: ["materia"],
+          });
+          for (const notas of notasAlumno) {
             let notaCount = 0;
             let promedioMateria = 0;
 
