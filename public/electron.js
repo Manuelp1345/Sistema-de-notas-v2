@@ -953,7 +953,6 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
             });
             const alumnos = yield transaction.getRepository(alumnos_1.Alumno).find({
                 where: {
-                    id: "1",
                     Etapas: {
                         anio: {
                             periodo: {
@@ -1001,7 +1000,6 @@ electron_1.ipcMain.handle("GRADE_ALUMNOS", (event, data) => __awaiter(void 0, vo
                         anio: true,
                     },
                 });
-                console.log("estapaReprobada", estapaReprobada && estapaReprobada.anio.id);
                 if (estapaReprobada) {
                     const notasAlumno = yield transaction.getRepository(nota_1.Nota).find({
                         where: {

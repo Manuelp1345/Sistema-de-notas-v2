@@ -974,7 +974,6 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
 
       const alumnos = await transaction.getRepository(Alumno).find({
         where: {
-          id: "1",
           Etapas: {
             anio: {
               periodo: {
@@ -1025,10 +1024,6 @@ ipcMain.handle("GRADE_ALUMNOS", async (event, data) => {
               anio: true,
             },
           });
-        console.log(
-          "estapaReprobada",
-          estapaReprobada && estapaReprobada.anio.id
-        );
         if (estapaReprobada) {
           const notasAlumno = await transaction.getRepository(Nota).find({
             where: {
