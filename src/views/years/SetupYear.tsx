@@ -21,7 +21,7 @@ import { CustomModal } from "../modals/customModal";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import GradeIcon from "@mui/icons-material/Grade";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -218,6 +218,22 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
       await getData();
     })();
   }, []);
+
+  React.useEffect(() => {
+    console.log(periodo, "periodo");
+    if (openAddPeriodo && periodo) {
+      // @ts-ignore
+      const splitPeriodo = periodo?.split(" - ");
+      const yearOne = Number(splitPeriodo[0]) + 1;
+      const yearTwo = Number(splitPeriodo[1]) + 1;
+
+      setValue((prev) => ({
+        ...prev,
+        yearOne: yearOne.toString(),
+        yearTwo: yearTwo.toString(),
+      }));
+    }
+  }, [openAddPeriodo]);
 
   return (
     <Box
@@ -459,44 +475,79 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
         }}
       >
         <Typography>
-          "¡Advertencia! Una vez que ingrese un nuevo periodo, no podrá editarlo
+          ¡Advertencia! Una vez que ingrese un nuevo periodo, no podrá editarlo
           ni eliminarlo. <br /> Asegúrese de verificar cuidadosamente la
-          información antes de guardar. ¿Desea continuar?"
+          información antes de guardar. ¿Desea continuar?
         </Typography>
         <FormGroup
           sx={{
             gap: 2,
             mt: 2,
+            px: 4,
           }}
         >
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              views={["year"]}
-              label="Desde"
-              value={value?.yearOne}
-              onChange={(newValue: Moment | null) => {
-                setValue({
-                  ...value,
-                  yearOne: newValue?.format("YYYY") as string,
-                });
+          <>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                views={["year"]}
+                label="Año Inicial"
+                value={value?.yearOne}
+                //@ts-ignore
+                minDate={moment(periodo?.split(" - ")[1], "YYYY")?.toDate()}
+                onChange={(newValue: Moment | null) => {
+                  if (
+                    Number(
+                      //@ts-ignore
+                      moment(periodo?.split(" - ")[1], "YYYY").format("YYYY")
+                    ) > Number(newValue?.format("YYYY"))
+                  ) {
+                    setValue({
+                      ...value,
+                      //@ts-ignore
+                      yearOne: moment(periodo?.split(" - ")[1], "YYYY").format(
+                        "YYYY"
+                      ),
+                      yearTwo:
+                        //@ts-ignore
+                        moment(periodo?.split(" - ")[1], "YYYY")
+                          .add(1, "year")
+                          .format("YYYY"),
+                    });
+                    return Swal.fire({
+                      title:
+                        "El año inicial no puede ser mayor al año final del periodo",
+                      icon: "error",
+                      showConfirmButton: false,
+                      timer: 1500,
+                    });
+                  }
+                  setValue({
+                    ...value,
+                    yearOne: newValue?.format("YYYY") as string,
+                    yearTwo: (Number(newValue?.format("YYYY")) + 1).toString(),
+                  });
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </LocalizationProvider>
+            <Typography
+              sx={{
+                mt: 2,
               }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              views={["year"]}
-              label="Hasta"
-              value={value?.yearTwo}
-              onChange={(newValue: Moment | null) => {
-                setValue({
-                  ...value,
-                  yearTwo: newValue?.format("YYYY") as string,
-                });
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
+            >
+              <span
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                El nuevo periodo será el siguiente:
+              </span>{" "}
+              {value.yearOne &&
+                value.yearOne !== "" &&
+                value.yearOne !== "Invalid date" &&
+                `${value.yearOne} - ${value.yearTwo}`}
+            </Typography>
+          </>
         </FormGroup>
       </CustomModal>
       <CustomModal
@@ -564,36 +615,71 @@ const SetupYear = ({ idPeriodo }: { idPeriodo: number }): JSX.Element => {
           sx={{
             gap: 2,
             mt: 2,
+            px: 4,
           }}
         >
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              views={["year"]}
-              label="Desde"
-              value={value?.yearOne}
-              onChange={(newValue: Moment | null) => {
-                setValue({
-                  ...value,
-                  yearOne: newValue?.format("YYYY") as string,
-                });
+          <>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DatePicker
+                views={["year"]}
+                label="Año Inicial"
+                value={value?.yearOne}
+                //@ts-ignore
+                minDate={moment(periodo?.split(" - ")[1], "YYYY")?.toDate()}
+                onChange={(newValue: Moment | null) => {
+                  if (
+                    Number(
+                      //@ts-ignore
+                      moment(periodo?.split(" - ")[1], "YYYY").format("YYYY")
+                    ) > Number(newValue?.format("YYYY"))
+                  ) {
+                    setValue({
+                      ...value,
+                      //@ts-ignore
+                      yearOne: moment(periodo?.split(" - ")[1], "YYYY").format(
+                        "YYYY"
+                      ),
+                      yearTwo:
+                        //@ts-ignore
+                        moment(periodo?.split(" - ")[1], "YYYY")
+                          .add(1, "year")
+                          .format("YYYY"),
+                    });
+                    return Swal.fire({
+                      title:
+                        "El año inicial no puede ser mayor al año final del periodo",
+                      icon: "error",
+                      showConfirmButton: false,
+                      timer: 1500,
+                    });
+                  }
+                  setValue({
+                    ...value,
+                    yearOne: newValue?.format("YYYY") as string,
+                    yearTwo: (Number(newValue?.format("YYYY")) + 1).toString(),
+                  });
+                }}
+                renderInput={(params) => <TextField {...params} />}
+              />
+            </LocalizationProvider>
+            <Typography
+              sx={{
+                mt: 2,
               }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DatePicker
-              views={["year"]}
-              label="Hasta"
-              value={value?.yearTwo}
-              onChange={(newValue: Moment | null) => {
-                setValue({
-                  ...value,
-                  yearTwo: newValue?.format("YYYY") as string,
-                });
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
-          </LocalizationProvider>
+            >
+              <span
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                El nuevo periodo será el siguiente:
+              </span>{" "}
+              {value.yearOne &&
+                value.yearOne !== "" &&
+                value.yearOne !== "Invalid date" &&
+                `${value.yearOne} - ${value.yearTwo}`}
+            </Typography>
+          </>
         </FormGroup>
       </CustomModal>
     </Box>

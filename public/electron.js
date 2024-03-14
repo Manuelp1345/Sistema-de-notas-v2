@@ -1267,7 +1267,7 @@ electron_1.ipcMain.handle("GENERAR_BOLETIN", (event, data) => __awaiter(void 0, 
     const reponseDialog = yield electron_1.dialog.showSaveDialog({
         title: "Guardar archivo",
         //@ts-ignore
-        defaultPath: `${electron_1.app.getPath("documents")}/boletin.xlsx`,
+        defaultPath: `${electron_1.app.getPath("documents")}/boletin-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.firstName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondName}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.Surname}-${alumno === null || alumno === void 0 ? void 0 : alumno.DatosPersonales.secondSurname}.xlsx`,
         filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
     });
     if (reponseDialog.canceled)

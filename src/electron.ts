@@ -1390,7 +1390,11 @@ ipcMain.handle("GENERAR_BOLETIN", async (event, data) => {
   const reponseDialog = await dialog.showSaveDialog({
     title: "Guardar archivo",
     //@ts-ignore
-    defaultPath: `${app.getPath("documents")}/boletin.xlsx`,
+    defaultPath: `${app.getPath("documents")}/boletin-${
+      alumno?.DatosPersonales.firstName
+    }-${alumno?.DatosPersonales.secondName}-${
+      alumno?.DatosPersonales.Surname
+    }-${alumno?.DatosPersonales.secondSurname}.xlsx`,
     filters: [{ name: "Archivos de Excel", extensions: ["xlsx"] }],
   });
   if (reponseDialog.canceled) return "cancelado";

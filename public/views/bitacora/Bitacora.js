@@ -62,7 +62,7 @@ function Bitacora() {
         { field: "id", headerName: "ID", width: 20, hide: true },
         { field: "accion", headerName: "Acción", width: 100 },
         { field: "usuario", headerName: "Usuario", width: 200 },
-        { field: "descripcion", headerName: "Descripción", width: 300 },
+        { field: "descripcion", headerName: "Descripción", width: 300, flex: 1 },
         { field: "fecha", headerName: "Fecha", width: 150 },
         { field: "hora", headerName: "Hora", width: 150 },
     ];
